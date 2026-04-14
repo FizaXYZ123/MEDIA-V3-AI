@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "phone_counters",
+  "info": {
+    "singularName": "phone-counter",
+    "pluralName": "phone-counters",
+    "displayName": "phoneCounter"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "date": {
+      "type": "datetime"
+    },
+    "count": {
+      "type": "integer"
+    }
+  }
+}

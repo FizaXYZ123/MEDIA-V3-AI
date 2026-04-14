@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "plans",
+  "info": {
+    "singularName": "plan",
+    "pluralName": "plans",
+    "displayName": "Plan",
+    "description": "Subscription plans available to artists"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "price": {
+      "type": "decimal",
+      "default": 0
+    },
+    "billingCycle": {
+      "type": "enumeration",
+      "enum": [
+        "yearly"
+      ],
+      "default": "yearly"
+    },
+    "defaultCommission": {
+      "type": "decimal",
+      "default": 0
+    },
+    "isContactSales": {
+      "type": "boolean",
+      "default": false
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "plan"
+    },
+    "default_label_fee": {
+      "type": "integer"
+    },
+    "default_admin_fee": {
+      "type": "integer"
+    },
+    "maxPrimaryArtists": {
+      "type": "string"
+    }
+  }
+}

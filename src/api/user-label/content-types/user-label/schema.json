@@ -1,0 +1,20 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_labels",
+  "info": {
+    "singularName": "user-label",
+    "pluralName": "user-labels",
+    "displayName": "User Label",
+    "description": "Per-user private labels for releases/tracks"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "label": { "type": "string", "required": true },
+    "labelLower": { "type": "string" },
+    "owner": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "artist_details",
+  "info": {
+    "singularName": "artist-detail",
+    "pluralName": "artist-details",
+    "displayName": "artist_details",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "artistName": {
+      "type": "string",
+      "required": true
+    },
+    "roleName": {
+      "type": "string"
+    },
+    "appleMusicId": {
+      "type": "string"
+    },
+    "spotifyId": {
+      "type": "string"
+    },
+    "youtubeUsername": {
+      "type": "string"
+    },
+    "soundcloudPage": {
+      "type": "string"
+    },
+    "facebookPage": {
+      "type": "string"
+    },
+    "twitterUsername": {
+      "type": "string"
+    },
+    "websiteUrl": {
+      "type": "string"
+    },
+    "biography": {
+      "type": "text"
+    },
+    "owner": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "artist_details"
+    },
+    "tracks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::distribute-track.distribute-track",
+      "inversedBy": "artistDetails"
+    },
+    "Profile_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "itsVerified": {
+      "type": "boolean",
+      "default": false
+    },
+    "requiredVerification": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

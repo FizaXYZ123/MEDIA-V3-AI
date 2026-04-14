@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "admin_fee_histories",
+  "info": {
+    "singularName": "admin-fee-history",
+    "pluralName": "admin-fee-histories",
+    "displayName": "admin-fee-history"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "feePercentage": {
+      "type": "integer"
+    },
+    "effective_from": {
+      "type": "datetime"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "admin_fee_histories"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "xyz-media-backend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A Strapi application",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@getbrevo/brevo": "^4.0.1",
+    "@sendgrid/mail": "^8.1.5",
+    "@strapi/plugin-cloud": "4.24.0",
+    "@strapi/plugin-documentation": "^4.24.0",
+    "@strapi/plugin-i18n": "4.24.0",
+    "@strapi/plugin-users-permissions": "4.24.0",
+    "@strapi/provider-upload-aws-s3": "^5.38.0",
+    "@strapi/strapi": "4.24.0",
+    "axios": "^1.13.6",
+    "csv-parser": "^3.2.0",
+    "google-auth-library": "^10.6.2",
+    "node-cron": "^4.2.1",
+    "patch-package": "^8.0.0",
+    "pg": "8.8.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "5.3.4",
+    "sharp": "0.32.6",
+    "strapi-provider-email-brevo": "^1.0.4",
+    "styled-components": "5.3.3"
+  },
+  "author": {
+    "name": "A Strapi developer"
+  },
+  "strapi": {
+    "uuid": "ccf811cd-8ef9-48a8-95ab-a8831f16b466"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.4.0"
+  }
+}

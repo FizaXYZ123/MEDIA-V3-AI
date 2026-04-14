@@ -1,0 +1,100 @@
+"use strict";
+
+const path = require("node:path");
+
+module.exports = {
+  routes: [
+    {
+      method: "POST",
+      path: "/royalty-report/import",
+      handler: "custom-royalty-report.importReport",
+      config: {
+        auth: {}
+      }
+    },
+    {
+      method: "GET",
+      path: "/search-reports",
+      handler: "custom-royalty-report.searchReports",
+      config: {
+        auth: {}
+      }
+    },
+
+    // USER-SPECIFIC ENDPOINTS
+    {
+      method: "GET",
+      path: "/user/track-earnings",
+      handler: "custom-royalty-report.getTrackEarnings",
+      config: {
+        auth: {},
+      }
+    },
+    {
+      method: "GET",
+      path: "/user/streams-per-platform",
+      handler: "custom-royalty-report.userStreamsPerPlatform",
+      config: {
+        auth: {}
+      }
+    },
+    {
+      method: "GET",
+      path: "/user/country-earnings",
+      handler: "custom-royalty-report.userCountryEarnings",
+      config: {
+        auth: {}
+      }
+    },
+    {
+      method: "GET",
+      path: "/user/earnings-per-month",
+      handler: "custom-royalty-report.getUserEarningsPerMonth",
+      config: {
+        auth: {}
+      }
+    },
+     {
+      method: "GET",
+      path: "/user/streams-per-month",
+      handler: "custom-royalty-report.getUserStreamsPerMonth",
+      config: {
+        auth: {}
+      }
+    },
+      {
+      method: "GET",
+      path: "/user/streams-per-platform-per-month",
+      handler: "custom-royalty-report.getUserStreamsPerPlatform",
+      config: {
+        auth: {}
+      }
+    },
+
+    // V3 — Priority 12: enhanced analytics endpoints
+    {
+      method: "GET",
+      path: "/user/analytics/overview",
+      handler: "custom-royalty-report.analyticsOverview",
+      config: { auth: {} },
+    },
+    {
+      method: "GET",
+      path: "/user/analytics/by-dsp",
+      handler: "custom-royalty-report.analyticsByDsp",
+      config: { auth: {} },
+    },
+    {
+      method: "GET",
+      path: "/user/analytics/by-release/:id",
+      handler: "custom-royalty-report.analyticsByRelease",
+      config: { auth: {} },
+    },
+    {
+      method: "GET",
+      path: "/user/analytics/by-country",
+      handler: "custom-royalty-report.analyticsByCountry",
+      config: { auth: {} },
+    }
+  ]
+};

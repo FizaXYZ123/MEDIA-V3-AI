@@ -1,0 +1,119 @@
+{
+  "kind": "collectionType",
+  "collectionName": "distribute_drafts",
+  "info": {
+    "singularName": "distribute-draft",
+    "pluralName": "distribute-drafts",
+    "displayName": "distributeDraft",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "ReleaseType": {
+      "type": "enumeration",
+      "enum": [
+        "Single",
+        "EP",
+        "Album"
+      ],
+      "required": true
+    },
+    "ReleaseTitle": {
+      "type": "string",
+      "required": true
+    },
+    "Version": {
+      "type": "enumeration",
+      "enum": [
+        "Remaster",
+        "Live",
+        "Remix",
+        "Other"
+      ]
+    },
+    "LanguageOfTheTitles": {
+      "type": "string"
+    },
+    "PrimaryGenre": {
+      "type": "string"
+    },
+    "SecondaryGenre": {
+      "type": "string"
+    },
+    "AddLabel": {
+      "type": "string"
+    },
+    "CoverArt": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "Priority": {
+      "type": "enumeration",
+      "enum": [
+        "Standard",
+        "Priority"
+      ],
+      "default": "Standard"
+    },
+    "TimeZoneOfReference": {
+      "type": "string"
+    },
+    "OriginalReleaseDate": {
+      "type": "date"
+    },
+    "Countries": {
+      "type": "json"
+    },
+    "MusicStores": {
+      "type": "json"
+    },
+    "CopyrightYear": {
+      "type": "integer"
+    },
+    "PhonogramRightsHolderName": {
+      "type": "string"
+    },
+    "PhonogramRightsHolderYear": {
+      "type": "integer"
+    },
+    "PriceCategory": {
+      "type": "enumeration",
+      "enum": [
+        "Budget",
+        "Mid",
+        "Full",
+        "Premium"
+      ]
+    },
+    "TrackList": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::distribute-track.distribute-track",
+      "mappedBy": "DraftRelease"
+    },
+    "DigitalReleaseDate": {
+      "type": "date"
+    },
+    "ReleaseTime": {
+      "type": "time"
+    },
+    "CopyrightholderName": {
+      "type": "string"
+    },
+    "UserDetail": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "distribute_drafts"
+    },
+    "CompletedSteps": {
+      "type": "string"
+    }
+  }
+}

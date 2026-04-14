@@ -1,0 +1,32 @@
+{
+  "kind": "singleType",
+  "collectionName": "global_settings",
+  "info": {
+    "singularName": "global-setting",
+    "pluralName": "global-settings",
+    "displayName": "Global Setting",
+    "description": "Platform-wide defaults for fees, payouts, and pricing"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "defaultSonosuiteCut": {
+      "type": "decimal",
+      "default": 15
+    },
+    "defaultPlatformFee": {
+      "type": "decimal",
+      "default": 5
+    },
+    "minimumPayoutThreshold": {
+      "type": "decimal",
+      "default": 50
+    },
+    "fastReleaseFeePerTrack": {
+      "type": "decimal",
+      "default": 13
+    }
+  }
+}

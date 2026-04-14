@@ -1,0 +1,96 @@
+{
+  "kind": "collectionType",
+  "collectionName": "distribute_tracks",
+  "info": {
+    "singularName": "distribute-track",
+    "pluralName": "distribute-tracks",
+    "displayName": "distributeTrack",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "DraftRelease": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::distribute-draft.distribute-draft",
+      "inversedBy": "TrackList"
+    },
+    "PublishedRelease": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::publish-distribute.publish-distribute",
+      "inversedBy": "TrackList"
+    },
+    "TrackName": {
+      "type": "string",
+      "required": true
+    },
+    "TrackUpload": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "audios"
+      ]
+    },
+    "PrimaryGenre": {
+      "type": "string"
+    },
+    "SecondaryGenre": {
+      "type": "string"
+    },
+    "RoleCredits": {
+      "type": "json"
+    },
+    "LyricsAvailable": {
+      "type": "boolean",
+      "default": false
+    },
+    "AppropriateForAllAudiences": {
+      "type": "boolean",
+      "default": true
+    },
+    "ContainsExplicitContent": {
+      "type": "boolean",
+      "default": false
+    },
+    "CleanVersionAvailable": {
+      "type": "boolean",
+      "default": false
+    },
+    "ISRC": {
+      "type": "string"
+    },
+    "ISWC": {
+      "type": "string"
+    },
+    "RequestANewISRC": {
+      "type": "boolean",
+      "default": false
+    },
+    "Status": {
+      "type": "enumeration",
+      "enum": [
+        "In-Progress",
+        "Completed",
+        "Pending",
+        "In-Review",
+        "Cancelled"
+      ]
+    },
+    "artistDetails": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::artist-detail.artist-detail",
+      "mappedBy": "tracks"
+    },
+    "royalty_reports": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::royalty-report.royalty-report",
+      "mappedBy": "distribute_track"
+    }
+  }
+}

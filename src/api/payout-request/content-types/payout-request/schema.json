@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payout_requests",
+  "info": {
+    "singularName": "payout-request",
+    "pluralName": "payout-requests",
+    "displayName": "Payout Request",
+    "description": "Artist withdrawal requests against available balance"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "payout_requests"
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "approved",
+        "processing",
+        "completed",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "reviewedBy": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "reviewedAt": {
+      "type": "datetime"
+    },
+    "completedAt": {
+      "type": "datetime"
+    },
+    "rejectionReason": {
+      "type": "text"
+    },
+    "paymentMethodSnapshot": {
+      "type": "json"
+    },
+    "transactionReference": {
+      "type": "string"
+    }
+  }
+}

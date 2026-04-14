@@ -1,0 +1,132 @@
+{
+  "kind": "collectionType",
+  "collectionName": "publish_distributes",
+  "info": {
+    "singularName": "publish-distribute",
+    "pluralName": "publish-distributes",
+    "displayName": "PublishDistribute",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ReleaseType": {
+      "type": "enumeration",
+      "enum": [
+        "Single",
+        "EP",
+        "Album"
+      ],
+      "required": true
+    },
+    "ReleaseTitle": {
+      "type": "string",
+      "required": true
+    },
+    "Version": {
+      "type": "enumeration",
+      "enum": [
+        "Remaster",
+        "Live",
+        "Remix",
+        "Other"
+      ]
+    },
+    "LanguageOfTheTitles": {
+      "type": "string"
+    },
+    "PrimaryGenre": {
+      "type": "string"
+    },
+    "SecondaryGenre": {
+      "type": "string"
+    },
+    "AddLabel": {
+      "type": "string"
+    },
+    "CoverArt": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "Priority": {
+      "type": "enumeration",
+      "enum": [
+        "Standard",
+        "Priority"
+      ],
+      "default": "Standard"
+    },
+    "TimeZoneOfReference": {
+      "type": "string"
+    },
+    "OriginalReleaseDate": {
+      "type": "date"
+    },
+    "Countries": {
+      "type": "json"
+    },
+    "MusicStores": {
+      "type": "json"
+    },
+    "CopyrightYear": {
+      "type": "integer"
+    },
+    "PhonogramRightsHolderName": {
+      "type": "string"
+    },
+    "PhonogramRightsHolderYear": {
+      "type": "integer"
+    },
+    "PriceCategory": {
+      "type": "enumeration",
+      "enum": [
+        "Budget",
+        "Mid",
+        "Full",
+        "Premium"
+      ]
+    },
+    "TrackList": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::distribute-track.distribute-track",
+      "mappedBy": "PublishedRelease"
+    },
+    "DigitalReleaseDate": {
+      "type": "date"
+    },
+    "ReleaseTime": {
+      "type": "time"
+    },
+    "CopyrightholderName": {
+      "type": "string"
+    },
+    "UserDetail": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "distribute_drafts"
+    },
+    "Status": {
+      "type": "enumeration",
+      "enum": [
+        "In-Progress",
+        "Completed",
+        "Cancelled"
+      ],
+      "default": "In-Progress"
+    },
+    "published_track_update_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::published-track-update-log.published-track-update-log",
+      "mappedBy": "publish_distribute"
+    }
+  }
+}

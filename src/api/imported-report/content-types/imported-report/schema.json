@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "imported_reports",
+  "info": {
+    "singularName": "imported-report",
+    "pluralName": "imported-reports",
+    "displayName": "imported-report"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "FileName": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "totalNet": {
+      "type": "decimal"
+    },
+    "skippedNet": {
+      "type": "decimal"
+    },
+    "CommissionPercent": {
+      "type": "decimal"
+    },
+    "OriginalTotal": {
+      "type": "decimal"
+    }
+  }
+}

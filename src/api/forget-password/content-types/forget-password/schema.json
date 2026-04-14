@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forget_passwords",
+  "info": {
+    "singularName": "forget-password",
+    "pluralName": "forget-passwords",
+    "displayName": "forget-password",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "otp": {
+      "type": "string"
+    },
+    "otpExpiry": {
+      "type": "datetime"
+    },
+    "otpVerified": {
+      "type": "boolean",
+      "default": false
+    },
+    "email": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "invoices",
+  "info": {
+    "singularName": "invoice",
+    "pluralName": "invoices",
+    "displayName": "invoices"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "month": {
+      "type": "integer",
+      "required": true
+    },
+    "year": {
+      "type": "integer",
+      "required": true
+    },
+    "totalEarnings": {
+      "type": "decimal",
+      "required": true
+    },
+    "labelFeePercentage": {
+      "type": "integer",
+      "default": 0
+    },
+    "labelFeeAmount": {
+      "type": "decimal",
+      "required": false,
+      "default": 0
+    },
+    "amountPayableBeforeAdminFee": {
+      "type": "decimal",
+      "default": 0
+    },
+    "adminFeePercentage": {
+      "type": "integer",
+      "default": 0
+    },
+    "adminFeeAmount": {
+      "type": "decimal",
+      "default": 0
+    },
+    "finalAmountPayable": {
+      "type": "decimal",
+      "required": true
+    },
+    "invoiceDate": {
+      "type": "datetime"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "invoices"
+    }
+  }
+}

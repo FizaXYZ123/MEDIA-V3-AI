@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "published_track_update_logs",
+  "info": {
+    "singularName": "published-track-update-log",
+    "pluralName": "published-track-update-logs",
+    "displayName": "published-track-update-logs"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "changes": {
+      "type": "json"
+    },
+    "publish_distribute": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::publish-distribute.publish-distribute",
+      "inversedBy": "published_track_update_logs"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "published_track_update_logs"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "label_fee_histories",
+  "info": {
+    "singularName": "label-fee-history",
+    "pluralName": "label-fee-histories",
+    "displayName": "label-fee-history"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "feePercentage": {
+      "type": "integer"
+    },
+    "effective_from": {
+      "type": "datetime"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "label_fee_histories"
+    }
+  }
+}
