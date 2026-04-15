@@ -19,14 +19,27 @@ module.exports = {
       userId
     );
 
-    // FREE PLAN
-    if (plan.price == 0) {
-      return { message: "Free plan activated" };
+    // ✅ FREE PLAN 
+    if (Number(plan.price) === 0) {
+      const handleSuccess = require("../../../utils/handle-success");
+
+      await handleSuccess({
+        metadata: {
+          userId: userId.toString(),
+          planId: plan.id.toString(),
+        },
+      });
+
+      return {
+        message: "Free plan activated successfully",
+      };
     }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: user.email,
+
+      payment_method_types: ["card", "upi"],
 
       line_items: [
         {
@@ -41,11 +54,11 @@ module.exports = {
 
       metadata: {
         userId: userId.toString(),
-       planId: plan.id.toString(), 
+        planId: plan.id.toString(),
       },
 
-      success_url: "http://localhost:3000/success",
-      cancel_url: "http://localhost:3000/cancel",
+      success_url: "http://localhost:5173/payment-success",
+      cancel_url: "http://localhost:5173/payment-cancel",
     });
 
     return { url: session.url };
