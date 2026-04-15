@@ -37,6 +37,7 @@ module.exports = [
       formidable: {
         maxFileSize: 100 * 1024 * 1024, // 100MB
       },
+      includeUnparsed: true,
     },
   },
   'strapi::session',

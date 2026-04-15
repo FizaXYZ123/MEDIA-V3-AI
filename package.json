@@ -30,6 +30,7 @@
     "react-router-dom": "5.3.4",
     "sharp": "0.32.6",
     "strapi-provider-email-brevo": "^1.0.4",
+    "stripe": "^22.0.1",
     "styled-components": "5.3.3"
   },
   "author": {
@@ -44,6 +45,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^25.4.0"
+    "@types/node": "^25.6.0"
   }
 }

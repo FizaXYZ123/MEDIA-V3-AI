@@ -14,11 +14,8 @@
   "attributes": {
     "name": {
       "type": "string",
-      "required": true
-    },
-    "slug": {
-      "type": "uid",
-      "targetField": "name"
+      "required": true,
+      "unique": true
     },
     "price": {
       "type": "decimal",
@@ -35,23 +32,9 @@
       "type": "decimal",
       "default": 0
     },
-    "isContactSales": {
-      "type": "boolean",
-      "default": false
-    },
     "isActive": {
       "type": "boolean",
       "default": true
-    },
-    "sortOrder": {
-      "type": "integer",
-      "default": 0
-    },
-    "users_permissions_users": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "plan"
     },
     "default_label_fee": {
       "type": "integer"
@@ -61,6 +44,12 @@
     },
     "maxPrimaryArtists": {
       "type": "string"
+    },
+    "user_subscriptions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-subscription.user-subscription",
+      "mappedBy": "plan"
     }
   }
 }

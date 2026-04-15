@@ -158,31 +158,17 @@
     "paymentMethod": {
       "type": "json"
     },
-    "subscriptionStatus": {
-      "type": "enumeration",
-      "enum": [
-        "active",
-        "expired",
-        "cancelled"
-      ]
-    },
-    "subscriptionStartDate": {
-      "type": "date"
-    },
-    "subscriptionEndDate": {
-      "type": "date"
-    },
-    "plan": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::plan.plan",
-      "inversedBy": "users_permissions_users"
-    },
     "payout_requests": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::payout-request.payout-request",
       "mappedBy": "user"
+    },
+    "user_subscriptions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-subscription.user-subscription",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

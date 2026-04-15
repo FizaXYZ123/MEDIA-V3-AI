@@ -817,20 +817,15 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     availableBalance: Attribute.Decimal & Attribute.DefaultTo<0>;
     pendingBalance: Attribute.Decimal & Attribute.DefaultTo<0>;
     paymentMethod: Attribute.JSON;
-    subscriptionStatus: Attribute.Enumeration<
-      ['active', 'expired', 'cancelled']
-    >;
-    subscriptionStartDate: Attribute.Date;
-    subscriptionEndDate: Attribute.Date;
-    plan: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'manyToOne',
-      'api::plan.plan'
-    >;
     payout_requests: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::payout-request.payout-request'
+    >;
+    user_subscriptions: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::user-subscription.user-subscription'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1492,23 +1487,20 @@ export interface ApiPlanPlan extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    name: Attribute.String & Attribute.Required;
-    slug: Attribute.UID<'api::plan.plan', 'name'>;
+    name: Attribute.String & Attribute.Required & Attribute.Unique;
     price: Attribute.Decimal & Attribute.DefaultTo<0>;
     billingCycle: Attribute.Enumeration<['yearly']> &
       Attribute.DefaultTo<'yearly'>;
     defaultCommission: Attribute.Decimal & Attribute.DefaultTo<0>;
-    isContactSales: Attribute.Boolean & Attribute.DefaultTo<false>;
     isActive: Attribute.Boolean & Attribute.DefaultTo<true>;
-    sortOrder: Attribute.Integer & Attribute.DefaultTo<0>;
-    users_permissions_users: Attribute.Relation<
-      'api::plan.plan',
-      'oneToMany',
-      'plugin::users-permissions.user'
-    >;
     default_label_fee: Attribute.Integer;
     default_admin_fee: Attribute.Integer;
     maxPrimaryArtists: Attribute.String;
+    user_subscriptions: Attribute.Relation<
+      'api::plan.plan',
+      'oneToMany',
+      'api::user-subscription.user-subscription'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1864,6 +1856,50 @@ export interface ApiUserLabelUserLabel extends Schema.CollectionType {
   };
 }
 
+export interface ApiUserSubscriptionUserSubscription
+  extends Schema.CollectionType {
+  collectionName: 'user_subscriptions';
+  info: {
+    singularName: 'user-subscription';
+    pluralName: 'user-subscriptions';
+    displayName: 'user-subscription';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    users_permissions_user: Attribute.Relation<
+      'api::user-subscription.user-subscription',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    startDate: Attribute.DateTime;
+    endDate: Attribute.DateTime;
+    status: Attribute.Enumeration<['active', 'expired', 'canceled']>;
+    plan: Attribute.Relation<
+      'api::user-subscription.user-subscription',
+      'manyToOne',
+      'api::plan.plan'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::user-subscription.user-subscription',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::user-subscription.user-subscription',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -1905,6 +1941,7 @@ declare module '@strapi/types' {
       'api::ticket-message.ticket-message': ApiTicketMessageTicketMessage;
       'api::ticket-raise.ticket-raise': ApiTicketRaiseTicketRaise;
       'api::user-label.user-label': ApiUserLabelUserLabel;
+      'api::user-subscription.user-subscription': ApiUserSubscriptionUserSubscription;
     }
   }
 }

@@ -1,7 +1,6 @@
 'use strict';
 
 const utils = require('@strapi/utils');
-const { getService } = require('@strapi/plugin-users-permissions/server/utils');
 const { ApplicationError, ValidationError } = utils.errors;
 
 module.exports = {
@@ -19,7 +18,7 @@ module.exports = {
           { username: identifier },
         ],
       },
-      populate: ['role'], // ✅ populate role
+      populate: ['role'],
     });
 
     if (!user) {
@@ -27,7 +26,8 @@ module.exports = {
     }
 
     const validPassword = await strapi
-      .service('plugin::users-permissions.user')
+      .plugin('users-permissions')
+      .service('user')
       .validatePassword(password, user.password);
 
     if (!validPassword) {
@@ -35,7 +35,8 @@ module.exports = {
     }
 
     const token = strapi
-      .service('plugin::users-permissions.jwt')
+      .plugin('users-permissions')
+      .service('jwt')
       .issue({ id: user.id });
 
     ctx.body = {
@@ -44,15 +45,16 @@ module.exports = {
         id: user.id,
         username: user.username,
         email: user.email,
-        role: user.role ? {
-          id: user.role.id,
-          name: user.role.name,
-          type: user.role.type,
-        } : null,
+        role: user.role
+          ? {
+              id: user.role.id,
+              name: user.role.name,
+              type: user.role.type,
+            }
+          : null,
       },
     };
   },
-
 
   async register(ctx) {
     const pluginStore = await strapi.store({
@@ -67,8 +69,9 @@ module.exports = {
       throw new ValidationError('Please provide email, username, and password');
     }
 
-    const userService = getService('user');
-    const roleService = getService('role');
+    // ✅ FIX: use plugin service directly
+    const userService = strapi.plugin('users-permissions').service('user');
+    const roleService = strapi.plugin('users-permissions').service('role');
 
     const defaultRole = await roleService.getDefaultRole();
 
@@ -86,7 +89,8 @@ module.exports = {
     });
 
     const jwt = strapi
-      .service('plugin::users-permissions.jwt')
+      .plugin('users-permissions')
+      .service('jwt')
       .issue({ id: user.id });
 
     ctx.body = {
@@ -95,16 +99,17 @@ module.exports = {
         id: userWithRole.id,
         username: userWithRole.username,
         email: userWithRole.email,
-        role: userWithRole.role ? {
-          id: userWithRole.role.id,
-          name: userWithRole.role.name,
-          type: userWithRole.role.type,
-        } : null,
+        role: userWithRole.role
+          ? {
+              id: userWithRole.role.id,
+              name: userWithRole.role.name,
+              type: userWithRole.role.type,
+            }
+          : null,
       },
     };
   },
 
-  // ✅ Add "me" endpoint
   async me(ctx) {
     const user = ctx.state.user;
 
@@ -124,12 +129,13 @@ module.exports = {
       id: userWithRole.id,
       username: userWithRole.username,
       email: userWithRole.email,
-      role: userWithRole.role ? {
-        id: userWithRole.role.id,
-        name: userWithRole.role.name,
-        type: userWithRole.role.type,
-      } : null,
+      role: userWithRole.role
+        ? {
+            id: userWithRole.role.id,
+            name: userWithRole.role.name,
+            type: userWithRole.role.type,
+          }
+        : null,
     });
   },
-
 };
