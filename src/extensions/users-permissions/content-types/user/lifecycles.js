@@ -38,5 +38,6 @@ module.exports = {
     if (data.phoneNumber) {
       data.phoneNumber = String(data.phoneNumber).replace(/\D/g, '');
     }
-  }
+  },
+
 };
