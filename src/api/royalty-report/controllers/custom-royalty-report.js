@@ -3,68 +3,56 @@
 module.exports = {
 
   async importReport(ctx) {
-
     try {
-
       const file = ctx.request.files?.file;
 
       if (!file) {
         return ctx.badRequest("CSV file is required");
       }
 
-      const body = ctx.request.body || {};
+      /* ================= DEFAULT COMMISSION ================= */
+      const commissionRaw = ctx.request.body?.commission;
 
-      // Legacy commission % (kept as fallback when no per-user override / plan default exists)
-      const commissionRaw = body.commission;
       const commissionValue =
         commissionRaw !== undefined &&
           !isNaN(Number(commissionRaw)) &&
           Number(commissionRaw) >= 0 &&
           Number(commissionRaw) <= 100
           ? Number(commissionRaw)
-          : undefined;
+          : 15;
 
-      // New: optional global SonoSuite cut % (overrides global-setting default for this import)
-      const sonoRaw = body.sonosuiteCutPercent;
-      const sonosuiteCutPercent =
-        sonoRaw !== undefined &&
-          !isNaN(Number(sonoRaw)) &&
-          Number(sonoRaw) >= 0 &&
-          Number(sonoRaw) <= 100
-          ? Number(sonoRaw)
-          : undefined;
+      /* ================= PLATFORM COMMISSION ================= */
+      let platformCommissions = {};
 
-      // New: optional per-DSP overrides — `[{ channel: "YouTube Art Tracks", percent: 20 }, ...]`
-      // Accepts either an array or a JSON string (multipart forms send strings).
-      let dspOverrides = body.dspOverrides;
-      if (typeof dspOverrides === "string") {
-        try { dspOverrides = JSON.parse(dspOverrides); } catch (_) { dspOverrides = []; }
+      try {
+        platformCommissions =
+          typeof ctx.request.body?.platformCommissions === "string"
+            ? JSON.parse(ctx.request.body.platformCommissions)
+            : ctx.request.body?.platformCommissions || {};
+      } catch (err) {
+        return ctx.badRequest("Invalid platformCommissions JSON");
       }
-      if (!Array.isArray(dspOverrides)) dspOverrides = [];
 
       const result = await strapi
         .service("api::royalty-report.royalty-report")
-        .importCSV(file.path, file.name, {
-          sonosuiteCutPercent,
-          dspOverrides,
-          commissionPercent: commissionValue,
-        });
+        .importCSV(
+          file.path,
+          file.name,
+          commissionValue,
+          platformCommissions
+        );
 
       return ctx.send({
         message: "Royalty report processed successfully",
         inserted: result.inserted,
-        updated: result.updated,
         skipped: result.skipped,
         totalNet: result.monthlyTotal,
         skippedNet: result.skippedTotal
       });
 
     } catch (error) {
-
       return ctx.badRequest(error.message);
-
     }
-
   },
 
   async searchReports(ctx) {
@@ -463,127 +451,127 @@ module.exports = {
     };
   },
   async getUserStreamsPerPlatform(ctx) {
-  const userId = ctx.state.user.id;
+    const userId = ctx.state.user.id;
 
-  // ✅ Year
-  const year = parseInt(ctx.query.year) || new Date().getFullYear();
+    // ✅ Year
+    const year = parseInt(ctx.query.year) || new Date().getFullYear();
 
-  const start = `${year}-01-01`;
-  const end = `${year}-12-31`;
+    const start = `${year}-01-01`;
+    const end = `${year}-12-31`;
 
-  // ✅ Normalize platform names
-  function normalizePlatformName(p) {
-    const value = p.toLowerCase();
+    // ✅ Normalize platform names
+    function normalizePlatformName(p) {
+      const value = p.toLowerCase();
 
-    if (value.includes("youtube")) return "YouTube Music";
-    if (value.includes("spotify")) return "Spotify";
-    if (value.includes("apple")) return "Apple Music";
-    if (value.includes("amazon")) return "Amazon Music";
-    if (value.includes("deezer")) return "Deezer";
+      if (value.includes("youtube")) return "YouTube Music";
+      if (value.includes("spotify")) return "Spotify";
+      if (value.includes("apple")) return "Apple Music";
+      if (value.includes("amazon")) return "Amazon Music";
+      if (value.includes("deezer")) return "Deezer";
 
-    return p;
-  }
-
-  // ✅ Handle multiple platform=params
-  let platformFilter = [];
-
-  if (ctx.query.platform) {
-    if (Array.isArray(ctx.query.platform)) {
-      platformFilter = ctx.query.platform.map(p =>
-        normalizePlatformName(p.trim())
-      );
-    } else {
-      platformFilter = [
-        normalizePlatformName(ctx.query.platform.trim()),
-      ];
+      return p;
     }
-  }
 
-  const royalties = await strapi.entityService.findMany(
-    "api::royalty-report.royalty-report",
-    {
-      filters: {
-        EndDate: {
-          $gte: start,
-          $lte: end,
-        },
+    // ✅ Handle multiple platform=params
+    let platformFilter = [];
 
-        // ✅ Apply platform filter only if passed
-        ...(platformFilter.length > 0 && {
-          Platform: {
-            $in: platformFilter,
+    if (ctx.query.platform) {
+      if (Array.isArray(ctx.query.platform)) {
+        platformFilter = ctx.query.platform.map(p =>
+          normalizePlatformName(p.trim())
+        );
+      } else {
+        platformFilter = [
+          normalizePlatformName(ctx.query.platform.trim()),
+        ];
+      }
+    }
+
+    const royalties = await strapi.entityService.findMany(
+      "api::royalty-report.royalty-report",
+      {
+        filters: {
+          EndDate: {
+            $gte: start,
+            $lte: end,
           },
-        }),
 
-        distribute_track: {
-          PublishedRelease: {
-            UserDetail: {
-              id: userId,
+          // ✅ Apply platform filter only if passed
+          ...(platformFilter.length > 0 && {
+            Platform: {
+              $in: platformFilter,
             },
-          },
-        },
-      },
+          }),
 
-      fields: ["Units", "EndDate", "Platform"],
-
-      populate: {
-        distribute_track: {
-          populate: {
+          distribute_track: {
             PublishedRelease: {
-              populate: {
-                UserDetail: true,
+              UserDetail: {
+                id: userId,
               },
             },
           },
         },
-      },
 
-      limit: -1,
-    }
-  );
+        fields: ["Units", "EndDate", "Platform"],
 
-  const monthNames = [
-    "Jan","Feb","Mar","Apr","May","Jun",
-    "Jul","Aug","Sep","Oct","Nov","Dec"
-  ];
+        populate: {
+          distribute_track: {
+            populate: {
+              PublishedRelease: {
+                populate: {
+                  UserDetail: true,
+                },
+              },
+            },
+          },
+        },
 
-  // ✅ Initialize 12 months
-  const monthly = Array(12).fill(null).map(() => ({}));
+        limit: -1,
+      }
+    );
 
-  royalties.forEach(r => {
-    if (!r.EndDate) return;
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
 
-    const monthIndex = new Date(r.EndDate).getMonth();
-    const platform = r.Platform || "Unknown";
-    const units = Number(r.Units || 0);
+    // ✅ Initialize 12 months
+    const monthly = Array(12).fill(null).map(() => ({}));
 
-    if (!monthly[monthIndex][platform]) {
-      monthly[monthIndex][platform] = 0;
-    }
+    royalties.forEach(r => {
+      if (!r.EndDate) return;
 
-    monthly[monthIndex][platform] += units;
-  });
+      const monthIndex = new Date(r.EndDate).getMonth();
+      const platform = r.Platform || "Unknown";
+      const units = Number(r.Units || 0);
 
-  // ✅ Ensure all selected platforms appear (even if 0)
-  if (platformFilter.length > 0) {
-    platformFilter.forEach(platform => {
-      monthly.forEach(m => {
-        if (!m[platform]) {
-          m[platform] = 0;
-        }
-      });
+      if (!monthly[monthIndex][platform]) {
+        monthly[monthIndex][platform] = 0;
+      }
+
+      monthly[monthIndex][platform] += units;
     });
-  }
 
-  return {
-    year,
-    platforms: platformFilter,
-    monthly: monthly.map((data, i) => ({
-      month: monthNames[i],
-      ...data,
-    })),
-  };
-},
+    // ✅ Ensure all selected platforms appear (even if 0)
+    if (platformFilter.length > 0) {
+      platformFilter.forEach(platform => {
+        monthly.forEach(m => {
+          if (!m[platform]) {
+            m[platform] = 0;
+          }
+        });
+      });
+    }
+
+    return {
+      year,
+      platforms: platformFilter,
+      monthly: monthly.map((data, i) => ({
+        month: monthNames[i],
+        ...data,
+      })),
+    };
+  },
 
   // ─── V3 — Priority 12: enhanced analytics ─────────────────────────────────
   // Shared helper: build a where clause that scopes to the current user and

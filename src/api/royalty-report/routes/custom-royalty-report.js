@@ -9,7 +9,7 @@ module.exports = {
       path: "/royalty-report/import",
       handler: "custom-royalty-report.importReport",
       config: {
-        auth: {}
+        auth: false
       }
     },
     {

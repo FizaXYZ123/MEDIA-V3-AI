@@ -88,95 +88,10 @@ function normalizeHeader(header) {
   return map[h] || h;
 }
 
-/* Build a per-DSP override lookup keyed by channel name (raw and normalized).
-   Each entry: { percent: number } */
-function buildDspOverrideMap(dspOverrides) {
-  const map = {};
-  if (!Array.isArray(dspOverrides)) return map;
-
-  for (const o of dspOverrides) {
-    if (!o || o.channel === undefined || o.channel === null) continue;
-    const pct = Number(o.percent);
-    if (isNaN(pct)) continue;
-
-    const raw = String(o.channel).trim();
-    map[raw.toLowerCase()] = pct;
-
-    const normalized = normalizePlatform(raw);
-    if (normalized) {
-      map[String(normalized).toLowerCase()] = pct;
-    }
-  }
-  return map;
-}
-
-function lookupSonosuiteCut(channelRaw, channelNormalized, overrideMap, fallback) {
-  if (overrideMap) {
-    if (channelNormalized && overrideMap[String(channelNormalized).toLowerCase()] !== undefined) {
-      return overrideMap[String(channelNormalized).toLowerCase()];
-    }
-    if (channelRaw && overrideMap[String(channelRaw).toLowerCase()] !== undefined) {
-      return overrideMap[String(channelRaw).toLowerCase()];
-    }
-  }
-  return fallback;
-}
-
 module.exports = () => ({
 
-  /**
-   * Imports a SonoSuite-style CSV and applies the 3-layer fee model.
-   *
-   * Backward-compatible signature:
-   *   importCSV(filepath, filename, commissionPercent)        // legacy: number
-   *   importCSV(filepath, filename, { sonosuiteCutPercent, dspOverrides, commissionPercent })
-   *
-   * 3-layer model (per row):
-   *   gross         = net_total_client_currency (or net_total fallback)
-   *   sonosuiteCut% = dspOverride[channel] ?? sonosuiteCutPercent ?? globalSettings.defaultSonosuiteCut
-   *   afterSono     = gross * (1 - sonosuiteCut/100)
-   *   platformFee%  = user.platformFeeOverride ?? globalSettings.defaultPlatformFee
-   *   afterPlatform = afterSono * (1 - platformFee/100)
-   *   commission%   = user.commissionOverride ?? plan.defaultCommission ?? commissionPercent (legacy fallback)
-   *   artistEarn    = afterPlatform * (1 - commission/100)
-   *
-   * NetTotal stored on the royalty-report row is the artist-visible net (= artistEarnings),
-   * preserving the existing reporting/dashboard semantics. The three applied %s and the
-   * artistEarnings figure are stored explicitly for auditing.
-   */
-  async importCSV(filepath, filename, optionsOrCommission) {
+  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {}) {
 
-    /* -------- Parse arguments (backward compat) -------- */
-    let sonosuiteCutPercentArg;
-    let dspOverridesArg;
-    let commissionPercentArg;
-
-    if (typeof optionsOrCommission === "object" && optionsOrCommission !== null) {
-      sonosuiteCutPercentArg = optionsOrCommission.sonosuiteCutPercent;
-      dspOverridesArg = optionsOrCommission.dspOverrides;
-      commissionPercentArg = optionsOrCommission.commissionPercent;
-    } else if (optionsOrCommission !== undefined) {
-      commissionPercentArg = optionsOrCommission;
-    }
-
-    /* -------- Load global settings (defaults) -------- */
-    const globalSettings = await strapi
-      .service("api::global-setting.global-setting")
-      .getOrCreate();
-
-    const defaultSonoCut = Number(
-      sonosuiteCutPercentArg ?? globalSettings.defaultSonosuiteCut ?? 15
-    );
-    const defaultPlatformFee = Number(
-      globalSettings.defaultPlatformFee ?? 5
-    );
-    const fallbackCommission = Number(
-      commissionPercentArg ?? 15
-    );
-
-    const dspOverrideMap = buildDspOverrideMap(dspOverridesArg);
-
-    /* -------- Read CSV -------- */
     const rows = [];
 
     await new Promise((resolve) => {
@@ -192,7 +107,78 @@ module.exports = () => ({
       throw new Error("CSV file is empty");
     }
 
-    /* -------- Compute report period -------- */
+    /* ================= GROUP BY ISRC ================= */
+    const isrcGroups = {};
+
+    rows.forEach((row, index) => {
+      const isrc = row.isrc?.trim().toUpperCase();
+      if (!isrc) return;
+
+      if (!isrcGroups[isrc]) {
+        isrcGroups[isrc] = [];
+      }
+
+      isrcGroups[isrc].push({ ...row, __index: index });
+    });
+
+    /* ================= APPLY 15% COMMISSION ================= */
+    const adjustedMap = {};
+
+    for (const isrc in isrcGroups) {
+      const group = isrcGroups[isrc];
+
+      let totalNet = 0;
+
+      group.forEach(r => {
+        totalNet += toNumber(r.net_total);
+      });
+
+      if (totalNet === 0) continue;
+
+      /******** GROUP BY PLATFORM INSIDE ISRC ********/
+      const platformGroups = {};
+
+      group.forEach(r => {
+        const platform = normalizePlatform(r.channel) || "UNKNOWN";
+
+        if (!platformGroups[platform]) {
+          platformGroups[platform] = [];
+        }
+
+        platformGroups[platform].push(r);
+      });
+
+      /******** APPLY COMMISSION PER PLATFORM ********/
+      for (const platform in platformGroups) {
+        const rowsInPlatform = platformGroups[platform];
+
+        let platformTotal = 0;
+
+        rowsInPlatform.forEach(r => {
+          platformTotal += toNumber(r.net_total);
+        });
+
+        const commissionToApply =
+          platformCommissions?.[platform] ?? commissionPercent;
+
+        const rate = commissionToApply / 100;
+
+        const platformRemaining = platformTotal * (1 - rate);
+
+        rowsInPlatform.forEach(r => {
+          const original = toNumber(r.net_total);
+
+          const adjusted =
+            platformTotal > 0
+              ? (original / platformTotal) * platformRemaining
+              : 0;
+
+          adjustedMap[r.__index] = Number(adjusted.toFixed(6));
+        });
+      }
+    }
+
+    /* REPORT PERIOD */
     let minStart = null;
     let maxEnd = null;
 
@@ -207,206 +193,171 @@ module.exports = () => ({
     const reportStartDate = formatDate(minStart);
     const reportEndDate = formatDate(maxEnd);
 
-    /* -------- Duplicate guard -------- */
+    console.log("🧠 Calculated Period:", reportStartDate, "→", reportEndDate);
+
+    /* ❌ DO NOT CHANGE (DUPLICATE CHECK) */
+
     const reportExists = await strapi.db
       .query("api::imported-report.imported-report")
-      .findOne({
+      .findMany({
         where: {
-          startDate: reportStartDate,
-          endDate: reportEndDate
+          $or: [
+            {
+              startDate: reportStartDate,
+              endDate: reportEndDate
+            },
+            {
+              startDate: { $lte: reportEndDate },
+              endDate: { $gte: reportStartDate }
+            }
+          ]
         }
       });
 
-    if (reportExists) {
+    if (reportExists.length > 0) {
       throw new Error(
-        `Royalty report from ${reportStartDate} to ${reportEndDate} already uploaded`
+        `Report already exists for overlapping period (${reportStartDate} → ${reportEndDate})`
       );
     }
 
-    /* -------- Load tracks (id + ISRC + owning user) -------- */
+    /* LOAD TRACKS */
     const tracks = await strapi.db
       .query("api::distribute-track.distribute-track")
       .findMany({
-        select: ["id", "ISRC"],
-        populate: {
-          PublishedRelease: {
-            populate: {
-              UserDetail: {
-                select: [
-                  "id",
-                  "platformFeeOverride",
-                  "commissionOverride",
-                  "availableBalance",
-                ],
-                populate: {
-                  plan: {
-                    select: ["defaultCommission"],
-                  },
-                },
-              },
-            },
-          },
-        },
+        select: ["id", "ISRC"]
       });
 
     const trackMap = {};
-    const trackUserMap = {}; // trackId -> user record (with overrides + plan)
     tracks.forEach(t => {
       if (t.ISRC) {
         trackMap[t.ISRC.toUpperCase()] = t.id;
       }
-      const u = t?.PublishedRelease?.UserDetail;
-      if (u) {
-        trackUserMap[t.id] = u;
-      }
     });
 
-    /* -------- Walk rows and apply 3-layer fees -------- */
     let inserted = 0;
     let skipped = 0;
-    let monthlyTotal = 0;     // sum of artist-visible NetTotal
+    let monthlyTotal = 0;
     let skippedTotal = 0;
-    let originalGrossTotal = 0; // sum of pre-cut gross
-
-    // Track per-user balance deltas to apply at the end
-    const userBalanceDelta = {}; // userId -> sum of artistEarnings
 
     for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
+
+      const row = rows[i];   
+      const adjustedNet = adjustedMap[i];
+
+      if (adjustedNet === undefined) {
+        skipped++;
+
+        const original = toNumber(row.net_total);
+        skippedTotal += original;
+
+        console.log(`⚠️ SKIPPED (NO ADJUSTED VALUE): Index ${i}`);
+
+        continue;
+      }
 
       const isrc = row.isrc?.trim().toUpperCase();
-      const channelRaw = row.channel;
-      const platform = normalizePlatform(channelRaw);
+      const platform = normalizePlatform(row.channel);
 
       if (!isrc) {
         skipped++;
+        const original = toNumber(row.net_total);
+        skippedTotal += original;
         continue;
       }
 
       const trackId = trackMap[isrc];
       if (!trackId) {
         skipped++;
-        skippedTotal += toNumber(row.net_total_client_currency || row.net_total);
+        const original = toNumber(row.net_total);
+        skippedTotal += original;
         continue;
       }
 
-      const user = trackUserMap[trackId] || null;
-
-      // Gross figure for this row (prefer client currency)
-      const gross = toNumber(
-        row.net_total_client_currency || row.net_total
-      );
-
-      // Layer 1 — SonoSuite cut (per-DSP override > global default)
-      const sonoCutPct = lookupSonosuiteCut(
-        channelRaw,
-        platform,
-        dspOverrideMap,
-        defaultSonoCut
-      );
-      const afterSono = gross * (1 - sonoCutPct / 100);
-
-      // Layer 2 — Platform fee (user override > global default)
-      const platformFeePct = Number(
-        user?.platformFeeOverride ?? defaultPlatformFee
-      );
-      const afterPlatform = afterSono * (1 - platformFeePct / 100);
-
-      // Layer 3 — Commission (user override > plan default > legacy CSV input)
-      const commissionPct = Number(
-        user?.commissionOverride ??
-        user?.plan?.defaultCommission ??
-        fallbackCommission
-      );
-      const artistEarnings = afterPlatform * (1 - commissionPct / 100);
-
-      const round6 = (n) => Number(Number(n).toFixed(6));
-
-      monthlyTotal += artistEarnings;
-      originalGrossTotal += gross;
-
-      if (user?.id) {
-        userBalanceDelta[user.id] =
-          (userBalanceDelta[user.id] || 0) + artistEarnings;
-      }
+      monthlyTotal += adjustedNet;
 
       const startDate = formatDate(row.start_date);
       const endDate = formatDate(row.end_date);
       const confirmationDate = formatDate(row.confirmation_report_date);
 
-      await strapi.db
+      /* ================= CREATE ================= */
+
+      const created = await strapi.db
         .query("api::royalty-report.royalty-report")
         .create({
           data: {
+
             ISRC: isrc,
+
             TrackTitle: row.track_title,
+
             Artist: row.artist,
+
             ReleaseTitle: row.release || row.release_title || "",
+
             Platform: platform,
+
             Country: row.country,
+
             Units: toNumber(row.units),
+
             UnitPrice: toNumber(row.unit_price),
+
             GrossTotal: toNumber(row.gross_total),
 
-            // Artist-visible net = post-commission
-            NetTotal: round6(artistEarnings),
+            NetTotal: adjustedNet,
 
             StartDate: startDate,
+
             EndDate: endDate,
             ConfirmationReportDate: confirmationDate,
+
             Currency: row.currency,
+
             Label: row.label,
             Type: row.type,
+
             Taxes: toNumber(row.taxes),
             ChannelCosts: toNumber(row.channel_costs),
+
             CurrencyRate: toNumber(row.currency_rate),
-            GrossTotalClientCurrency: toNumber(row.gross_total_client_currency),
-            NetTotalClientCurrency: toNumber(row.net_total_client_currency),
-            OtherCostsClientCurrency: toNumber(row.other_costs_client_currency),
-            ChannelCostsClientCurrency: toNumber(row.channel_costs_client_currency),
+
+            GrossTotalClientCurrency:
+              toNumber(row.gross_total_client_currency),
+
+            NetTotalClientCurrency:
+              toNumber(row.net_total_client_currency),
+
+            OtherCostsClientCurrency:
+              toNumber(row.other_costs_client_currency),
+
+            ChannelCostsClientCurrency:
+              toNumber(row.channel_costs_client_currency),
+
             UserEmail: row.user_email,
+
             UPC: row.upc || "",
+
             TenantId: row.tenant_id,
+
             OriginalNetTotal: toNumber(row.net_total),
 
-            // 3-layer audit fields
-            SonosuiteCutApplied: sonoCutPct,
-            PlatformFeeApplied: platformFeePct,
-            CommissionApplied: commissionPct,
-            ArtistEarnings: round6(artistEarnings),
-
             distribute_track: trackId,
-            publishedAt: new Date(),
-          },
+
+            publishedAt: new Date()
+          }
         });
 
       inserted++;
     }
 
-    /* -------- Update user available balances -------- */
-    for (const userId in userBalanceDelta) {
-      const delta = userBalanceDelta[userId];
-      if (!delta) continue;
+    let originalTotal = 0;
 
-      const fresh = await strapi.db
-        .query("plugin::users-permissions.user")
-        .findOne({ where: { id: userId }, select: ["id", "availableBalance"] });
-
-      if (!fresh) continue;
-
-      const newBalance = Number(
-        (Number(fresh.availableBalance || 0) + delta).toFixed(2)
-      );
-
-      await strapi.db
-        .query("plugin::users-permissions.user")
-        .update({
-          where: { id: userId },
-          data: { availableBalance: newBalance },
-        });
+    for (let i = 0; i < rows.length; i++) {
+      originalTotal += toNumber(rows[i].net_total);
     }
 
-    /* -------- Persist imported-report metadata -------- */
+    originalTotal = Number(originalTotal.toFixed(6));
+
     await strapi.db
       .query("api::imported-report.imported-report")
       .create({
@@ -414,43 +365,42 @@ module.exports = () => ({
           startDate: reportStartDate,
           endDate: reportEndDate,
           FileName: filename,
-          totalNet: Number(monthlyTotal.toFixed(6)),
-          skippedNet: Number(skippedTotal.toFixed(6)),
-          CommissionPercent: fallbackCommission,
-          OriginalTotal: Number(originalGrossTotal.toFixed(6)),
+          totalNet: monthlyTotal,
+          skippedNet: skippedTotal,
+          CommissionPercent: commissionPercent,
+          PlatformCommission: platformCommissions,
+          OriginalTotal: Number(originalTotal.toFixed(6)),
+
         }
       });
 
-    /* -------- Generate invoices using new 3-layer figures -------- */
-    await generateInvoices(reportStartDate, reportEndDate, {
-      defaultSonoCut,
-      defaultPlatformFee,
-    });
+    console.log({ inserted, skipped });
 
-    return {
-      inserted,
-      skipped,
-      monthlyTotal,
-      skippedTotal,
-      sonosuiteCutPercent: defaultSonoCut,
-      platformFeePercent: defaultPlatformFee,
-      commissionPercent: fallbackCommission,
-      originalTotal: originalGrossTotal,
-    };
+    /* 🔥 GENERATE INVOICES */
+    await generateInvoices(reportStartDate, reportEndDate);
+
+    return { inserted, skipped, monthlyTotal, skippedTotal, commissionPercent, originalTotal };
+
+
   }
 
 });
 
 /* ================= INVOICE GENERATION ================= */
-async function generateInvoices(reportStartDate, reportEndDate, defaults = {}) {
+async function generateInvoices(reportStartDate, reportEndDate) {
+
+  // console.log("🔥 Invoice generation started");
+  // console.log("📅 Period:", reportStartDate, "→", reportEndDate);
 
   try {
 
     const end = new Date(reportEndDate);
+
     const month = end.getMonth() + 1;
     const year = end.getFullYear();
 
-    /* -------- Fetch royalties for the period (with audit fields) -------- */
+    // console.log("📆 Invoice Month:", month, year);
+    /* ================= FETCH ROYALTIES ================= */
     const royalties = await strapi.entityService.findMany(
       "api::royalty-report.royalty-report",
       {
@@ -472,60 +422,56 @@ async function generateInvoices(reportStartDate, reportEndDate, defaults = {}) {
       }
     );
 
-    if (!royalties.length) return;
+    // console.log("📦 Royalties fetched:", royalties.length);
 
-    /* -------- Group per user with all 3 layers -------- */
+    if (!royalties.length) {
+      // console.log("⚠️ No royalties found");
+      return;
+    }
+
+    /* ================= GROUP BY USER ================= */
     const userMap = {};
 
     for (const r of royalties) {
-      const user = r.distribute_track?.PublishedRelease?.UserDetail;
-      if (!user) continue;
+
+      const user =
+        r.distribute_track?.PublishedRelease?.UserDetail;
+
+      if (!user) {
+        // console.log("❌ No user found for royalty:", r.id);
+        continue;
+      }
 
       if (!userMap[user.id]) {
         userMap[user.id] = {
+          totalEarnings: 0,
           user,
-          grossClient: 0,         // pre-SonoSuite cut
-          sonoCutAmount: 0,
-          afterSono: 0,
-          platformFeeAmount: 0,
-          afterPlatform: 0,
-          commissionAmount: 0,
-          artistEarnings: 0,      // = afterCommission
         };
       }
 
-      const m = userMap[user.id];
-
-      const gross = Number(r.NetTotalClientCurrency || r.OriginalNetTotal || 0);
-      const sonoPct = Number(r.SonosuiteCutApplied ?? defaults.defaultSonoCut ?? 15);
-      const platformPct = Number(r.PlatformFeeApplied ?? defaults.defaultPlatformFee ?? 5);
-      const commissionPct = Number(r.CommissionApplied ?? 0);
-
-      const sonoCutAmt = gross * (sonoPct / 100);
-      const afterSono = gross - sonoCutAmt;
-      const platformAmt = afterSono * (platformPct / 100);
-      const afterPlatform = afterSono - platformAmt;
-      const commissionAmt = afterPlatform * (commissionPct / 100);
-      const artistEarn = Number(r.ArtistEarnings ?? (afterPlatform - commissionAmt));
-
-      m.grossClient += gross;
-      m.sonoCutAmount += sonoCutAmt;
-      m.afterSono += afterSono;
-      m.platformFeeAmount += platformAmt;
-      m.afterPlatform += afterPlatform;
-      m.commissionAmount += commissionAmt;
-      m.artistEarnings += artistEarn;
+      // ✅ FIX FLOAT ISSUE
+      userMap[user.id].totalEarnings =
+        Number(
+          (userMap[user.id].totalEarnings + Number(r.NetTotal || 0)).toFixed(2)
+        );
     }
 
-    /* -------- Process each user -------- */
+    // console.log("👥 Total users grouped:", Object.keys(userMap).length);
+
+    /* ================= PROCESS USERS ================= */
     for (const userId in userMap) {
-      const m = userMap[userId];
-      const { user } = m;
 
-      const totalEarnings = Number(m.artistEarnings.toFixed(2));
-      if (totalEarnings <= 0) continue;
+      const { user, totalEarnings } = userMap[userId];
 
-      // Duplicate-month guard
+      // console.log("➡️ Processing user:", user.id);
+      // console.log("💰 Total Earnings:", totalEarnings);
+
+      if (!totalEarnings || totalEarnings <= 0) {
+        // console.log("⚠️ Skipping (no earnings):", user.id);
+        continue;
+      }
+
+      /* ================= DUPLICATE CHECK ================= */
       const existing = await strapi.entityService.findMany(
         "api::invoice.invoice",
         {
@@ -537,68 +483,115 @@ async function generateInvoices(reportStartDate, reportEndDate, defaults = {}) {
         }
       );
 
-      if (existing.length > 0) continue;
+      if (existing.length > 0) {
+        // console.log("⚠️ Invoice already exists:", user.id);
+        continue;
+      }
 
-      // Map new layered amounts onto the existing invoice schema:
-      //   labelFeePercentage / labelFeeAmount  ← commission (artist-visible)
-      //   adminFeePercentage / adminFeeAmount  ← platform fee + sono cut (hidden bundle)
-      const grossForInvoice = Number(m.afterPlatform.toFixed(2)); // post-platform-fee, pre-commission
+      /* ================= FETCH FEES (FIXED) ================= */
+      const labelFeeData = await strapi.db
+        .query("api::label-fee-history.label-fee-history")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
 
-      const commissionPctEffective =
-        grossForInvoice > 0
-          ? Number(((m.commissionAmount / grossForInvoice) * 100).toFixed(2))
-          : 0;
+      const adminFeeData = await strapi.db
+        .query("api::admin-fee-history.admin-fee-history")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
 
-      const hiddenAmount = Number(
-        (m.sonoCutAmount + m.platformFeeAmount).toFixed(2)
-      );
-      const hiddenPct =
-        m.grossClient > 0
-          ? Number(((hiddenAmount / m.grossClient) * 100).toFixed(2))
-          : 0;
 
+      const labelFee =
+        labelFeeData[0]?.feePercentage ??
+        user.labelFee ??
+        0;
+
+      const adminFee =
+        adminFeeData[0]?.feePercentage ??
+        user.adminFee ??
+        0;
+
+      // console.log("💸 Fees:", {
+      //   userId: user.id,
+      //   labelFee,
+      //   adminFee,
+      // });
+
+      /* ================= CALCULATION ================= */
+      const labelFeeAmount = Number((totalEarnings * labelFee / 100).toFixed(2));
+      const afterLabel = Number((totalEarnings - labelFeeAmount).toFixed(2));
+
+      const adminFeeAmount = Number((afterLabel * adminFee / 100).toFixed(2));
+      const finalAmount = Number((afterLabel - adminFeeAmount).toFixed(2));
+
+      // console.log("🧮 Calculation:", {
+      //   totalEarnings,
+      //   labelFeeAmount,
+      //   afterLabel,
+      //   adminFeeAmount,
+      //   finalAmount,
+      // });
+
+      /* ================= CREATE INVOICE ================= */
       const createdInvoice = await strapi.entityService.create(
         "api::invoice.invoice",
         {
           data: {
             month,
             year,
+            totalEarnings,
 
-            // Total earnings = grossForInvoice (after the hidden cuts; what artist sees as gross)
-            totalEarnings: grossForInvoice,
+            labelFeePercentage: labelFee,
+            labelFeeAmount,
 
-            // labelFee* = commission (artist-visible)
-            labelFeePercentage: commissionPctEffective,
-            labelFeeAmount: Number(m.commissionAmount.toFixed(2)),
+            amountPayableBeforeAdminFee: afterLabel,
 
-            amountPayableBeforeAdminFee: totalEarnings,
+            adminFeePercentage: adminFee,
+            adminFeeAmount,
 
-            // adminFee* = SonoSuite cut + platform fee (hidden bundle, kept off the artist UI)
-            adminFeePercentage: hiddenPct,
-            adminFeeAmount: hiddenAmount,
-
-            finalAmountPayable: totalEarnings,
+            finalAmountPayable: finalAmount,
 
             invoiceDate: new Date(),
+
             users_permissions_user: user.id,
+
             publishedAt: new Date(),
           },
         }
       );
 
+      // console.log("✅ Invoice created:", user.id);
+
+      /* ================= 🔔 SEND NOTIFICATION ================= */
       try {
         await strapi.entityService.create("api::notification.notification", {
           data: {
             title: "Invoice Generated ",
-            message: `Your invoice for ${month}/${year} is ready. Amount: ₹${totalEarnings}`,
+            message: `Your invoice for ${month}/${year} is ready. Amount: ₹${finalAmount}`,
             users_permissions_user: user.id,
             publishedAt: new Date(),
           },
         });
+
+        // console.log("🔔 Notification created for user:", user.id);
+
       } catch (err) {
-        // swallow notification errors
+        // console.error("❌ Notification error:", err);
       }
+
+      // console.log("✅ Invoice created:", user.id);
     }
+
+    // console.log("🎉 Invoice generation completed");
 
   } catch (error) {
     // console.error("❌ Invoice generation error:", error);

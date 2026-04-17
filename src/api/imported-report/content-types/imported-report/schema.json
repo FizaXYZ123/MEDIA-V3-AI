@@ -31,6 +31,9 @@
     },
     "OriginalTotal": {
       "type": "decimal"
+    },
+    "PlatformCommission": {
+      "type": "json"
     }
   }
 }

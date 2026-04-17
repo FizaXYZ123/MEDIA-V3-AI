@@ -1259,6 +1259,7 @@ export interface ApiImportedReportImportedReport extends Schema.CollectionType {
     skippedNet: Attribute.Decimal;
     CommissionPercent: Attribute.Decimal;
     OriginalTotal: Attribute.Decimal;
+    PlatformCommission: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

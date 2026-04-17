@@ -57,8 +57,8 @@ module.exports = {
         planId: plan.id.toString(),
       },
 
-      success_url: "http://localhost:5173/payment-success",
-      cancel_url: "http://localhost:5173/payment-cancel",
+      success_url: `${process.env.FRONTEND_BASE_URL}/payment-success`,
+      cancel_url: `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
     });
 
     return { url: session.url };

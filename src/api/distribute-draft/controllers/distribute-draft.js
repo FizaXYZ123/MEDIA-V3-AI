@@ -49,6 +49,93 @@ const autoUpdateCompletedSteps = async (id) => {
   });
 };
 
+
+
+// helper to find artist allowed according to latest subscription
+const checkPrimaryArtistLimit = async (userId, incomingTracks = []) => {
+
+  // 1. Get latest active subscription
+  const subscription = await strapi.db
+    .query("api::user-subscription.user-subscription")
+    .findOne({
+      where: {
+        users_permissions_user: userId,
+        status: "active",
+      },
+      orderBy: { startDate: "desc" },
+      populate: ["plan"],
+    });
+
+  if (!subscription || !subscription.plan) {
+    throw new Error("No active subscription found");
+  }
+
+  // 2. Get plan limit (STRING)
+  const rawLimit = subscription.plan.maxPrimaryArtists?.trim().toLowerCase();
+
+  // ✅ UNLIMITED → skip
+  if (!rawLimit || rawLimit === "unlimited") {
+    return;
+  }
+
+  const allowedLimit = Number(rawLimit);
+
+  if (isNaN(allowedLimit)) {
+    throw new Error("Invalid maxPrimaryArtists value in plan");
+  }
+
+  // 3. Get existing UNIQUE primary artists
+  const existingArtists = await strapi.db
+    .query("api::artist-detail.artist-detail")
+    .findMany({
+      where: {
+        owner: userId,
+        roleName: "Primary Artist",
+      },
+      select: ["artistName"],
+    });
+
+  const existingSet = new Set(
+    existingArtists.map(a => a.artistName.toLowerCase())
+  );
+
+  // 4. Extract NEW artists from request
+  const newSet = new Set();
+
+  incomingTracks.forEach(track => {
+    track?.RoleCredits?.forEach(credit => {
+      if (
+        credit?.roleName === "Primary Artist" &&
+        credit?.artistName
+      ) {
+        newSet.add(credit.artistName.toLowerCase());
+      }
+    });
+  });
+
+  let newUniqueCount = 0;
+
+  newSet.forEach(name => {
+    if (!existingSet.has(name)) {
+      newUniqueCount++;
+    }
+  });
+
+  const totalAfterUpload = existingSet.size + newUniqueCount;
+
+  // 5. Final check
+  if (totalAfterUpload > allowedLimit) {
+    const message =
+  allowedLimit === 1
+    ? `Your plan allows only 1 primary artist. Please upgrade your subscription.`
+    : `According to your subscription only ${allowedLimit} primary artists are allowed. Please upgrade your subscription.`;
+
+const error = new Error(message);
+error.status = 400;
+throw error;
+  }
+};
+
 module.exports = createCoreController('api::distribute-draft.distribute-draft', ({ strapi }) => ({
 
   /* ----------------------- CRUD ----------------------- */
@@ -335,19 +422,29 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
     const draft = await strapi.entityService.update('api::distribute-draft.distribute-draft', id, { data: dataToSet, populate: DEFAULT_POPULATE });
     await autoUpdateCompletedSteps(id);
 
-const updated = await strapi.entityService.findOne(
-  'api::distribute-draft.distribute-draft',
-  id,
-  { populate: DEFAULT_POPULATE }
-);
+    const updated = await strapi.entityService.findOne(
+      'api::distribute-draft.distribute-draft',
+      id,
+      { populate: DEFAULT_POPULATE }
+    );
 
-ctx.body = { data: updated };
+    ctx.body = { data: updated };
   },
 
   async step3(ctx) {
     const { id } = ctx.params;
     if (!id) return ctx.badRequest('Draft id is required.');
     const payload = ctx.request.body?.data || ctx.request.body || {};
+
+    const userId = ctx.state.user.id;
+
+    const incomingTracks = [
+      ...(payload.tracks || []),
+      ...(payload.trackObjects || [])
+    ];
+
+    // ✅ CHECK LIMIT BEFORE ANY CREATION
+    await checkPrimaryArtistLimit(userId, incomingTracks);
 
     // Roles we want to auto-create as artist-detail
     const rolesToAutoSave = ["Primary Artist", "Lyricist", "Vocals", "Composer"];
@@ -378,6 +475,14 @@ ctx.body = { data: updated };
     // Combine newly created tracks + any provided track objects (only process ones that contain RoleCredits)
     const allTracksToProcess = [...createdTracks, ...providedTrackObjects];
 
+    const existingList = await strapi.entityService.findMany(
+      'api::artist-detail.artist-detail',
+      {
+        filters: { owner: ctx.state.user.id },
+        fields: ['id', 'artistName'],
+      }
+    );
+
     for (const track of allTracksToProcess) {
       if (!track || !track.RoleCredits || !Array.isArray(track.RoleCredits)) continue;
 
@@ -390,30 +495,40 @@ ctx.body = { data: updated };
         if (!rolesToAutoSave.includes(roleName)) continue;
 
         // *** CHANGE: find existing artist-detail by artistName ONLY (ignore roleName) ***
-        const existing = await strapi.entityService.findMany('api::artist-detail.artist-detail', {
-          filters: { artistName },
-          limit: 1,
-        });
+        const normalizedName = artistName.trim().toLowerCase();
+
+        // case-insensitive match
+        const existing = existingList.find(
+          a => a.artistName?.trim().toLowerCase() === normalizedName
+        );
 
         let artistRecord;
-        if (existing.length) {
-          artistRecord = existing[0];
+
+        if (existing) {
+          artistRecord = existing;
         } else {
-          artistRecord = await strapi.entityService.create('api::artist-detail.artist-detail', {
-            data: {
-              artistName,
-              // don't require roleName — store it if provided, otherwise null
-              roleName: roleName || null,
-              // set a sensible default for searchRole when roleName is missing
-              searchRole: roleName ? `${roleName}_detail` : 'artist_detail',
-              owner: ctx.state.user?.id || null,
-            },
+          artistRecord = await strapi.entityService.create(
+            'api::artist-detail.artist-detail',
+            {
+              data: {
+                artistName,
+                roleName: roleName || null,
+                searchRole: roleName ? `${roleName}_detail` : 'artist_detail',
+                owner: ctx.state.user?.id || null,
+              },
+            }
+          );
+
+          existingList.push({
+            id: artistRecord.id,
+            artistName: artistName,
           });
+
         }
 
-        if (artistRecord && artistRecord.id) {
-          artistIdsToAdd.push(artistRecord.id);
-        }
+        if (artistRecord?.id) {
+            artistIdsToAdd.push(artistRecord.id);
+          }
       }
 
       // If we got artist ids and track has an id, append them to the track relation (merge with existing)
@@ -443,15 +558,15 @@ ctx.body = { data: updated };
       id,
       { populate: DEFAULT_POPULATE }
     );
-  await autoUpdateCompletedSteps(id);
+    await autoUpdateCompletedSteps(id);
 
-const updated = await strapi.entityService.findOne(
-  'api::distribute-draft.distribute-draft',
-  id,
-  { populate: DEFAULT_POPULATE }
-);
+    const updated = await strapi.entityService.findOne(
+      'api::distribute-draft.distribute-draft',
+      id,
+      { populate: DEFAULT_POPULATE }
+    );
 
-ctx.body = { data: updated };
+    ctx.body = { data: updated };
   },
   async step4(ctx) {
     const { id } = ctx.params;
@@ -467,15 +582,15 @@ ctx.body = { data: updated };
       data: { Priority, TimeZoneOfReference, OriginalReleaseDate, Countries, MusicStores, PriceCategory, DigitalReleaseDate, ReleaseTime },
       populate: DEFAULT_POPULATE,
     });
-await autoUpdateCompletedSteps(id);
+    await autoUpdateCompletedSteps(id);
 
-const updated = await strapi.entityService.findOne(
-  'api::distribute-draft.distribute-draft',
-  id,
-  { populate: DEFAULT_POPULATE }
-);
+    const updated = await strapi.entityService.findOne(
+      'api::distribute-draft.distribute-draft',
+      id,
+      { populate: DEFAULT_POPULATE }
+    );
 
-ctx.body = { data: updated };
+    ctx.body = { data: updated };
   },
 
   async finish(ctx) {
