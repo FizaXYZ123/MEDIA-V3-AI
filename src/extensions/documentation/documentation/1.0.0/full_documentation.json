@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-04-21T10:20:04.294Z"
+    "x-generation-date": "2026-04-21T12:52:22.360Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3137,7 +3137,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -6681,7 +6685,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -10272,7 +10280,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -14353,7 +14365,11 @@
                                                                           "name": {
                                                                             "type": "string"
                                                                           },
-                                                                          "price": {
+                                                                          "price_inr": {
+                                                                            "type": "number",
+                                                                            "format": "float"
+                                                                          },
+                                                                          "price_cad": {
                                                                             "type": "number",
                                                                             "format": "float"
                                                                           },
@@ -17839,7 +17855,11 @@
                                                                                       "name": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "price": {
+                                                                                      "price_inr": {
+                                                                                        "type": "number",
+                                                                                        "format": "float"
+                                                                                      },
+                                                                                      "price_cad": {
                                                                                         "type": "number",
                                                                                         "format": "float"
                                                                                       },
@@ -23853,7 +23873,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -27314,7 +27338,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -30773,7 +30801,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -34255,7 +34287,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -37788,7 +37824,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -38660,7 +38700,11 @@
               "name": {
                 "type": "string"
               },
-              "price": {
+              "price_inr": {
+                "type": "number",
+                "format": "float"
+              },
+              "price_cad": {
                 "type": "number",
                 "format": "float"
               },
@@ -38773,7 +38817,11 @@
           "name": {
             "type": "string"
           },
-          "price": {
+          "price_inr": {
+            "type": "number",
+            "format": "float"
+          },
+          "price_cad": {
             "type": "number",
             "format": "float"
           },
@@ -41781,7 +41829,11 @@
                                                               "name": {
                                                                 "type": "string"
                                                               },
-                                                              "price": {
+                                                              "price_inr": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
+                                                              "price_cad": {
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
@@ -45054,7 +45106,11 @@
                                                                           "name": {
                                                                             "type": "string"
                                                                           },
-                                                                          "price": {
+                                                                          "price_inr": {
+                                                                            "type": "number",
+                                                                            "format": "float"
+                                                                          },
+                                                                          "price_cad": {
                                                                             "type": "number",
                                                                             "format": "float"
                                                                           },
@@ -48462,7 +48518,11 @@
                                                                                       "name": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "price": {
+                                                                                      "price_inr": {
+                                                                                        "type": "number",
+                                                                                        "format": "float"
+                                                                                      },
+                                                                                      "price_cad": {
                                                                                         "type": "number",
                                                                                         "format": "float"
                                                                                       },
@@ -52254,7 +52314,11 @@
                                                                         "name": {
                                                                           "type": "string"
                                                                         },
-                                                                        "price": {
+                                                                        "price_inr": {
+                                                                          "type": "number",
+                                                                          "format": "float"
+                                                                        },
+                                                                        "price_cad": {
                                                                           "type": "number",
                                                                           "format": "float"
                                                                         },
@@ -56819,7 +56883,11 @@
                                                             "name": {
                                                               "type": "string"
                                                             },
-                                                            "price": {
+                                                            "price_inr": {
+                                                              "type": "number",
+                                                              "format": "float"
+                                                            },
+                                                            "price_cad": {
                                                               "type": "number",
                                                               "format": "float"
                                                             },
@@ -61022,7 +61090,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -65020,7 +65092,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },
@@ -68490,7 +68566,11 @@
                                                 "name": {
                                                   "type": "string"
                                                 },
-                                                "price": {
+                                                "price_inr": {
+                                                  "type": "number",
+                                                  "format": "float"
+                                                },
+                                                "price_cad": {
                                                   "type": "number",
                                                   "format": "float"
                                                 },

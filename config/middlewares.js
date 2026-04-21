@@ -24,7 +24,19 @@ module.exports = [
       },
     },
   },
-  'strapi::cors',
+  {
+  name: 'strapi::cors',
+  config: {
+    origin: ['http://localhost:3000'], // your frontend
+    headers: [
+      'Content-Type',
+      'Authorization',
+      'Origin',
+      'Accept',
+      'client-ip', // ✅ ADD THIS
+    ],
+  },
+},
   'strapi::poweredBy',
   'strapi::logger',
   'strapi::query',

@@ -17,9 +17,11 @@
       "required": true,
       "unique": true
     },
-    "price": {
-      "type": "decimal",
-      "default": 0
+    "price_inr": {
+      "type": "decimal"
+    },
+    "price_cad": {
+      "type": "decimal"
     },
     "billingCycle": {
       "type": "enumeration",

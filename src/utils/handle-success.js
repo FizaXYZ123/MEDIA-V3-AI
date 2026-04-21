@@ -3,9 +3,8 @@ const applyPlanFees = require("./apply-plan-fees");
 
 module.exports = async (session) => {
 
-  const amountPaid = session.amount_total / 100;
-  const currency = session.currency.toUpperCase();
-
+ const amountPaid = Number((session.amount_total / 100).toFixed(2));
+const currency = session.currency.toUpperCase();
   // ✅ SAFE EXTRACTION
   const userId = session.metadata?.userId
     ? parseInt(session.metadata.userId)
@@ -46,7 +45,7 @@ module.exports = async (session) => {
   }
 
 
-  // ✅ EXPIRE OLD SUBSCRIPTION (IMPORTANT)
+  // ✅ EXPIRE OLD SUBSCRIPTION 
   const existing = await strapi.db
     .query("api::user-subscription.user-subscription")
     .findOne({
@@ -108,17 +107,18 @@ module.exports = async (session) => {
     {
       data: {
         plan: planId,
+         user_type: "subscribed", 
       },
     }
   );
 
- await strapi.entityService.create("api::payment-log.payment-log", {
+await strapi.entityService.create("api::payment-log.payment-log", {
   data: {
     users_permissions_user: userId,
     plan: planId,
 
     stripeSessionId: session.id,
-    paymentIntentId: session.payment_intent,
+    paymentIntentId: session.payment_intent || null,
 
     amount: amountPaid,
     currency: currency,

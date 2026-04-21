@@ -1538,7 +1538,8 @@ export interface ApiPlanPlan extends Schema.CollectionType {
   };
   attributes: {
     name: Attribute.String & Attribute.Required & Attribute.Unique;
-    price: Attribute.Decimal & Attribute.DefaultTo<0>;
+    price_inr: Attribute.Decimal;
+    price_cad: Attribute.Decimal;
     billingCycle: Attribute.Enumeration<['yearly']> &
       Attribute.DefaultTo<'yearly'>;
     defaultCommission: Attribute.Decimal & Attribute.DefaultTo<0>;
