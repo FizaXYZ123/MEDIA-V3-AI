@@ -52,6 +52,8 @@ module.exports = {
         }
       ],
 
+       allow_promotion_codes: true,
+
       metadata: {
         userId: userId.toString(),
         planId: plan.id.toString(),

@@ -50,6 +50,12 @@
       "relation": "oneToMany",
       "target": "api::user-subscription.user-subscription",
       "mappedBy": "plan"
+    },
+    "payment_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment-log.payment-log",
+      "mappedBy": "plan"
     }
   }
 }

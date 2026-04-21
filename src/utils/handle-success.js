@@ -1,6 +1,10 @@
 const applyPlanFees = require("./apply-plan-fees");
 
+
 module.exports = async (session) => {
+
+  const amountPaid = session.amount_total / 100;
+  const currency = session.currency.toUpperCase();
 
   // ✅ SAFE EXTRACTION
   const userId = session.metadata?.userId
@@ -19,6 +23,17 @@ module.exports = async (session) => {
     return;
   }
 
+  const exists = await strapi.db
+    .query("api::payment-log.payment-log")
+    .findOne({
+      where: { stripeSessionId: session.id },
+    });
+
+  if (exists) {
+    console.log("⚠️ Payment already logged");
+    return;
+  }
+
   // ✅ FETCH PLAN
   const plan = await strapi.entityService.findOne(
     "api::plan.plan",
@@ -29,6 +44,7 @@ module.exports = async (session) => {
     console.log("❌ Plan not found");
     return;
   }
+
 
   // ✅ EXPIRE OLD SUBSCRIPTION (IMPORTANT)
   const existing = await strapi.db
@@ -57,24 +73,24 @@ module.exports = async (session) => {
 
 
   // ✅ CREATE NEW SUBSCRIPTION
-const startDate = new Date();
-const endDate = new Date(startDate);
+  const startDate = new Date();
+  const endDate = new Date(startDate);
 
-endDate.setFullYear(endDate.getFullYear() + 1);
+  endDate.setFullYear(endDate.getFullYear() + 1);
 
-const subscription = await strapi.entityService.create(
-  "api::user-subscription.user-subscription",
-  {
-    data: {
-      users_permissions_user: userId,
-      plan: planId,
-      status: "active",
-      startDate,
-      endDate,
-      publishedAt: new Date(),
-    },
-  }
-);
+  const subscription = await strapi.entityService.create(
+    "api::user-subscription.user-subscription",
+    {
+      data: {
+        users_permissions_user: userId,
+        plan: planId,
+        status: "active",
+        startDate,
+        endDate,
+        publishedAt: new Date(),
+      },
+    }
+  );
 
   console.log("✅ Subscription created:", subscription.id);
 
@@ -85,7 +101,7 @@ const subscription = await strapi.entityService.create(
     subscriptionId: subscription.id,
   });
 
-  // ✅ UPDATE USER (FINAL STATE)
+  // ✅ UPDATE USER 
   await strapi.entityService.update(
     "plugin::users-permissions.user",
     userId,
@@ -96,5 +112,22 @@ const subscription = await strapi.entityService.create(
     }
   );
 
-  console.log("🎉 Subscription + Fees + User Updated");
+ await strapi.entityService.create("api::payment-log.payment-log", {
+  data: {
+    users_permissions_user: userId,
+    plan: planId,
+
+    stripeSessionId: session.id,
+    paymentIntentId: session.payment_intent,
+
+    amount: amountPaid,
+    currency: currency,
+
+    status: "success",
+    paidAt: new Date(),
+  },
+});
+
+  console.log("🎉 Subscription + Fees + User Updated + Payment log created");
+
 };

@@ -827,6 +827,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::user-subscription.user-subscription'
     >;
+    payment_logs: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::payment-log.payment-log'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1394,6 +1399,50 @@ export interface ApiNotificationNotification extends Schema.CollectionType {
   };
 }
 
+export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
+  collectionName: 'payment_logs';
+  info: {
+    singularName: 'payment-log';
+    pluralName: 'payment-logs';
+    displayName: 'payment-log';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    users_permissions_user: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    plan: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'manyToOne',
+      'api::plan.plan'
+    >;
+    stripeSessionId: Attribute.String & Attribute.Unique;
+    paymentIntentId: Attribute.String;
+    amount: Attribute.Decimal;
+    currency: Attribute.String;
+    status: Attribute.Enumeration<['success', 'failed']>;
+    paidAt: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiPayoutRequestPayoutRequest extends Schema.CollectionType {
   collectionName: 'payout_requests';
   info: {
@@ -1501,6 +1550,11 @@ export interface ApiPlanPlan extends Schema.CollectionType {
       'api::plan.plan',
       'oneToMany',
       'api::user-subscription.user-subscription'
+    >;
+    payment_logs: Attribute.Relation<
+      'api::plan.plan',
+      'oneToMany',
+      'api::payment-log.payment-log'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1932,6 +1986,7 @@ declare module '@strapi/types' {
       'api::invoice.invoice': ApiInvoiceInvoice;
       'api::label-fee-history.label-fee-history': ApiLabelFeeHistoryLabelFeeHistory;
       'api::notification.notification': ApiNotificationNotification;
+      'api::payment-log.payment-log': ApiPaymentLogPaymentLog;
       'api::payout-request.payout-request': ApiPayoutRequestPayoutRequest;
       'api::phone-counter.phone-counter': ApiPhoneCounterPhoneCounter;
       'api::plan.plan': ApiPlanPlan;
