@@ -25,18 +25,18 @@ module.exports = [
     },
   },
   {
-  name: 'strapi::cors',
-  config: {
-    origin: ['http://localhost:5173'], 
-    headers: [
-      'Content-Type',
-      'Authorization',
-      'Origin',
-      'Accept',
-      'client-ip',
-    ],
+    name: 'strapi::cors',
+    config: {
+      origin: ['http://localhost:5173', 'https://v3.amozart.com'],
+      headers: [
+        'Content-Type',
+        'Authorization',
+        'Origin',
+        'Accept',
+        'client-ip',
+      ],
+    },
   },
-},
   'strapi::poweredBy',
   'strapi::logger',
   'strapi::query',
