@@ -1,5 +1,7 @@
 'use strict';
 
+const { config } = require("node:process");
+
 module.exports = {
   routes: [
     {
@@ -25,21 +27,33 @@ module.exports = {
       method: 'GET',
       path: '/artist-details',
       handler: 'artist-detail.find',
+      config:{
+        type: "content-api"
+      }
     },
     {
       method: 'GET',
       path: '/artist-details/:id',
       handler: 'artist-detail.findOne',
+      config:{
+        type: "content-api"
+      }
     },
     {
       method: 'PUT',
       path: '/artist-details/:id',
       handler: 'artist-detail.update',
+      config:{
+        type: "content-api"
+      }
     },
     {
       method: 'DELETE',
       path: '/artist-details/:id',
       handler: 'artist-detail.delete',
+      config:{
+        type: "content-api"
+      }
     },
   ],
 };

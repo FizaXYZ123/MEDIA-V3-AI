@@ -2,11 +2,31 @@
 
 module.exports = {
   routes: [
-    { method: 'GET', path: '/publish-distributes', handler: 'publish-distribute.find' },
-    { method: 'GET', path: '/publish-distributes/:id', handler: 'publish-distribute.findOne' },
-    { method: 'POST', path: '/publish-distributes', handler: 'publish-distribute.create' },
-    { method: 'PUT', path: '/publish-distributes/:id', handler: 'publish-distribute.update' },
-    { method: 'DELETE', path: '/publish-distributes/:id', handler: 'publish-distribute.delete' },
+    { method: 'GET', path: '/publish-distributes', handler: 'publish-distribute.find',
+      config:{
+        type: "content-api"
+      }
+     },
+    { method: 'GET', path: '/publish-distributes/:id', handler: 'publish-distribute.findOne',
+      config:{
+        type: "content-api"
+      }
+     },
+    { method: 'POST', path: '/publish-distributes', handler: 'publish-distribute.create',
+      config:{
+        type: "content-api"
+      }
+     },
+    { method: 'PUT', path: '/publish-distributes/:id', handler: 'publish-distribute.update',
+      config:{
+        type: "content-api"
+      }
+     },
+    { method: 'DELETE', path: '/publish-distributes/:id', handler: 'publish-distribute.delete',
+      config:{
+        type: "content-api"
+      }
+     },
     {
       method: 'GET',
       path: '/publish-distributes/priorities',
@@ -20,7 +40,10 @@ module.exports = {
     {
       method: 'POST',
       path: '/publish-distributes/from-draft/:id',   // <-- :id is required here
-      handler: 'publish-distribute.publishFromDraft'
+      handler: 'publish-distribute.publishFromDraft',
+      config:{
+        type: "content-api"
+      }
     },
 
     {
