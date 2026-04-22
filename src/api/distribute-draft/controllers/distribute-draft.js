@@ -126,13 +126,13 @@ const checkPrimaryArtistLimit = async (userId, incomingTracks = []) => {
   // 5. Final check
   if (totalAfterUpload > allowedLimit) {
     const message =
-  allowedLimit === 1
-    ? `Your plan allows only 1 primary artist. Please upgrade your subscription.`
-    : `According to your subscription only ${allowedLimit} primary artists are allowed. Please upgrade your subscription.`;
+      allowedLimit === 1
+        ? `Your plan allows only 1 primary artist. Please upgrade your subscription.`
+        : `According to your subscription only ${allowedLimit} primary artists are allowed. Please upgrade your subscription.`;
 
-const error = new Error(message);
-error.status = 400;
-throw error;
+    const error = new Error(message);
+    error.status = 400;
+    throw error;
   }
 };
 
@@ -527,8 +527,8 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
         }
 
         if (artistRecord?.id) {
-            artistIdsToAdd.push(artistRecord.id);
-          }
+          artistIdsToAdd.push(artistRecord.id);
+        }
       }
 
       // If we got artist ids and track has an id, append them to the track relation (merge with existing)
@@ -603,6 +603,7 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
       id,
       { populate: { TrackList: true } }
     );
+
 
     let generatedISRCs = [];
 

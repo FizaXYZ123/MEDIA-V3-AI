@@ -111,7 +111,7 @@ module.exports = {
     let country = await getCountryFromIP(ip);
 
     if (!country) {
-      console.log("⚠️ Falling back to INDIA");
+      console.log("⚠️ Falling back to CANADA");
       country = "CA";
     }
 
@@ -182,6 +182,24 @@ module.exports = {
     if (plan.name.toLowerCase() === "pro label") {
       console.log("🆓 Free plan selected");
 
+      const alreadySubscribed = await strapi.db
+        .query("api::user-subscription.user-subscription")
+        .findOne({
+          where: {
+            users_permissions_user: userId,
+            plan: plan.id,
+            status: "active",
+          },
+        });
+
+      if (alreadySubscribed) {
+        console.log("⚠️ Already subscribed to this plan");
+
+        return ctx.send({
+          message: "Already subscribed",
+        });
+      }
+
       const activeSubs = await strapi.db
         .query("api::user-subscription.user-subscription")
         .findMany({
@@ -205,6 +223,7 @@ module.exports = {
       }
 
       console.log("♻️ Old subscriptions expired");
+
 
       // ✅ Create new subscription
       const startDate = new Date();
@@ -241,7 +260,6 @@ module.exports = {
         message: "Free plan activated successfully",
         subscription,
       });
-      return;
     }
 
     // =========================
@@ -251,7 +269,7 @@ module.exports = {
       mode: "payment",
       customer_email: user.email,
 
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "upi"],
 
       line_items: [
         {
@@ -276,6 +294,6 @@ module.exports = {
       cancel_url: `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
     });
 
-    return { url: session.url };
+    return ctx.send({ url: session.url });
   },
 };

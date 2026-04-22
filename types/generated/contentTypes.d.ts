@@ -1405,6 +1405,7 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
     singularName: 'payment-log';
     pluralName: 'payment-logs';
     displayName: 'payment-log';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -1426,6 +1427,13 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
     currency: Attribute.String;
     status: Attribute.Enumeration<['success', 'failed']>;
     paidAt: Attribute.DateTime;
+    draftId: Attribute.Integer;
+    publish_distribute: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'manyToOne',
+      'api::publish-distribute.publish-distribute'
+    >;
+    type: Attribute.Enumeration<['subscription', 'priority-upload']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1618,6 +1626,11 @@ export interface ApiPublishDistributePublishDistribute
       'api::publish-distribute.publish-distribute',
       'oneToMany',
       'api::published-track-update-log.published-track-update-log'
+    >;
+    payment_logs: Attribute.Relation<
+      'api::publish-distribute.publish-distribute',
+      'oneToMany',
+      'api::payment-log.payment-log'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

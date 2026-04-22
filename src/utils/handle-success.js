@@ -1,10 +1,10 @@
+const { savePriorityPaymentLog } = require("./priority-payment");
 const applyPlanFees = require("./apply-plan-fees");
-
 
 module.exports = async (session) => {
 
- const amountPaid = Number((session.amount_total / 100).toFixed(2));
-const currency = session.currency.toUpperCase();
+  const amountPaid = Number((session.amount_total / 100).toFixed(2));
+  const currency = session.currency.toUpperCase();
   // ✅ SAFE EXTRACTION
   const userId = session.metadata?.userId
     ? parseInt(session.metadata.userId)
@@ -14,8 +14,17 @@ const currency = session.currency.toUpperCase();
     ? parseInt(session.metadata.planId)
     : null;
 
-  console.log("SESSION METADATA:", session.metadata);
+  
   console.log("PARSED:", { userId, planId });
+
+   const isPriority = session.metadata?.draftId !== undefined;
+
+  if (isPriority) {
+    console.log("🔥 Handling PRIORITY payment");
+
+    await savePriorityPaymentLog(session);
+    return;
+  }
 
   if (!userId || !planId) {
     console.log("❌ Missing userId or planId");
@@ -107,26 +116,26 @@ const currency = session.currency.toUpperCase();
     {
       data: {
         plan: planId,
-         user_type: "subscribed", 
+        user_type: "subscribed",
       },
     }
   );
 
-await strapi.entityService.create("api::payment-log.payment-log", {
-  data: {
-    users_permissions_user: userId,
-    plan: planId,
+  await strapi.entityService.create("api::payment-log.payment-log", {
+    data: {
+      users_permissions_user: userId,
+      plan: planId,
 
-    stripeSessionId: session.id,
-    paymentIntentId: session.payment_intent || null,
+      stripeSessionId: session.id,
+      paymentIntentId: session.payment_intent || null,
 
-    amount: amountPaid,
-    currency: currency,
-
-    status: "success",
-    paidAt: new Date(),
-  },
-});
+      amount: amountPaid,
+      currency: currency,
+      type: "subscription",
+      status: "success",
+      paidAt: new Date(),
+    },
+  });
 
   console.log("🎉 Subscription + Fees + User Updated + Payment log created");
 

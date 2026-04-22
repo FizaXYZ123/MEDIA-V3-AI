@@ -6,7 +6,15 @@ module.exports = {
       method: "POST",
       path: "/subscription/create-session",
       handler: "subscription.createSession",
-      config: { auth: {}}
-    }
+      config: { auth: {} }
+    },
+    {
+      method: "POST",
+      path: "/priority-payment",
+      handler: "priority-payment.createPrioritySession",
+      config: {
+        auth: {}, 
+      },
+    },
   ]
 };

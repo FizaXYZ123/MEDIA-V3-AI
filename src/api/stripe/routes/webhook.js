@@ -5,6 +5,6 @@ module.exports = {
       path: "/stripe/webhook",
       handler: "webhook.webhook",
       config: { auth: false }
-    }
+    },
   ]
 };

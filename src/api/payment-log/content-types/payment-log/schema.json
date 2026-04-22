@@ -4,7 +4,8 @@
   "info": {
     "singularName": "payment-log",
     "pluralName": "payment-logs",
-    "displayName": "payment-log"
+    "displayName": "payment-log",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -45,6 +46,23 @@
     },
     "paidAt": {
       "type": "datetime"
+    },
+    "draftId": {
+      "type": "integer",
+      "required": false
+    },
+    "publish_distribute": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::publish-distribute.publish-distribute",
+      "inversedBy": "payment_logs"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "subscription",
+        "priority-upload"
+      ]
     }
   }
 }

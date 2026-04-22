@@ -127,6 +127,12 @@
       "relation": "oneToMany",
       "target": "api::published-track-update-log.published-track-update-log",
       "mappedBy": "publish_distribute"
+    },
+    "payment_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment-log.payment-log",
+      "mappedBy": "publish_distribute"
     }
   }
 }

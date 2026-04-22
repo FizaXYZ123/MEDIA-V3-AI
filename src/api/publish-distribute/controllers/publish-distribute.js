@@ -126,72 +126,143 @@ module.exports = createCoreController('api::publish-distribute.publish-distribut
    * 3) Move tracks: set PublishedRelease = new publish id; set DraftRelease = null
    * 4) Optionally: archive the draft (unpublish or delete)
    */
-  async publishFromDraft(ctx) {
-    try {
-      const draftId = ctx.params.id || ctx.request.query.id;
-      if (!draftId) {
-        return ctx.badRequest("Draft ID is required");
+
+ async publishFromDraft(ctx) {
+  try {
+    const draftId = ctx.params.id || ctx.request.query.id;
+    if (!draftId) {
+      return ctx.badRequest("Draft ID is required");
+    }
+
+    const userId = ctx.state.user?.id;
+    const draftIdNum = Number(draftId); 
+
+    const draft = await strapi.entityService.findOne(
+      "api::distribute-draft.distribute-draft",
+      draftId,
+      {
+        populate: [
+          "CoverArt",
+          "TrackList",
+          "TrackList.PrimaryArtist",
+          "UserDetail",
+        ],
       }
+    );
 
-      const userId = ctx.state.user?.id;
+    if (!draft) return ctx.notFound("Draft not found");
 
-      // Fetch draft with relations
-      const draft = await strapi.entityService.findOne(
-        "api::distribute-draft.distribute-draft",
-        draftId,
-        {
-          populate: [
-            "CoverArt",
-            "TrackList",
-            "TrackList.PrimaryArtist",   // ✅ include artist detail
-            "UserDetail",
-          ]
-        }
-      );
+    // ✅ 1. OWNERSHIP CHECK
+    if (draft?.UserDetail?.id !== userId) {
+      return ctx.unauthorized("Not your draft");
+    }
 
-      if (!draft) return ctx.notFound("Draft not found");
+    // ✅ 2. PAYMENT CHECK (ONLY FOR PRIORITY)
+    let payment = null;
 
-      // Strip metadata + relations
-      const {
-        id,
-        createdAt,
-        updatedAt,
-        publishedAt,
-        CoverArt,
-        TrackList,
-        UserDetail,
-        ...draftData
-      } = draft;
+    if (draft.Priority === "Priority") {
+      payment = await strapi.db
+        .query("api::payment-log.payment-log")
+        .findOne({
+          where: {
+            users_permissions_user: userId,
+            draftId: draftIdNum, 
+            type: "priority-upload",
+            status: "success",
+          },
+        });
 
-      // Map tracks + artist details
-      const trackIds = TrackList?.map((track) => track.id) || [];
-      const artistIds = TrackList
-        ?.map((track) => track.PrimaryArtist?.id)
-        .filter(Boolean) || [];
+      if (!payment) {
+        return ctx.badRequest("Please complete priority payment first");
+      }
+    }
 
-      // Prepare publish data
-      const publishData = {
-        ...draftData,
-        UserDetail: userId || UserDetail?.id || null,
-        CoverArt: CoverArt ? CoverArt.id : null,
-        TrackList: trackIds,
-        ArtistDetails: artistIds,   // ✅ assuming your publish schema has this relation
-        publishedAt: new Date(),
-      };
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      publishedAt,
+      CoverArt,
+      TrackList,
+      UserDetail,
+      ...draftData
+    } = draft;
 
-      // Create publish entry
-      const publishEntry = await strapi.entityService.create(
+    const trackIds = TrackList?.map((t) => t.id) || [];
+
+    const artistIds = TrackList
+      ?.map((t) => t.PrimaryArtist?.id)
+      .filter(Boolean) || [];
+
+    const publishData = {
+      ...draftData,
+      draftId: draftIdNum, 
+      UserDetail: userId,
+      CoverArt: CoverArt ? CoverArt.id : null,
+      TrackList: trackIds,
+      ArtistDetails: artistIds,
+      priorityUpload: draft.Priority === "Priority",
+      publishedAt: new Date(),
+    };
+
+    // ✅ DUPLICATE CHECK
+    const existingAgain = await strapi.db
+      .query("api::publish-distribute.publish-distribute")
+      .findOne({
+        where: {
+          draftId: draftIdNum,
+        },
+      });
+
+    if (existingAgain) {
+      return ctx.send({ data: existingAgain });
+    }
+
+    // ✅ CREATE PUBLISH ENTRY
+    let publishEntry;
+
+    try {
+      publishEntry = await strapi.entityService.create(
         "api::publish-distribute.publish-distribute",
         { data: publishData }
       );
-
-      return ctx.send({ data: publishEntry });
     } catch (err) {
-      strapi.log.error(err);
-      return ctx.internalServerError("Failed to publish draft");
-    }
-  },
 
+      const existing = await strapi.db
+        .query("api::publish-distribute.publish-distribute")
+        .findOne({
+          where: {
+            draftId: draftIdNum, 
+          },
+        });
+
+      if (existing) {
+        return ctx.send({ data: existing });
+      }
+
+      throw err;
+    }
+
+    // ✅ UPDATE PAYMENT LOG (ONLY IF EXISTS)
+    if (payment && !payment.publish_distribute) {
+      await strapi.entityService.update(
+        "api::payment-log.payment-log",
+        payment.id,
+        {
+          data: {
+            publish_distribute: publishEntry.id,
+          },
+        }
+      );
+    }
+
+    return ctx.send({ data: publishEntry });
+
+  } catch (err) {
+    strapi.log.error(err);
+    return ctx.internalServerError("Failed to publish draft");
+  }
+},
 
   async updateRelease(ctx) {
     try {
