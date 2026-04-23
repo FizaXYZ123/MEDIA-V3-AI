@@ -11,7 +11,7 @@ module.exports = {
     {
       method: "POST",
       path: "/priority-payment",
-      handler: "priority-payment.createPrioritySession",
+      handler: "priority-session.createPrioritySession",
       config: {
         auth: {}, 
       },

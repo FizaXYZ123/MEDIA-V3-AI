@@ -1,8 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-/**
- * 🔥 CREATE STRIPE SESSION (PRIORITY UPLOAD)
- */
 const createPriorityStripeSession = async ({ userId, draft }) => {
   if (!draft) throw new Error("Draft not found");
 
@@ -12,14 +9,11 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
 
   const trackCount = draft.TrackList?.length || 1;
 
-  // 💰 FIXED PRICE: 12 CAD per track
-  const amount = trackCount * 12;
-
-  console.log(`💰 Tracks: ${trackCount}, Amount: ${amount} CAD`);
+  const amount = trackCount * 1299;
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    payment_method_types: ["card", "upi"],
+    payment_method_types: ["card"],
 
     line_items: [
       {
@@ -28,77 +22,67 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
           product_data: {
             name: `Priority Upload (${trackCount} tracks)`,
           },
-          unit_amount: Math.round(amount * 100),
+          unit_amount: amount,
         },
         quantity: 1,
       },
     ],
 
     metadata: {
+      type: "priority-upload",
       userId: userId.toString(),
-      draftId: draft.id.toString(), // 🔥 IMPORTANT
+      draftId: draft.id.toString(),
     },
 
-    success_url: `${process.env.FRONTEND_BASE_URL}/payment-success`,
-    cancel_url: `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
+    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release`,
+    cancel_url: `${process.env.FRONTEND_BASE_URL}/catalogue/draft`,
   });
 
   return session;
 };
 
-/**
- * 🔥 SAVE PAYMENT LOG (PRIORITY UPLOAD)
- */
 const savePriorityPaymentLog = async (session) => {
   try {
     const userId = session.metadata?.userId
-      ? parseInt(session.metadata.userId)
-      : null;
+  ? parseInt(session.metadata.userId)
+  : null;
 
-    const draftId = session.metadata?.draftId
-      ? parseInt(session.metadata.draftId)
-      : null;
+const draftId = session.metadata?.draftId
+  ? parseInt(session.metadata.draftId)
+  : null;
 
-    if (!userId || !draftId) {
-      console.log("❌ Missing metadata for priority payment");
-      return;
-    }
+    if (!userId || !draftId) return null;
 
-    // ✅ Prevent duplicate
     const exists = await strapi.db
       .query("api::payment-log.payment-log")
       .findOne({
         where: { stripeSessionId: session.id },
       });
 
-    if (exists) {
-      console.log("⚠️ Priority payment already logged");
-      return;
-    }
+    if (exists) return null;
 
-    // ✅ CREATE LOG
-    await strapi.entityService.create("api::payment-log.payment-log", {
-      data: {
-        users_permissions_user: userId,
-        draftId: draftId,
+    const createdLog = await strapi.entityService.create(
+      "api::payment-log.payment-log",
+      {
+        data: {
+          users_permissions_user: userId,
+          draftId,
+          stripeSessionId: session.id,
+          paymentIntentId: session.payment_intent || null,
+          amount: Number((session.amount_total / 100).toFixed(2)),
+          currency: session.currency.toUpperCase(),
+          status: "success",
+          paidAt: new Date(),
+          type: "priority-upload",
+        },
+      }
+    );
 
-        stripeSessionId: session.id,
-        paymentIntentId: session.payment_intent || null,
-
-        amount: Number((session.amount_total / 100).toFixed(2)),
-        currency: session.currency.toUpperCase(),
-
-        status: "success",
-        paidAt: new Date(),
-
-        type: "priority-upload",
-      },
-    });
-
-    console.log("✅ Priority payment log created");
+    return createdLog;
 
   } catch (err) {
     console.log("❌ Error saving priority payment:", err.message);
+    return null;
   }
 };
 

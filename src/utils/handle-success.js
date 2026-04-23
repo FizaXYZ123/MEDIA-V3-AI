@@ -1,5 +1,6 @@
-const { savePriorityPaymentLog } = require("./priority-payment");
+const { fullDistribute } = require("./distribute-after-payment");
 const applyPlanFees = require("./apply-plan-fees");
+const { savePriorityPaymentLog } = require("./priority-payment");
 
 module.exports = async (session) => {
 
@@ -17,14 +18,55 @@ module.exports = async (session) => {
   
   console.log("PARSED:", { userId, planId });
 
-   const isPriority = session.metadata?.draftId !== undefined;
+const isPriority = session.metadata?.type === "priority-upload";
 
-  if (isPriority) {
-    console.log("🔥 Handling PRIORITY payment");
+if (isPriority) {
+  console.log("🔥 Handling PRIORITY payment");
 
-    await savePriorityPaymentLog(session);
+  let paymentLog = await savePriorityPaymentLog(session);
+
+  if (!paymentLog) {
+    console.log("⚠️ Payment log already exists, fetching...");
+
+    paymentLog = await strapi.db
+      .query("api::payment-log.payment-log")
+      .findOne({
+        where: { stripeSessionId: session.id },
+      });
+  }
+
+  if (!paymentLog) {
+    console.log("❌ Payment log not found");
     return;
   }
+
+  // ✅ prevent duplicate distribution
+  if (paymentLog.publish_distribute) {
+    console.log("⚠️ Already distributed, skipping");
+    return;
+  }
+
+  console.log("🚀 CALLING FULL DISTRIBUTE");
+
+  try {
+    const publish = await fullDistribute(Number(paymentLog.draftId));
+
+    await strapi.entityService.update(
+      "api::payment-log.payment-log",
+      paymentLog.id,
+      {
+        data: {
+          publish_distribute: publish.id,
+        },
+      }
+    );
+
+  } catch (err) {
+    console.log("❌ DISTRIBUTE ERROR:", err.message);
+  }
+
+  return;
+}
 
   if (!userId || !planId) {
     console.log("❌ Missing userId or planId");
