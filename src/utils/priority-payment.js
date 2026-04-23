@@ -11,8 +11,14 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
 
   const amount = trackCount * 1299;
 
+  const user = await strapi.entityService.findOne(
+    "plugin::users-permissions.user",
+    userId
+  );
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    customer_email: user.email,
     payment_method_types: ["card"],
 
     line_items: [
@@ -34,7 +40,7 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
       draftId: draft.id.toString(),
     },
 
-    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release`,
+    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}&draft_id=${draft.id}`,
     cancel_url: `${process.env.FRONTEND_BASE_URL}/catalogue/draft`,
   });
 
@@ -44,12 +50,12 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
 const savePriorityPaymentLog = async (session) => {
   try {
     const userId = session.metadata?.userId
-  ? parseInt(session.metadata.userId)
-  : null;
+      ? parseInt(session.metadata.userId)
+      : null;
 
-const draftId = session.metadata?.draftId
-  ? parseInt(session.metadata.draftId)
-  : null;
+    const draftId = session.metadata?.draftId
+      ? parseInt(session.metadata.draftId)
+      : null;
 
     if (!userId || !draftId) return null;
 

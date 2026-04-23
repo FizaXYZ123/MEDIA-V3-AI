@@ -16,5 +16,13 @@ module.exports = {
         auth: {}, 
       },
     },
+    {
+      method: "POST",
+      path: "/priority-payment/verify",
+      handler: "priority-session.verifyPrioritySession",
+      config: {
+        auth: {}, 
+      },
+    },
   ]
 };
