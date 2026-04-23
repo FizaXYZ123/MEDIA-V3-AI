@@ -17,6 +17,20 @@ module.exports = (plugin) => {
       body.FulllName = body.FulllName.trim();
     }
 
+    // Prevent "invalid input syntax for type bigint: ''" error
+    // Delete empty string values for numeric or potentially bigint DB fields
+    const fieldsToClean = [
+      'phoneNumber', 'phone_number',
+      'availableBalance', 'available_balance',
+      'pendingBalance', 'pending_balance',
+      'platformFeeOverride', 'commissionOverride'
+    ];
+    fieldsToClean.forEach(field => {
+      if (body[field] === "") {
+        delete body[field];
+      }
+    });
+
     ctx.request.body = body;
 
     // Call original register

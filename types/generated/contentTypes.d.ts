@@ -772,7 +772,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     firstName: Attribute.String;
     lastName: Attribute.String;
-    phoneNumber: Attribute.BigInteger;
+    phoneNumber: Attribute.String;
     distribute_drafts: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',

@@ -72,7 +72,8 @@
       "type": "string"
     },
     "phoneNumber": {
-      "type": "biginteger"
+      "type": "string",
+      "required": false
     },
     "distribute_drafts": {
       "type": "relation",
@@ -90,12 +91,7 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+      "allowedTypes": ["images", "files", "videos", "audios"]
     },
     "currency": {
       "type": "string"
@@ -111,11 +107,7 @@
     },
     "user_type": {
       "type": "enumeration",
-      "enum": [
-        "basic",
-        "subscribed",
-        "enterprise"
-      ]
+      "enum": ["basic", "subscribed", "enterprise"]
     },
     "label_fee_histories": {
       "type": "relation",
