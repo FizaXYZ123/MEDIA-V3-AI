@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-04-23T10:37:09.222Z"
+    "x-generation-date": "2026-05-07T09:57:53.215Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2568,6 +2568,9 @@
                                                       "success",
                                                       "failed"
                                                     ]
+                                                  },
+                                                  "processing": {
+                                                    "type": "boolean"
                                                   },
                                                   "paidAt": {
                                                     "type": "string",
@@ -6161,6 +6164,9 @@
                                                       "success",
                                                       "failed"
                                                     ]
+                                                  },
+                                                  "processing": {
+                                                    "type": "boolean"
                                                   },
                                                   "paidAt": {
                                                     "type": "string",
@@ -9801,6 +9807,9 @@
                                                       "success",
                                                       "failed"
                                                     ]
+                                                  },
+                                                  "processing": {
+                                                    "type": "boolean"
                                                   },
                                                   "paidAt": {
                                                     "type": "string",
@@ -13672,6 +13681,9 @@
                                                                                 "success",
                                                                                 "failed"
                                                                               ]
+                                                                            },
+                                                                            "processing": {
+                                                                              "type": "boolean"
                                                                             },
                                                                             "paidAt": {
                                                                               "type": "string",
@@ -18150,6 +18162,9 @@
                                                                                                         "success",
                                                                                                         "failed"
                                                                                                       ]
+                                                                                                    },
+                                                                                                    "processing": {
+                                                                                                      "type": "boolean"
                                                                                                     },
                                                                                                     "paidAt": {
                                                                                                       "type": "string",
@@ -23530,6 +23545,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -27040,6 +27058,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -30548,6 +30569,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -31625,6 +31649,9 @@
                   "success",
                   "failed"
                 ]
+              },
+              "processing": {
+                "type": "boolean"
               },
               "paidAt": {
                 "type": "string",
@@ -34100,6 +34127,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -35093,6 +35123,9 @@
               "success",
               "failed"
             ]
+          },
+          "processing": {
+            "type": "boolean"
           },
           "paidAt": {
             "type": "string",
@@ -37708,6 +37741,9 @@
                                                       "success",
                                                       "failed"
                                                     ]
+                                                  },
+                                                  "processing": {
+                                                    "type": "boolean"
                                                   },
                                                   "paidAt": {
                                                     "type": "string",
@@ -41658,6 +41694,9 @@
                                                                     "failed"
                                                                   ]
                                                                 },
+                                                                "processing": {
+                                                                  "type": "boolean"
+                                                                },
                                                                 "paidAt": {
                                                                   "type": "string",
                                                                   "format": "date-time"
@@ -44835,6 +44874,9 @@
                                                                                 "success",
                                                                                 "failed"
                                                                               ]
+                                                                            },
+                                                                            "processing": {
+                                                                              "type": "boolean"
                                                                             },
                                                                             "paidAt": {
                                                                               "type": "string",
@@ -49256,6 +49298,9 @@
                                                                                                         "failed"
                                                                                                       ]
                                                                                                     },
+                                                                                                    "processing": {
+                                                                                                      "type": "boolean"
+                                                                                                    },
                                                                                                     "paidAt": {
                                                                                                       "type": "string",
                                                                                                       "format": "date-time"
@@ -52153,6 +52198,9 @@
                                                                               "success",
                                                                               "failed"
                                                                             ]
+                                                                          },
+                                                                          "processing": {
+                                                                            "type": "boolean"
                                                                           },
                                                                           "paidAt": {
                                                                             "type": "string",
@@ -57027,6 +57075,9 @@
                                                                   "failed"
                                                                 ]
                                                               },
+                                                              "processing": {
+                                                                "type": "boolean"
+                                                              },
                                                               "paidAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -61279,6 +61330,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -65326,6 +65380,9 @@
                                                       "failed"
                                                     ]
                                                   },
+                                                  "processing": {
+                                                    "type": "boolean"
+                                                  },
                                                   "paidAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -68844,6 +68901,9 @@
                                                       "success",
                                                       "failed"
                                                     ]
+                                                  },
+                                                  "processing": {
+                                                    "type": "boolean"
                                                   },
                                                   "paidAt": {
                                                     "type": "string",

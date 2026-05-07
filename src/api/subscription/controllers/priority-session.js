@@ -79,25 +79,73 @@ module.exports = {
       let paymentLog = existingLog || await savePriorityPaymentLog(session);
 
       if (!paymentLog) {
-         paymentLog = await strapi.db.query("api::payment-log.payment-log").findOne({
-           where: { stripeSessionId: session.id },
-         });
+        paymentLog = await strapi.db.query("api::payment-log.payment-log").findOne({
+          where: { stripeSessionId: session.id },
+        });
       }
 
-      if (!paymentLog || paymentLog.publish_distribute) {
-        return ctx.send({ publishId: paymentLog?.publish_distribute });
+      if (!paymentLog) {
+        return ctx.badRequest("Payment log not found");
       }
 
-      // Process distribution synchronously
-      const publish = await fullDistribute(Number(paymentLog.draftId));
+      // ✅ already distributed
+      if (paymentLog.publish_distribute) {
+        return ctx.send({
+          publishId: paymentLog.publish_distribute,
+        });
+      }
 
+      // ✅ already processing
+      if (paymentLog.processing) {
+        return ctx.send({
+          message: "Distribution already in progress",
+        });
+      }
+
+      // ✅ LOCK
       await strapi.entityService.update(
         "api::payment-log.payment-log",
         paymentLog.id,
-        { data: { publish_distribute: publish.id } }
+        {
+          data: {
+            processing: true,
+          },
+        }
       );
 
-      return ctx.send({ publishId: publish.id });
+      try {
+
+        const publish = await fullDistribute(Number(paymentLog.draftId));
+
+        await strapi.entityService.update(
+          "api::payment-log.payment-log",
+          paymentLog.id,
+          {
+            data: {
+              publish_distribute: publish.id,
+              processing: false,
+            },
+          }
+        );
+
+        return ctx.send({
+          publishId: publish.id,
+        });
+
+      } catch (err) {
+
+        await strapi.entityService.update(
+          "api::payment-log.payment-log",
+          paymentLog.id,
+          {
+            data: {
+              processing: false,
+            },
+          }
+        );
+
+        throw err;
+      }
 
     } catch (err) {
       console.error("❌ ERROR Verifying:", err.message);

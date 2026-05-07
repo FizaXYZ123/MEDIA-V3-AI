@@ -1426,6 +1426,7 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
     amount: Attribute.Decimal;
     currency: Attribute.String;
     status: Attribute.Enumeration<['success', 'failed']>;
+    processing: Attribute.Boolean & Attribute.DefaultTo<false>;
     paidAt: Attribute.DateTime;
     draftId: Attribute.Integer;
     publish_distribute: Attribute.Relation<

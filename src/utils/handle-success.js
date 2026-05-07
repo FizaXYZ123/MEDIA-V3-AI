@@ -41,12 +41,31 @@ module.exports = async (session) => {
     }
 
     // ✅ prevent duplicate distribution
+
+
     if (paymentLog.publish_distribute) {
-      console.log("⚠️ Already distributed, skipping");
+      console.log("⚠️ Already distributed");
       return;
     }
 
+    if (paymentLog.processing) {
+      console.log("⚠️ Distribution already processing");
+      return;
+    }
+
+    // ✅ LOCK
+    await strapi.entityService.update(
+      "api::payment-log.payment-log",
+      paymentLog.id,
+      {
+        data: {
+          processing: true,
+        },
+      }
+    );
+
     try {
+
       const publish = await fullDistribute(Number(paymentLog.draftId));
 
       await strapi.entityService.update(
@@ -55,11 +74,23 @@ module.exports = async (session) => {
         {
           data: {
             publish_distribute: publish.id,
+            processing: false,
           },
         }
       );
 
     } catch (err) {
+
+      await strapi.entityService.update(
+        "api::payment-log.payment-log",
+        paymentLog.id,
+        {
+          data: {
+            processing: false,
+          },
+        }
+      );
+
       console.log("❌ DISTRIBUTE ERROR:", err.message);
     }
 

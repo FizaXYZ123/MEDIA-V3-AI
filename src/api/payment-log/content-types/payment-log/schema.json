@@ -44,6 +44,10 @@
         "failed"
       ]
     },
+    "processing": {
+      "type": "boolean",
+      "default": false
+    },
     "paidAt": {
       "type": "datetime"
     },
