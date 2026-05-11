@@ -1260,10 +1260,10 @@ export interface ApiImportedReportImportedReport extends Schema.CollectionType {
     FileName: Attribute.String;
     startDate: Attribute.Date;
     endDate: Attribute.Date;
-    totalNet: Attribute.Decimal;
-    skippedNet: Attribute.Decimal;
-    CommissionPercent: Attribute.Decimal;
-    OriginalTotal: Attribute.Decimal;
+    totalNet: Attribute.Float;
+    skippedNet: Attribute.Float;
+    CommissionPercent: Attribute.Float;
+    OriginalTotal: Attribute.Float;
     PlatformCommission: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

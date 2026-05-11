@@ -523,6 +523,8 @@ module.exports = () => ({
 
           OriginalTotal:
             toDecimal(originalTotal, "OriginalTotal"),
+
+          PlatformCommission: platformCommissions,
         }
       });
 
