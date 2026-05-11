@@ -288,10 +288,13 @@ module.exports = {
 
       /* 4️⃣ GROUP BY COUNTRY */
       let totalEarnings = 0;
+
       const countryMap = {};
 
       data.forEach(item => {
+
         const country = item.Country || "Unknown";
+
         const earnings = Number(item.NetTotal || 0);
 
         totalEarnings += earnings;
@@ -299,19 +302,59 @@ module.exports = {
         if (!countryMap[country]) {
           countryMap[country] = {
             country,
+            originalEarnings: 0,
             totalEarnings: 0,
             percentage: 0
           };
         }
 
-        countryMap[country].totalEarnings += earnings;
+        countryMap[country].originalEarnings += earnings;
       });
 
-      /* 5️⃣ CALCULATE % */
+      /* 5️⃣ FETCH LATEST LABEL FEE */
+      const labelFeeData = await strapi.db
+        .query("api::label-fee-history.label-fee-history")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+          },
+          orderBy: {
+            effective_from: "desc"
+          },
+          limit: 1,
+        });
+
+      const labelFee =
+        labelFeeData[0]?.feePercentage ?? 0;
+
+      /* 6️⃣ DEDUCT LABEL FEE */
+      const adjustedTotalEarnings =
+        totalEarnings -
+        (totalEarnings * labelFee / 100);
+
+      /* 7️⃣ REDISTRIBUTE PROPORTIONALLY */
+      Object.values(countryMap).forEach(country => {
+
+        country.totalEarnings =
+          totalEarnings > 0
+            ? (
+              (country.originalEarnings / totalEarnings)
+              * adjustedTotalEarnings
+            )
+            : 0;
+      });
+
+      /* 8️⃣ CALCULATE % */
       const result = Object.values(countryMap).map(c => ({
-        ...c,
-        percentage: totalEarnings
-          ? ((c.totalEarnings / totalEarnings) * 100).toFixed(2)
+        country: c.country,
+
+        totalEarnings:
+          Number(c.totalEarnings.toFixed(2)),
+
+        percentage: adjustedTotalEarnings
+          ? (
+            (c.totalEarnings / adjustedTotalEarnings) * 100
+          ).toFixed(2)
           : 0
       }));
 
@@ -319,7 +362,10 @@ module.exports = {
       result.sort((a, b) => b.totalEarnings - a.totalEarnings);
 
       return ctx.send({
-        totalEarnings,
+        totalEarnings:
+          Number(adjustedTotalEarnings.toFixed(2)),
+
+        labelFee,
         countries: result
       });
 
