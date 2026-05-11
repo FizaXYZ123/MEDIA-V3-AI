@@ -7,49 +7,189 @@ const csv = require("csv-parser");
 function formatDate(dateStr) {
   if (!dateStr) return null;
 
-  // ✅ FIX: parse MM/DD/YYYY manually
+  // already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+
+  // MM/DD/YYYY
   const parts = String(dateStr).split("/");
 
   if (parts.length === 3) {
     const [month, day, year] = parts;
 
-    const d = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day)
-    );
-
-    return d.toISOString().split("T")[0];
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
 
-  // fallback
   const d = new Date(dateStr);
+
   if (isNaN(d.getTime())) return null;
 
-  return d.toISOString().split("T")[0];
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
-
 
 /* SAFE NUMBER */
 function toNumber(value) {
-  if (value === undefined || value === null) return 0;
-  const cleaned = String(value).replace(/,/g, "").trim();
-  const n = parseFloat(cleaned);
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return 0;
+  }
+
+  const cleaned = String(value)
+    .replace(/,/g, "")
+    .trim();
+
+  const n = Number(cleaned);
+
   return isNaN(n) ? 0 : n;
+}
+
+function toDecimal(value, fieldName = "", digits = 20) {
+
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return 0;
+  }
+
+  const cleaned = String(value)
+    .replace(/,/g, "")
+    .trim();
+
+  let num = Number(cleaned);
+
+  if (isNaN(num)) {
+    return 0;
+  }
+
+  /*
+    ✅ Convert scientific notation
+    into full decimal 
+  */
+  const decimalValue = num.toLocaleString("fullwide", {
+    useGrouping: false,
+    maximumFractionDigits: digits,
+  });
+
+  if (/e/i.test(cleaned)) {
+    console.log(
+      `🔄 [${fieldName}] ${cleaned} → ${decimalValue}`
+    );
+  }
+
+  return decimalValue;
+}
+
+function normalizeISRC(isrc) {
+  if (!isrc) return null;
+
+  const clean = isrc
+    .replace(/-/g, "")
+    .replace(/\s+/g, "")
+    .trim()
+    .toUpperCase();
+
+  // Convert AUBEC2469677 → AU-BEC-24-69677
+  if (clean.length === 12) {
+    return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5, 7)}-${clean.slice(7)}`;
+  }
+
+  return clean;
 }
 
 /* PLATFORM NORMALIZER */
 function normalizePlatform(platform) {
   if (!platform) return null;
+
   const p = platform.toLowerCase().trim();
 
-  if (p.includes("youtube")) return "YouTube Music";
-  if (p.includes("apple")) return "Apple Music";
   if (p.includes("spotify")) return "Spotify";
+
+  if (p.includes("apple")) return "Apple Music";
+
+  if (p.includes("youtube")) return "YouTube Music";
+
   if (p.includes("amazon")) return "Amazon Music";
+
   if (p.includes("deezer")) return "Deezer";
 
-  return platform;
+  if (p.includes("tidal")) return "Tidal";
+
+  if (p.includes("yango")) return "Yango Play";
+
+  if (p.includes("meta")) return "Meta";
+
+  if (p.includes("peloton")) return "Peloton";
+
+  if (p.includes("awa")) return "AWA";
+
+  if (p.includes("itunes")) return "iTunes";
+
+  if (p.includes("kdigital")) return "KDigital Media";
+
+  if (p.includes("supernatural")) return "Supernatural";
+
+  if (p.includes("tiktok")) return "TikTok";
+
+  if (p.includes("mixcloud")) return "MixCloud";
+
+  if (p.includes("qobuz")) return "Qobuz";
+
+  if (p.includes("anghami")) return "Anghami";
+
+  if (p.includes("beatport")) return "Beatport";
+
+  if (p.includes("douyin")) return "DouYin";
+
+  if (p.includes("jio saavn") || p.includes("saavn"))
+    return "JioSaavn";
+
+  if (p.includes("kkbox")) return "KKBox";
+
+  if (p.includes("taobao")) return "Taobao";
+
+  if (p.includes("tuned global")) return "Tuned Global";
+
+  if (p.includes("soda")) return "Soda Music";
+
+  if (p.includes("netease")) return "NetEase Cloud Music";
+
+  if (p.includes("soundcloud")) return "SoundCloud";
+
+  if (p.includes("boomplay")) return "Boomplay Music";
+
+  if (p.includes("flo")) return "Flo";
+
+  if (p.includes("joox")) return "JOOX";
+
+  if (p.includes("lickd")) return "Lickd";
+
+  if (p.includes("tencent")) return "Tencent";
+
+  if (p.includes("udio")) return "Udio";
+
+  if (p.includes("massive music")) return "Massive Music";
+
+  if (p.includes("pandora")) return "Pandora";
+
+  if (p.includes("soundexchange")) return "SoundExchange";
+
+  if (p.includes("audible magic")) return "Audible Magic";
+
+  if (p.includes("claro")) return "Claro Musica";
+
+  if (p.includes("iheart")) return "iHeart";
+
+  if (p.includes("kanjian")) return "Kanjian";
+
+  if (p.includes("lissen")) return "Lissen";
+
+  return platform.trim();
 }
 
 /* HEADER NORMALIZER */
@@ -107,75 +247,65 @@ module.exports = () => ({
       throw new Error("CSV file is empty");
     }
 
-    /* ================= GROUP BY ISRC ================= */
-    const isrcGroups = {};
+    /* ================= GROUP BY PLATFORM ================= */
+    const platformGroups = {};
 
     rows.forEach((row, index) => {
-      const isrc = row.isrc?.trim().toUpperCase();
-      if (!isrc) return;
 
-      if (!isrcGroups[isrc]) {
-        isrcGroups[isrc] = [];
+      const platform =
+        normalizePlatform(row.channel) || "UNKNOWN";
+
+      if (!platformGroups[platform]) {
+        platformGroups[platform] = [];
       }
 
-      isrcGroups[isrc].push({ ...row, __index: index });
+      platformGroups[platform].push({
+        ...row,
+        __index: index
+      });
     });
 
-    /* ================= APPLY 15% COMMISSION ================= */
+
+    /* ================= APPLY COMMISSION PER PLATFORM ================= */
     const adjustedMap = {};
 
-    for (const isrc in isrcGroups) {
-      const group = isrcGroups[isrc];
+    for (const platform in platformGroups) {
 
-      let totalNet = 0;
+      const rowsInPlatform = platformGroups[platform];
 
-      group.forEach(r => {
-        totalNet += toNumber(r.net_total);
+      let platformTotal = 0;
+
+      rowsInPlatform.forEach(r => {
+        platformTotal += toNumber(r.net_total);
       });
 
-      if (totalNet === 0) continue;
+      if (platformTotal === 0) continue;
 
-      /******** GROUP BY PLATFORM INSIDE ISRC ********/
-      const platformGroups = {};
+      const commissionToApply =
+        platformCommissions?.[platform] ?? commissionPercent;
 
-      group.forEach(r => {
-        const platform = normalizePlatform(r.channel) || "UNKNOWN";
+      const rate = commissionToApply / 100;
 
-        if (!platformGroups[platform]) {
-          platformGroups[platform] = [];
-        }
+      const platformRemaining =
+        platformTotal * (1 - rate);
 
-        platformGroups[platform].push(r);
+      rowsInPlatform.forEach(r => {
+
+        const original = toNumber(r.net_total);
+
+        /*
+          ✅ Redistribute proportionally
+          after applying commission
+          on total platform earnings
+        */
+
+        const adjusted =
+          platformTotal > 0
+            ? (original / platformTotal) * platformRemaining
+            : 0;
+
+        adjustedMap[r.__index] = adjusted;
       });
-
-      /******** APPLY COMMISSION PER PLATFORM ********/
-      for (const platform in platformGroups) {
-        const rowsInPlatform = platformGroups[platform];
-
-        let platformTotal = 0;
-
-        rowsInPlatform.forEach(r => {
-          platformTotal += toNumber(r.net_total);
-        });
-
-        const commissionToApply =
-          platformCommissions?.[platform] ?? commissionPercent;
-
-        const rate = commissionToApply / 100;
-
-        const platformRemaining = platformTotal * (1 - rate);
-
-        rowsInPlatform.forEach(r => {
-          const original = toNumber(r.net_total);
-
-          const adjusted =
-            platformTotal > 0
-              ? (original / platformTotal) * platformRemaining
-              : 0;
-
-          adjustedMap[r.__index] = Number(adjusted.toFixed(6));
-        });
-      }
     }
 
     /* REPORT PERIOD */
@@ -229,8 +359,11 @@ module.exports = () => ({
 
     const trackMap = {};
     tracks.forEach(t => {
-      if (t.ISRC) {
-        trackMap[t.ISRC.toUpperCase()] = t.id;
+
+      const cleanISRC = normalizeISRC(t.ISRC);
+
+      if (cleanISRC) {
+        trackMap[cleanISRC] = t.id;
       }
     });
 
@@ -241,7 +374,7 @@ module.exports = () => ({
 
     for (let i = 0; i < rows.length; i++) {
 
-      const row = rows[i];   
+      const row = rows[i];
       const adjustedNet = adjustedMap[i];
 
       if (adjustedNet === undefined) {
@@ -255,7 +388,7 @@ module.exports = () => ({
         continue;
       }
 
-      const isrc = row.isrc?.trim().toUpperCase();
+      const isrc = normalizeISRC(row.isrc);
       const platform = normalizePlatform(row.channel);
 
       if (!isrc) {
@@ -298,48 +431,64 @@ module.exports = () => ({
 
             Country: row.country,
 
-            Units: toNumber(row.units),
-
-            UnitPrice: toNumber(row.unit_price),
-
-            GrossTotal: toNumber(row.gross_total),
-
-            NetTotal: adjustedNet,
+            Currency: row.currency,
 
             StartDate: startDate,
 
             EndDate: endDate,
+
             ConfirmationReportDate: confirmationDate,
 
-            Currency: row.currency,
+            Label: row.label || "",
 
-            Label: row.label,
-            Type: row.type,
+            Type: row.type || "",
 
-            Taxes: toNumber(row.taxes),
-            ChannelCosts: toNumber(row.channel_costs),
+            Units: toNumber(row.units),
 
-            CurrencyRate: toNumber(row.currency_rate),
+            UnitPrice: toDecimal(row.unit_price, "UnitPrice"),
+
+            GrossTotal: toDecimal(row.gross_total, "GrossTotal"),
+
+            NetTotal: toDecimal(adjustedNet, "NetTotal"),
+
+            Taxes: toDecimal(row.taxes, "Taxes"),
+
+            ChannelCosts: toDecimal(row.channel_costs, "ChannelCosts"),
+
+            CurrencyRate: toDecimal(row.currency_rate, "CurrencyRate"),
 
             GrossTotalClientCurrency:
-              toNumber(row.gross_total_client_currency),
+              toDecimal(
+                row.gross_total_client_currency,
+                "GrossTotalClientCurrency"
+              ),
 
             NetTotalClientCurrency:
-              toNumber(row.net_total_client_currency),
+              toDecimal(
+                row.net_total_client_currency,
+                "NetTotalClientCurrency"
+              ),
 
             OtherCostsClientCurrency:
-              toNumber(row.other_costs_client_currency),
+              toDecimal(
+                row.other_costs_client_currency,
+                "OtherCostsClientCurrency"
+              ),
 
             ChannelCostsClientCurrency:
-              toNumber(row.channel_costs_client_currency),
+              toDecimal(
+                row.channel_costs_client_currency,
+                "ChannelCostsClientCurrency"
+              ),
+
+            OriginalNetTotal:
+              toDecimal(row.net_total, "OriginalNetTotal"),
 
             UserEmail: row.user_email,
 
             UPC: row.upc || "",
 
             TenantId: row.tenant_id,
-
-            OriginalNetTotal: toNumber(row.net_total),
 
             distribute_track: trackId,
 
@@ -356,7 +505,7 @@ module.exports = () => ({
       originalTotal += toNumber(rows[i].net_total);
     }
 
-    originalTotal = Number(originalTotal.toFixed(6));
+    originalTotal = toDecimal(originalTotal);
 
     await strapi.db
       .query("api::imported-report.imported-report")
@@ -365,12 +514,15 @@ module.exports = () => ({
           startDate: reportStartDate,
           endDate: reportEndDate,
           FileName: filename,
-          totalNet: monthlyTotal,
-          skippedNet: skippedTotal,
-          CommissionPercent: commissionPercent,
-          PlatformCommission: platformCommissions,
-          OriginalTotal: Number(originalTotal.toFixed(6)),
+          totalNet: toDecimal(monthlyTotal, "totalNet"),
 
+          skippedNet: toDecimal(skippedTotal, "skippedNet"),
+
+          CommissionPercent:
+            toDecimal(commissionPercent, "CommissionPercent"),
+
+          OriginalTotal:
+            toDecimal(originalTotal, "OriginalTotal"),
         }
       });
 

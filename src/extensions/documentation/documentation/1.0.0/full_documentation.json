@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-07T09:57:53.215Z"
+    "x-generation-date": "2026-05-11T07:10:12.099Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2007,22 +2007,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -5603,22 +5587,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -9246,22 +9214,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -15282,22 +15234,6 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "SonosuiteCutApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "PlatformFeeApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "CommissionApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "ArtistEarnings": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
                                       "distribute_track": {
                                         "type": "object",
                                         "properties": {
@@ -18825,22 +18761,6 @@
                                                     "type": "string"
                                                   },
                                                   "OriginalNetTotal": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "SonosuiteCutApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "PlatformFeeApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "CommissionApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "ArtistEarnings": {
                                                     "type": "number",
                                                     "format": "float"
                                                   },
@@ -22986,22 +22906,6 @@
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
                                                                 "distribute_track": {
                                                                   "type": "object",
                                                                   "properties": {
@@ -26499,22 +26403,6 @@
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
                                                                 "distribute_track": {
                                                                   "type": "object",
                                                                   "properties": {
@@ -30007,22 +29895,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -33565,22 +33437,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -37180,22 +37036,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
@@ -41229,22 +41069,6 @@
                                                                                 "type": "string"
                                                                               },
                                                                               "OriginalNetTotal": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
-                                                                              "SonosuiteCutApplied": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
-                                                                              "PlatformFeeApplied": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
-                                                                              "CommissionApplied": {
-                                                                                "type": "number",
-                                                                                "format": "float"
-                                                                              },
-                                                                              "ArtistEarnings": {
                                                                                 "type": "number",
                                                                                 "format": "float"
                                                                               },
@@ -46475,22 +46299,6 @@
                                         "type": "number",
                                         "format": "float"
                                       },
-                                      "SonosuiteCutApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "PlatformFeeApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "CommissionApplied": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
-                                      "ArtistEarnings": {
-                                        "type": "number",
-                                        "format": "float"
-                                      },
                                       "distribute_track": {
                                         "type": "object",
                                         "properties": {
@@ -49935,22 +49743,6 @@
                                                     "type": "number",
                                                     "format": "float"
                                                   },
-                                                  "SonosuiteCutApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "PlatformFeeApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "CommissionApplied": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
-                                                  "ArtistEarnings": {
-                                                    "type": "number",
-                                                    "format": "float"
-                                                  },
                                                   "distribute_track": {
                                                     "type": "object",
                                                     "properties": {
@@ -50390,22 +50182,6 @@
                 "type": "number",
                 "format": "float"
               },
-              "SonosuiteCutApplied": {
-                "type": "number",
-                "format": "float"
-              },
-              "PlatformFeeApplied": {
-                "type": "number",
-                "format": "float"
-              },
-              "CommissionApplied": {
-                "type": "number",
-                "format": "float"
-              },
-              "ArtistEarnings": {
-                "type": "number",
-                "format": "float"
-              },
               "distribute_track": {
                 "oneOf": [
                   {
@@ -50562,22 +50338,6 @@
             "type": "string"
           },
           "OriginalNetTotal": {
-            "type": "number",
-            "format": "float"
-          },
-          "SonosuiteCutApplied": {
-            "type": "number",
-            "format": "float"
-          },
-          "PlatformFeeApplied": {
-            "type": "number",
-            "format": "float"
-          },
-          "CommissionApplied": {
-            "type": "number",
-            "format": "float"
-          },
-          "ArtistEarnings": {
             "type": "number",
             "format": "float"
           },
@@ -53799,22 +53559,6 @@
                                       "type": "number",
                                       "format": "float"
                                     },
-                                    "SonosuiteCutApplied": {
-                                      "type": "number",
-                                      "format": "float"
-                                    },
-                                    "PlatformFeeApplied": {
-                                      "type": "number",
-                                      "format": "float"
-                                    },
-                                    "CommissionApplied": {
-                                      "type": "number",
-                                      "format": "float"
-                                    },
-                                    "ArtistEarnings": {
-                                      "type": "number",
-                                      "format": "float"
-                                    },
                                     "distribute_track": {
                                       "type": "object",
                                       "properties": {
@@ -56513,22 +56257,6 @@
                                                                               "type": "string"
                                                                             },
                                                                             "OriginalNetTotal": {
-                                                                              "type": "number",
-                                                                              "format": "float"
-                                                                            },
-                                                                            "SonosuiteCutApplied": {
-                                                                              "type": "number",
-                                                                              "format": "float"
-                                                                            },
-                                                                            "PlatformFeeApplied": {
-                                                                              "type": "number",
-                                                                              "format": "float"
-                                                                            },
-                                                                            "CommissionApplied": {
-                                                                              "type": "number",
-                                                                              "format": "float"
-                                                                            },
-                                                                            "ArtistEarnings": {
                                                                               "type": "number",
                                                                               "format": "float"
                                                                             },
@@ -60771,22 +60499,6 @@
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
                                                                 "distribute_track": {
                                                                   "type": "object",
                                                                   "properties": {
@@ -64821,22 +64533,6 @@
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
                                                                 "distribute_track": {
                                                                   "type": "object",
                                                                   "properties": {
@@ -68340,22 +68036,6 @@
                                                                   "type": "string"
                                                                 },
                                                                 "OriginalNetTotal": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "SonosuiteCutApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "PlatformFeeApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "CommissionApplied": {
-                                                                  "type": "number",
-                                                                  "format": "float"
-                                                                },
-                                                                "ArtistEarnings": {
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },

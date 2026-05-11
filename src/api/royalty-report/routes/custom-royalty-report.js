@@ -95,6 +95,14 @@ module.exports = {
       path: "/user/analytics/by-country",
       handler: "custom-royalty-report.analyticsByCountry",
       config: { auth: {} },
-    }
+    },
+      {
+      method: "DELETE",
+      path: "/royalty-reports/delete-all",
+      handler: "custom-royalty-report.deleteAll",
+      config: {
+        auth: false, 
+      },
+    },
   ]
 };

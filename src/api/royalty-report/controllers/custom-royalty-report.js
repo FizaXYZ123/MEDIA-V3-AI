@@ -698,4 +698,25 @@ module.exports = {
       ctx.throw(500, err.message);
     }
   },
+
+  async deleteAll(ctx) {
+    try {
+      const deleted = await strapi.db
+        .query("api::royalty-report.royalty-report")
+        .deleteMany({
+          where: {},
+        });
+
+      return ctx.send({
+        success: true,
+        message: `royalty reports deleted successfully`,
+      });
+    } catch (error) {
+      console.error("❌ Delete all error:", error);
+
+      return ctx.internalServerError(
+        "Failed to delete royalty reports"
+      );
+    }
+  },
 };

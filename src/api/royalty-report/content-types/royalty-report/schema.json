@@ -11,46 +11,87 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "ISRC": { "type": "string" },
-    "TrackTitle": { "type": "string" },
-    "Artist": { "type": "string" },
-    "ReleaseTitle": { "type": "string" },
-
-    "Platform": { "type": "string" },
-    "Country": { "type": "string" },
-
-    "Units": { "type": "integer" },
-    "UnitPrice": { "type": "decimal" },
-
-    "GrossTotal": { "type": "decimal" },
-    "NetTotal": { "type": "decimal" },
-
-    "StartDate": { "type": "date" },
-    "EndDate": { "type": "date" },
-    "ConfirmationReportDate": { "type": "date" },
-
-    "Currency": { "type": "string" },
-    "Label": { "type": "string" },
-    "Type": { "type": "string" },
-
-    "Taxes": { "type": "decimal" },
-    "ChannelCosts": { "type": "decimal" },
-
-    "CurrencyRate": { "type": "decimal" },
-
-    "GrossTotalClientCurrency": { "type": "decimal" },
-    "NetTotalClientCurrency": { "type": "decimal" },
-    "OtherCostsClientCurrency": { "type": "decimal" },
-    "ChannelCostsClientCurrency": { "type": "decimal" },
-
-    "UserEmail": { "type": "string" },
-    "UPC": { "type": "string" },
-    "TenantId": { "type": "string" },
-    "OriginalNetTotal": { "type": "decimal" },
-    "SonosuiteCutApplied": { "type": "decimal" },
-    "PlatformFeeApplied": { "type": "decimal" },
-    "CommissionApplied": { "type": "decimal" },
-    "ArtistEarnings": { "type": "decimal" },
+    "ISRC": {
+      "type": "string"
+    },
+    "TrackTitle": {
+      "type": "string"
+    },
+    "Artist": {
+      "type": "string"
+    },
+    "ReleaseTitle": {
+      "type": "string"
+    },
+    "Platform": {
+      "type": "string"
+    },
+    "Country": {
+      "type": "string"
+    },
+    "Units": {
+      "type": "integer"
+    },
+    "UnitPrice": {
+      "type": "float"
+    },
+    "GrossTotal": {
+      "type": "float"
+    },
+    "NetTotal": {
+      "type": "float"
+    },
+    "StartDate": {
+      "type": "date"
+    },
+    "EndDate": {
+      "type": "date"
+    },
+    "ConfirmationReportDate": {
+      "type": "date"
+    },
+    "Currency": {
+      "type": "string"
+    },
+    "Label": {
+      "type": "string"
+    },
+    "Type": {
+      "type": "string"
+    },
+    "Taxes": {
+      "type": "float"
+    },
+    "ChannelCosts": {
+      "type": "float"
+    },
+    "CurrencyRate": {
+      "type": "float"
+    },
+    "GrossTotalClientCurrency": {
+      "type": "float"
+    },
+    "NetTotalClientCurrency": {
+      "type": "float"
+    },
+    "OtherCostsClientCurrency": {
+      "type": "float"
+    },
+    "ChannelCostsClientCurrency": {
+      "type": "float"
+    },
+    "UserEmail": {
+      "type": "string"
+    },
+    "UPC": {
+      "type": "string"
+    },
+    "TenantId": {
+      "type": "string"
+    },
+    "OriginalNetTotal": {
+      "type": "float"
+    },
     "distribute_track": {
       "type": "relation",
       "relation": "manyToOne",

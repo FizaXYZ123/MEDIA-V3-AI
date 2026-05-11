@@ -1709,30 +1709,26 @@ export interface ApiRoyaltyReportRoyaltyReport extends Schema.CollectionType {
     Platform: Attribute.String;
     Country: Attribute.String;
     Units: Attribute.Integer;
-    UnitPrice: Attribute.Decimal;
-    GrossTotal: Attribute.Decimal;
-    NetTotal: Attribute.Decimal;
+    UnitPrice: Attribute.Float;
+    GrossTotal: Attribute.Float;
+    NetTotal: Attribute.Float;
     StartDate: Attribute.Date;
     EndDate: Attribute.Date;
     ConfirmationReportDate: Attribute.Date;
     Currency: Attribute.String;
     Label: Attribute.String;
     Type: Attribute.String;
-    Taxes: Attribute.Decimal;
-    ChannelCosts: Attribute.Decimal;
-    CurrencyRate: Attribute.Decimal;
-    GrossTotalClientCurrency: Attribute.Decimal;
-    NetTotalClientCurrency: Attribute.Decimal;
-    OtherCostsClientCurrency: Attribute.Decimal;
-    ChannelCostsClientCurrency: Attribute.Decimal;
+    Taxes: Attribute.Float;
+    ChannelCosts: Attribute.Float;
+    CurrencyRate: Attribute.Float;
+    GrossTotalClientCurrency: Attribute.Float;
+    NetTotalClientCurrency: Attribute.Float;
+    OtherCostsClientCurrency: Attribute.Float;
+    ChannelCostsClientCurrency: Attribute.Float;
     UserEmail: Attribute.String;
     UPC: Attribute.String;
     TenantId: Attribute.String;
-    OriginalNetTotal: Attribute.Decimal;
-    SonosuiteCutApplied: Attribute.Decimal;
-    PlatformFeeApplied: Attribute.Decimal;
-    CommissionApplied: Attribute.Decimal;
-    ArtistEarnings: Attribute.Decimal;
+    OriginalNetTotal: Attribute.Float;
     distribute_track: Attribute.Relation<
       'api::royalty-report.royalty-report',
       'manyToOne',
