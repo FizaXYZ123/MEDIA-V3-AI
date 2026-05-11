@@ -21,24 +21,16 @@
       "type": "date"
     },
     "totalNet": {
-      "type": "decimal",
-      "precision": 20,
-      "scale": 10
+      "type": "float"
     },
     "skippedNet": {
-      "type": "decimal",
-      "precision": 20,
-      "scale": 10
+      "type": "float"
     },
     "CommissionPercent": {
-      "type": "decimal",
-      "precision": 20,
-      "scale": 10
+      "type": "float"
     },
     "OriginalTotal": {
-      "type": "decimal",
-      "precision": 20,
-      "scale": 10
+      "type": "float"
     },
     "PlatformCommission": {
       "type": "json"
