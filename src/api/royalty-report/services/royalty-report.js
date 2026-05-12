@@ -543,17 +543,14 @@ module.exports = () => ({
 /* ================= INVOICE GENERATION ================= */
 async function generateInvoices(reportStartDate, reportEndDate) {
 
-  // console.log("🔥 Invoice generation started");
-  // console.log("📅 Period:", reportStartDate, "→", reportEndDate);
-
   try {
 
     const end = new Date(reportEndDate);
 
     const month = end.getMonth() + 1;
     const year = end.getFullYear();
+    const currentDate = new Date();
 
-    // console.log("📆 Invoice Month:", month, year);
     /* ================= FETCH ROYALTIES ================= */
     const royalties = await strapi.entityService.findMany(
       "api::royalty-report.royalty-report",
@@ -600,6 +597,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         userMap[user.id] = {
           totalEarnings: 0,
           user,
+          royalties: [],
         };
       }
 
@@ -608,6 +606,8 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         Number(
           (userMap[user.id].totalEarnings + Number(r.NetTotal || 0)).toFixed(2)
         );
+
+      userMap[user.id].royalties.push(r);
     }
 
     // console.log("👥 Total users grouped:", Object.keys(userMap).length);
@@ -642,12 +642,38 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         continue;
       }
 
-      /* ================= FETCH FEES (FIXED) ================= */
+      /* ================= FETCH ACTIVE SUBSCRIPTION ================= */
+      const activeSubscription = await strapi.db
+        .query("api::user-subscription.user-subscription")
+        .findOne({
+          where: {
+            users_permissions_user: user.id,
+            status: "active",
+          },
+          populate: {
+            plan: true,
+          },
+        });
+
+      // ✅ SKIP IF PLAN NOT ACTIVE
+      if (!activeSubscription?.plan?.isActive) {
+        continue;
+      }
+
+      const activePlan = activeSubscription.plan;
+
+      const planName =
+        activePlan.name?.toLowerCase()?.trim();
+
+      /* ================= FETCH FEES ================= */
       const labelFeeData = await strapi.db
         .query("api::label-fee-history.label-fee-history")
         .findMany({
           where: {
             users_permissions_user: user.id,
+            effective_from: {
+              $lte: currentDate,
+            },
           },
           orderBy: { effective_from: "desc" },
           limit: 1,
@@ -658,6 +684,9 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         .findMany({
           where: {
             users_permissions_user: user.id,
+            effective_from: {
+              $lte: currentDate,
+            },
           },
           orderBy: { effective_from: "desc" },
           limit: 1,
@@ -674,6 +703,22 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         user.adminFee ??
         0;
 
+      const enterpriseCommissionData = await strapi.db
+        .query("api::enterprise-commission.enterprise-commission")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+            effective_from: {
+              $lte: currentDate,
+            },
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
+
+      const enterpriseCommission =
+        enterpriseCommissionData[0]?.commission_percentage ?? 0;
+
       // console.log("💸 Fees:", {
       //   userId: user.id,
       //   labelFee,
@@ -681,19 +726,94 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       // });
 
       /* ================= CALCULATION ================= */
-      const labelFeeAmount = Number((totalEarnings * labelFee / 100).toFixed(2));
-      const afterLabel = Number((totalEarnings - labelFeeAmount).toFixed(2));
 
-      const adminFeeAmount = Number((afterLabel * adminFee / 100).toFixed(2));
-      const finalAmount = Number((afterLabel - adminFeeAmount).toFixed(2));
+      let labelFeeAmount = 0;
+      let adminFeeAmount = 0;
 
-      // console.log("🧮 Calculation:", {
-      //   totalEarnings,
-      //   labelFeeAmount,
-      //   afterLabel,
-      //   adminFeeAmount,
-      //   finalAmount,
-      // });
+      let enterpriseCommissionPercentage = 0;
+      let enterpriseCommissionAmount = 0;
+
+      let afterLabel = totalEarnings;
+      let finalAmount = totalEarnings;
+
+      // ✅ ARTIST / ARTIST PLUS
+      if (
+        planName === "artist" ||
+        planName === "artist plus"
+      ) {
+
+        // 🔥 OLD LOGIC KEPT SAME
+
+        labelFeeAmount = Number(
+          (totalEarnings * labelFee / 100).toFixed(2)
+        );
+
+        afterLabel = Number(
+          (totalEarnings - labelFeeAmount).toFixed(2)
+        );
+
+        adminFeeAmount = Number(
+          (afterLabel * adminFee / 100).toFixed(2)
+        );
+
+        finalAmount = Number(
+          (afterLabel - adminFeeAmount).toFixed(2)
+        );
+      }
+
+      // ✅ PRO LABEL
+      else if (planName === "pro label") {
+
+        let totalCommissionAmount = 0;
+        let totalPayable = 0;
+
+        // ✅ APPLY COMMISSION SONG-WISE
+        for (const royalty of userMap[user.id].royalties) {
+
+          const songTotal = Number(
+            royalty.NetTotal || 0
+          );
+
+          const commissionAmount = Number(
+            (
+              songTotal *
+              enterpriseCommission /
+              100
+            ).toFixed(2)
+          );
+
+          const payableAmount = Number(
+            (
+              songTotal -
+              commissionAmount
+            ).toFixed(2)
+          );
+
+          totalCommissionAmount = Number(
+            (
+              totalCommissionAmount +
+              commissionAmount
+            ).toFixed(2)
+          );
+
+          totalPayable = Number(
+            (
+              totalPayable +
+              payableAmount
+            ).toFixed(2)
+          );
+        }
+
+        afterLabel = totalEarnings;
+
+        enterpriseCommissionPercentage =
+          enterpriseCommission;
+
+        enterpriseCommissionAmount =
+          totalCommissionAmount;
+
+        finalAmount = totalPayable;
+      };
 
       /* ================= CREATE INVOICE ================= */
       const createdInvoice = await strapi.entityService.create(
@@ -711,6 +831,9 @@ async function generateInvoices(reportStartDate, reportEndDate) {
 
             adminFeePercentage: adminFee,
             adminFeeAmount,
+
+            enterpriseCommissionPercentage,
+            enterpriseCommissionAmount,
 
             finalAmountPayable: finalAmount,
 

@@ -44,6 +44,14 @@
       "type": "decimal",
       "default": 0
     },
+    "enterpriseCommissionPercentage": {
+      "type": "decimal",
+      "default": 0
+    },
+    "enterpriseCommissionAmount": {
+      "type": "decimal",
+      "default": 0
+    },
     "finalAmountPayable": {
       "type": "decimal",
       "required": true

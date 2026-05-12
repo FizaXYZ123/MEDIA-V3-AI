@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "enterprise_commissions",
+  "info": {
+    "singularName": "enterprise-commission",
+    "pluralName": "enterprise-commissions",
+    "displayName": "enterprise-commission"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "commission_percentage": {
+      "type": "integer"
+    },
+    "effective_from": {
+      "type": "datetime"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "enterprise_commissions"
+    }
+  }
+}

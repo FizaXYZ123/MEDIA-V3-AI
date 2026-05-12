@@ -832,6 +832,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::payment-log.payment-log'
     >;
+    enterprise_commissions: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::enterprise-commission.enterprise-commission'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1144,6 +1149,43 @@ export interface ApiDistributeTrackDistributeTrack
   };
 }
 
+export interface ApiEnterpriseCommissionEnterpriseCommission
+  extends Schema.CollectionType {
+  collectionName: 'enterprise_commissions';
+  info: {
+    singularName: 'enterprise-commission';
+    pluralName: 'enterprise-commissions';
+    displayName: 'enterprise-commission';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    commission_percentage: Attribute.Integer;
+    effective_from: Attribute.DateTime;
+    users_permissions_user: Attribute.Relation<
+      'api::enterprise-commission.enterprise-commission',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::enterprise-commission.enterprise-commission',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::enterprise-commission.enterprise-commission',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiForgetPasswordForgetPassword extends Schema.CollectionType {
   collectionName: 'forget_passwords';
   info: {
@@ -1301,6 +1343,8 @@ export interface ApiInvoiceInvoice extends Schema.CollectionType {
     amountPayableBeforeAdminFee: Attribute.Decimal & Attribute.DefaultTo<0>;
     adminFeePercentage: Attribute.Integer & Attribute.DefaultTo<0>;
     adminFeeAmount: Attribute.Decimal & Attribute.DefaultTo<0>;
+    enterpriseCommissionPercentage: Attribute.Decimal & Attribute.DefaultTo<0>;
+    enterpriseCommissionAmount: Attribute.Decimal & Attribute.DefaultTo<0>;
     finalAmountPayable: Attribute.Decimal & Attribute.Required;
     invoiceDate: Attribute.DateTime;
     users_permissions_user: Attribute.Relation<
@@ -1990,6 +2034,7 @@ declare module '@strapi/types' {
       'api::blog.blog': ApiBlogBlog;
       'api::distribute-draft.distribute-draft': ApiDistributeDraftDistributeDraft;
       'api::distribute-track.distribute-track': ApiDistributeTrackDistributeTrack;
+      'api::enterprise-commission.enterprise-commission': ApiEnterpriseCommissionEnterpriseCommission;
       'api::forget-password.forget-password': ApiForgetPasswordForgetPassword;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;

@@ -91,7 +91,12 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images", "files", "videos", "audios"]
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     },
     "currency": {
       "type": "string"
@@ -107,7 +112,11 @@
     },
     "user_type": {
       "type": "enumeration",
-      "enum": ["basic", "subscribed", "enterprise"]
+      "enum": [
+        "basic",
+        "subscribed",
+        "enterprise"
+      ]
     },
     "label_fee_histories": {
       "type": "relation",
@@ -166,6 +175,12 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::payment-log.payment-log",
+      "mappedBy": "users_permissions_user"
+    },
+    "enterprise_commissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::enterprise-commission.enterprise-commission",
       "mappedBy": "users_permissions_user"
     }
   }

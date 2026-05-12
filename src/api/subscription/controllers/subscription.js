@@ -197,10 +197,30 @@ module.exports = {
         }
       );
 
-      console.log("✅ Free plan activated successfully");
-      
+      // ✅ ENTERPRISE COMMISSION ENTRY
+      const enterpriseCommission =
+        await strapi.entityService.create(
+          "api::enterprise-commission.enterprise-commission",
+          {
+            data: {
+              commission_percentage:
+                plan.defaultCommission || 0,
+              effective_from: new Date(),
+              users_permissions_user: userId,
+              publishedAt: new Date(),
+            },
+          }
+        );
+
+      console.log(
+        "✅ Enterprise commission created:",
+        enterpriseCommission.id
+      );
+
+      console.log("✅ enterprise plan activated successfully");
+
       return ctx.send({
-        message: "Free plan activated successfully",
+        message: "enterprise plan activated successfully",
         subscription,
       });
     }
