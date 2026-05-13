@@ -9,12 +9,12 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
   }
 
   if (!amount || amount <= 0) {
-  throw new Error("Invalid amount");
-}
+    throw new Error("Invalid amount");
+  }
 
-if (!currency) {
-  throw new Error("Currency is required");
-}
+  if (!currency) {
+    throw new Error("Currency is required");
+  }
 
   const user = await strapi.entityService.findOne(
     "plugin::users-permissions.user",
@@ -26,18 +26,18 @@ if (!currency) {
     customer_email: user.email,
     payment_method_types: ["card"],
 
-   line_items: [
-  {
-    price_data: {
-      currency: currency.toLowerCase(),
-      product_data: {
-        name: `Priority Upload`,
+    line_items: [
+      {
+        price_data: {
+          currency: currency.toLowerCase(),
+          product_data: {
+            name: `Priority Upload`,
+          },
+          unit_amount: Math.round(amount * 100),
+        },
+        quantity: 1,
       },
-      unit_amount: Math.round(amount * 100),
-    },
-    quantity: 1,
-  },
-],
+    ],
 
     metadata: {
       type: "priority-upload",
@@ -45,7 +45,7 @@ if (!currency) {
       draftId: draft.id.toString(),
     },
 
-    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}&draft_id=${draft.id}`,
+    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.FRONTEND_BASE_URL}/catalogue/draft`,
   });
 
@@ -67,10 +67,12 @@ const savePriorityPaymentLog = async (session) => {
     const exists = await strapi.db
       .query("api::payment-log.payment-log")
       .findOne({
-        where: { stripeSessionId: session.id },
+        where: {
+          stripeSessionId: session.id,
+        },
       });
 
-    if (exists) return null;
+    if (exists) return exists;
 
     const createdLog = await strapi.entityService.create(
       "api::payment-log.payment-log",
@@ -85,12 +87,12 @@ const savePriorityPaymentLog = async (session) => {
           status: "success",
           paidAt: new Date(),
           type: "priority-upload",
+          processing: false,
         },
       }
     );
 
     return createdLog;
-
   } catch (err) {
     console.log("❌ Error saving priority payment:", err.message);
     return null;
