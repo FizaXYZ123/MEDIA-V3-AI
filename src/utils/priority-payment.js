@@ -1,15 +1,20 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const createPriorityStripeSession = async ({ userId, draft }) => {
+const createPriorityStripeSession = async ({ userId, draft, amount,
+  currency, }) => {
   if (!draft) throw new Error("Draft not found");
 
   if (draft.Priority !== "Priority") {
     throw new Error("Draft is not marked as Priority");
   }
 
-  const trackCount = draft.TrackList?.length || 1;
+  if (!amount || amount <= 0) {
+  throw new Error("Invalid amount");
+}
 
-  const amount = trackCount * 1299;
+if (!currency) {
+  throw new Error("Currency is required");
+}
 
   const user = await strapi.entityService.findOne(
     "plugin::users-permissions.user",
@@ -21,18 +26,18 @@ const createPriorityStripeSession = async ({ userId, draft }) => {
     customer_email: user.email,
     payment_method_types: ["card"],
 
-    line_items: [
-      {
-        price_data: {
-          currency: "cad",
-          product_data: {
-            name: `Priority Upload (${trackCount} tracks)`,
-          },
-          unit_amount: amount,
-        },
-        quantity: 1,
+   line_items: [
+  {
+    price_data: {
+      currency: currency.toLowerCase(),
+      product_data: {
+        name: `Priority Upload`,
       },
-    ],
+      unit_amount: Math.round(amount * 100),
+    },
+    quantity: 1,
+  },
+],
 
     metadata: {
       type: "priority-upload",

@@ -4,10 +4,18 @@ module.exports = {
   async createPrioritySession(ctx) {
     try {
       const userId = ctx.state.user?.id;
-      const { draftId } = ctx.request.body;
+      const { draftId, amount, currency } = ctx.request.body;
 
       if (!draftId) {
         return ctx.badRequest("draftId is required");
+      }
+
+      if (!amount || amount <= 0) {
+        return ctx.badRequest("Valid amount is required");
+      }
+
+      if (!currency) {
+        return ctx.badRequest("currency is required");
       }
 
       // ✅ FETCH DRAFT
@@ -37,6 +45,8 @@ module.exports = {
       const session = await createPriorityStripeSession({
         userId,
         draft,
+        amount,
+        currency
       });
 
       return ctx.send({
