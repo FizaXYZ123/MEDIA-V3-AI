@@ -1186,6 +1186,29 @@ export interface ApiEnterpriseCommissionEnterpriseCommission
   };
 }
 
+export interface ApiFaqFaq extends Schema.CollectionType {
+  collectionName: 'faqs';
+  info: {
+    singularName: 'faq';
+    pluralName: 'faqs';
+    displayName: 'Faq';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    question: Attribute.String;
+    answer: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::faq.faq', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::faq.faq', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 export interface ApiForgetPasswordForgetPassword extends Schema.CollectionType {
   collectionName: 'forget_passwords';
   info: {
@@ -2035,6 +2058,7 @@ declare module '@strapi/types' {
       'api::distribute-draft.distribute-draft': ApiDistributeDraftDistributeDraft;
       'api::distribute-track.distribute-track': ApiDistributeTrackDistributeTrack;
       'api::enterprise-commission.enterprise-commission': ApiEnterpriseCommissionEnterpriseCommission;
+      'api::faq.faq': ApiFaqFaq;
       'api::forget-password.forget-password': ApiForgetPasswordForgetPassword;
       'api::form-submission.form-submission': ApiFormSubmissionFormSubmission;
       'api::global-setting.global-setting': ApiGlobalSettingGlobalSetting;
