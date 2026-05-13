@@ -28,6 +28,16 @@ module.exports = [
     name: 'strapi::cors',
     config: {
       origin: ['http://localhost:5173', 'https://v3.amozart.com'],
+
+      methods: [
+        'GET',
+        'POST',
+        'PUT',
+        'PATCH',
+        'DELETE',
+        'OPTIONS',
+      ],
+
       headers: [
         'Content-Type',
         'Authorization',
