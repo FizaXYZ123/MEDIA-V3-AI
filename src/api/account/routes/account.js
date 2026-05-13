@@ -1,5 +1,7 @@
 'use strict';
 
+const { config } = require("node:process");
+
 module.exports = {
   routes: [
     {
@@ -11,13 +13,13 @@ module.exports = {
         policies: [],
         middlewares: [],
       },
-      
+
     },
-     {
+    {
       method: 'GET',
       path: '/admin/dashboardcounts',
       handler: 'account.getPublishedTrackCount',
-       config: {
+      config: {
         auth: { scope: [] } // this makes it authenticated
       },
     },
@@ -30,7 +32,7 @@ module.exports = {
         middlewares: [],
       },
     },
-        {
+    {
       method: 'GET',
       path: '/publish-distributes/by-user/:userId',
       handler: 'account.findByUser',
@@ -46,7 +48,7 @@ module.exports = {
         auth: { scope: [] }, // authenticated users only
       },
     },
-     {
+    {
       method: 'GET',
       path: '/publish-distributes/my-calendar',
       handler: 'account.findMyCal',
@@ -54,18 +56,24 @@ module.exports = {
         auth: { scope: [] }, // authenticated users only
       },
     },
-      {
+    {
       method: "PATCH",
       path: "/users/me",
       handler: "account.updateMe",
-     config: {
+      config: {
         auth: { scope: [] }, // authenticated users only
       },
     },
-        { method: 'POST',         path: '/publish-distributes/draft/:id',   // <-- :id is required here
-      handler: 'account.publishDraft' }
-      ,
-     {
+    {
+      method: 'POST',
+      path: '/publish-distributes/draft/:id',   // <-- :id is required here
+      handler: 'account.publishDraft',
+      config: {
+        type: "content-api"
+      }
+    }
+    ,
+    {
       method: 'GET',
       path: '/distribute-tracks/count/user/:userId',
       handler: 'account.countByUser',
@@ -77,11 +85,11 @@ module.exports = {
       method: 'GET',
       path: '/distribute-tracks/count/me',
       handler: 'account.countMe',
-   config: {
+      config: {
         auth: { scope: [] }, // authenticated users only
       },
     },
-   {
+    {
       method: 'GET',
       path: '/users/clients',      // URL for all clients
       handler: 'account.getAllWithCounts',
@@ -97,7 +105,7 @@ module.exports = {
         auth: { scope: [] }, // authenticated users only
       },
     },
-       {
+    {
       method: 'GET',
       path: '/publish-distributes/priorities',
       handler: 'account.getOnlyPriority',
