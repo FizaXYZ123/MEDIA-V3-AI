@@ -48,21 +48,25 @@ module.exports = async (session) => {
       return;
     }
 
-    if (paymentLog.processing) {
-      console.log("⚠️ Distribution already processing");
-      return;
-    }
+   const lockResult = await strapi.db
+  .query("api::payment-log.payment-log")
+  .updateMany({
+    where: {
+      id: paymentLog.id,
+      $or: [
+        { processing: false },
+        { processing: null },
+      ],
+    },
+    data: {
+      processing: true,
+    },
+  });
 
-    // ✅ LOCK
-    await strapi.entityService.update(
-      "api::payment-log.payment-log",
-      paymentLog.id,
-      {
-        data: {
-          processing: true,
-        },
-      }
-    );
+if (!lockResult || lockResult.count === 0) {
+  console.log("⚠️ Already processing");
+  return;
+}
 
     try {
 

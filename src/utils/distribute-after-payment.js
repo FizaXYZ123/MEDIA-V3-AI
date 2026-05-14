@@ -99,6 +99,28 @@ module.exports = {
     delete publishData.updatedAt;
     delete publishData.publishedAt;
 
+    const existingPayment = await strapi.db
+      .query("api::payment-log.payment-log")
+      .findOne({
+        where: {
+          draftId,
+          publish_distribute: {
+            id: {
+              $notNull: true,
+            },
+          },
+        },
+        populate: ["publish_distribute"],
+      });
+
+    if (existingPayment?.publish_distribute) {
+
+      console.log("⚠️ Publish already exists");
+
+      return existingPayment.publish_distribute;
+    }
+
+
     const newPublish = await strapi.db
       .query('api::publish-distribute.publish-distribute')
       .create({
