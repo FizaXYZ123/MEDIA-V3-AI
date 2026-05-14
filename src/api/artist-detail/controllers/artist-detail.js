@@ -111,10 +111,14 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
     };
 
     const entity = await strapi.entityService.create('api::artist-detail.artist-detail', {
-      data: newData,
-      publishedAt: new Date(),
+    data: {
+    ...newData,
+    publishedAt: new Date(),
+  },
       populate: ['owner'], // include owner in response
     });
+
+    console.log("Artist Created",entity )
 
     return entity;
   },
