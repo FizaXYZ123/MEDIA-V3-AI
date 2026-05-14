@@ -106,14 +106,57 @@ if (!lockResult || lockResult.count === 0) {
     return;
   }
 
-  const exists = await strapi.db
+  // const exists = await strapi.db
+  //   .query("api::payment-log.payment-log")
+  //   .findOne({
+  //     where: { stripeSessionId: session.id },
+  //   });
+
+  // if (exists) {
+  //   console.log("⚠️ Payment already logged");
+  //   return;
+  // }
+
+    let paymentLog = await strapi.db
     .query("api::payment-log.payment-log")
     .findOne({
       where: { stripeSessionId: session.id },
     });
 
-  if (exists) {
-    console.log("⚠️ Payment already logged");
+  if (paymentLog?.status === "success") {
+    console.log("⚠️ Payment already processed");
+    return;
+  }
+
+  if (!paymentLog) {
+    paymentLog = await strapi.entityService.create(
+      "api::payment-log.payment-log",
+      {
+        data: {
+          stripeSessionId: session.id,
+          paymentIntentId: session.payment_intent || null,
+          status: "processing",
+          type: "subscription",
+          paidAt: new Date(),
+        },
+      }
+    );
+  }
+
+  const lockResult = await strapi.db
+    .query("api::payment-log.payment-log")
+    .updateMany({
+      where: {
+        id: paymentLog.id,
+        status: "processing",
+      },
+      data: {
+        status: "locked",
+      },
+    });
+
+  if (!lockResult || lockResult.count === 0) {
+    console.log("⚠️ Already processing");
     return;
   }
 
@@ -196,21 +239,21 @@ if (!lockResult || lockResult.count === 0) {
     }
   );
 
-  await strapi.entityService.create("api::payment-log.payment-log", {
+await strapi.entityService.update(
+  "api::payment-log.payment-log",
+  paymentLog.id,
+  {
     data: {
       users_permissions_user: userId,
       plan: planId,
 
-      stripeSessionId: session.id,
-      paymentIntentId: session.payment_intent || null,
-
       amount: amountPaid,
       currency: currency,
-      type: "subscription",
       status: "success",
       paidAt: new Date(),
     },
-  });
+  }
+);
 
   console.log("🎉 Subscription + Fees + User Updated + Payment log created");
 
