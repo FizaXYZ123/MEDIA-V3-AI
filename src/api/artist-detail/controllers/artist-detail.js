@@ -14,6 +14,20 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
     // Base filters: only this user's artists
     const filters = { owner: user.id };
 
+    if (ctx.query.roleName) {
+
+      const roles = ctx.query.roleName
+        .split(",")
+        .map(role => role.trim().toLowerCase())
+        .filter(Boolean);
+
+      filters.$or = roles.map(role => ({
+        roleName: {
+          $eqi: role,
+        },
+      }));
+    }
+
     if (q) {
       filters.artistName = { $containsi: q };
     }
@@ -35,7 +49,7 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
         'websiteUrl',
         'biography',
         'itsVerified',
-        'requiredVerification', // added field
+        'requiredVerification',
         'updatedAt',
         'createdAt',
       ],
