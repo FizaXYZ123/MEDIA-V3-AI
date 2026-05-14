@@ -1,109 +1,74 @@
-'use strict';
+"use strict";
 
-const axios = require('axios');
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const axios = require("axios");
+const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 
 module.exports = {
-
   async facebookLogin(ctx) {
-
     try {
-
-      const { accessToken } =
-        ctx.request.body;
+      const { accessToken } = ctx.request.body;
 
       if (!accessToken) {
-        return ctx.badRequest(
-          'Missing accessToken'
-        );
+        return ctx.badRequest("Missing accessToken");
       }
 
       /* ================= VERIFY FACEBOOK TOKEN ================= */
 
-      const fbResponse =
-        await axios.get(
-          'https://graph.facebook.com/me',
-          {
-            params: {
-              fields:
-                'id,name,email,picture',
+      const fbResponse = await axios.get("https://graph.facebook.com/me", {
+        params: {
+          fields: "id,name,email,picture",
 
-              access_token:
-                accessToken,
-            },
-          }
-        );
+          access_token: accessToken,
+        },
+      });
 
-      const payload =
-        fbResponse.data;
+      const payload = fbResponse.data;
 
       if (!payload?.email) {
-        return ctx.badRequest(
-          'Invalid Facebook token'
-        );
+        return ctx.badRequest("Invalid Facebook token");
       }
 
       /* ================= USER DATA ================= */
 
-      const email =
-        payload.email.toLowerCase();
+      const email = payload.email.toLowerCase();
 
-      const fullName =
-        payload.name || '';
+      const fullName = payload.name || "";
 
-      const nameParts =
-        fullName.split(' ');
+      const nameParts = fullName.split(" ");
 
-      const firstName =
-        nameParts[0] || '';
+      const firstName = nameParts[0] || "";
 
-      const lastName =
-        nameParts
-          .slice(1)
-          .join(' ');
+      const lastName = nameParts.slice(1).join(" ");
 
-      const phoneNumber = '';
+      const phoneNumber = "";
 
-      const picture =
-        payload.picture?.data?.url || '';
+      const picture = payload.picture?.data?.url || "";
 
       /* ================= USERNAME ================= */
 
-      const base =
-        (
-          firstName || 'user'
-        )
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, '');
+      const base = (firstName || "user")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "");
 
       let username;
       let exists = true;
 
       while (exists) {
+        const randomNumber = Math.floor(1000 + Math.random() * 9000);
 
-        const randomNumber =
-          Math.floor(
-            1000 +
-            Math.random() * 9000
-          );
+        username = `${base}${randomNumber}`;
 
-        username =
-          `${base}${randomNumber}`;
-
-        const check =
-          await strapi.db
-            .query(
-              'plugin::users-permissions.user'
-            )
-            .findOne({
-              where: {
-                username,
-              },
-            });
+        const check = await strapi.db
+          .query("plugin::users-permissions.user")
+          .findOne({
+            where: {
+              username,
+            },
+          });
 
         if (!check) {
           exists = false;
@@ -112,47 +77,33 @@ module.exports = {
 
       /* ================= ROLE ================= */
 
-      const userRole =
-        await strapi.db
-          .query(
-            'plugin::users-permissions.role'
-          )
-          .findOne({
-            where: {
-              name: 'Client',
-            },
-          });
+      const userRole = await strapi.db
+        .query("plugin::users-permissions.role")
+        .findOne({
+          where: {
+            name: "Client",
+          },
+        });
 
       if (!userRole) {
-        return ctx.internalServerError(
-          'Client role not found'
-        );
+        return ctx.internalServerError("Client role not found");
       }
 
       /* ================= FIND USER ================= */
 
-      let user =
-        await strapi.db
-          .query(
-            'plugin::users-permissions.user'
-          )
-          .findOne({
-            where: { email },
-          });
+      let user = await strapi.db
+        .query("plugin::users-permissions.user")
+        .findOne({
+          where: { email },
+        });
 
       /* ================= TOKEN ================= */
 
-      const confirmationToken =
-        crypto
-          .randomBytes(32)
-          .toString('hex');
+      const confirmationToken = crypto.randomBytes(32).toString("hex");
 
       /* ================= RANDOM PASSWORD ================= */
 
-      const generatedPassword =
-        crypto
-          .randomBytes(12)
-          .toString('hex');
+      const generatedPassword = crypto.randomBytes(12).toString("hex");
 
       let uploadedFileId = null;
 
@@ -161,148 +112,108 @@ module.exports = {
       ========================= */
 
       if (picture) {
-
         try {
+          const response = await axios({
+            url: picture,
+            method: "GET",
+            responseType: "arraybuffer",
+          });
 
-          const response =
-            await axios({
-              url: picture,
-              method: 'GET',
-              responseType: 'arraybuffer',
-            });
+          const buffer = Buffer.from(response.data);
 
-          const buffer =
-            Buffer.from(response.data);
-
-          const tempFilePath =
-            path.join(
-              os.tmpdir(),
-              `facebook-${Date.now()}.jpg`
-            );
-
-          fs.writeFileSync(
-            tempFilePath,
-            buffer
+          const tempFilePath = path.join(
+            os.tmpdir(),
+            `facebook-${Date.now()}.jpg`
           );
 
-          const uploadedFiles =
-            await strapi
-              .plugin('upload')
-              .service('upload')
-              .upload({
-                data: {},
+          fs.writeFileSync(tempFilePath, buffer);
 
-                files: {
-                  path: tempFilePath,
-                  name:
-                    `facebook-${Date.now()}.jpg`,
-                  type: 'image/jpeg',
-                  size: buffer.length,
-                },
-              });
+          const uploadedFiles = await strapi
+            .plugin("upload")
+            .service("upload")
+            .upload({
+              data: {},
 
-          if (
-            uploadedFiles &&
-            uploadedFiles.length > 0
-          ) {
-            uploadedFileId =
-              uploadedFiles[0].id;
+              files: {
+                path: tempFilePath,
+                name: `facebook-${Date.now()}.jpg`,
+                type: "image/jpeg",
+                size: buffer.length,
+              },
+            });
+
+          if (uploadedFiles && uploadedFiles.length > 0) {
+            uploadedFileId = uploadedFiles[0].id;
           }
 
           fs.unlinkSync(tempFilePath);
-
         } catch (uploadError) {
-
-          console.log(
-            'FACEBOOK IMAGE UPLOAD ERROR:',
-            uploadError
-          );
+          console.log("FACEBOOK IMAGE UPLOAD ERROR:", uploadError);
         }
       }
-
 
       /* ================= CREATE USER ================= */
 
       if (!user) {
-
-        user =
-          await strapi.entityService.create(
-            'plugin::users-permissions.user',
-            {
-              data: {
-
-                firstName,
-
-                lastName,
-
-                FulllName:
-                  fullName,
-
-                username,
-
-                email,
-
-                phoneNumber,
-
-                provider:
-                  'facebook',
-
-                confirmed: true,
-
-                confirmationToken,
-
-                role:
-                  userRole.id,
-
-                password:
-                  generatedPassword,
-
-                Profile_image:
-                  uploadedFileId,
-              },
-            }
-          );
-      } else {
-
-        await strapi.db
-          .query(
-            'plugin::users-permissions.user'
-          )
-          .update({
-            where: {
-              id: user.id,
-            },
-
+        user = await strapi.entityService.create(
+          "plugin::users-permissions.user",
+          {
             data: {
-              confirmationToken,
+              firstName,
+
+              lastName,
+
+              FulllName: fullName,
+
+              username,
+
+              email,
+
+              phoneNumber,
+
+              provider: "facebook",
 
               confirmed: true,
+
+              confirmationToken,
+
+              role: userRole.id,
+
+              password: generatedPassword,
+
+              Profile_image: uploadedFileId,
             },
-          });
+          }
+        );
+      } else {
+        await strapi.db.query("plugin::users-permissions.user").update({
+          where: {
+            id: user.id,
+          },
+
+          data: {
+            confirmationToken,
+
+            confirmed: true,
+          },
+        });
       }
 
       /* ================= JWT ================= */
 
-      const jwt =
-        strapi.plugins[
-          'users-permissions'
-        ].services.jwt.issue({
-          id: user.id,
-        });
+      const jwt = strapi.plugins["users-permissions"].services.jwt.issue({
+        id: user.id,
+      });
 
       /* ================= USER DETAILS ================= */
 
-      const latestUser =
-        await strapi.entityService.findOne(
-          'plugin::users-permissions.user',
-          user.id,
-          {
-            populate: [
-              'role',
-              'Profile_image',
-            ],
-          }
-        );
+      const latestUser = await strapi.entityService.findOne(
+        "plugin::users-permissions.user",
+        user.id,
+        {
+          populate: ["role", "Profile_image"],
+        }
+      );
 
       /* ================= SUBSCRIPTION ================= */
 
@@ -317,55 +228,22 @@ module.exports = {
           populate: ["plan"],
         });
 
-      const latest_subscription =
-        subscription[0] || null;
+      const latest_subscription = subscription[0] || null;
 
       /* ================= RESPONSE ================= */
 
-      
-const {
-  Profile_image,
-  ...restUser
-} = latestUser;
+      return ctx.send({
+        jwt,
 
-return ctx.send({
-  jwt,
-
-  user: {
-
-    ...restUser,
-
-    profileImage:
-      Profile_image
-        ? {
-            id:
-              Profile_image.id,
-
-            url:
-              Profile_image.url,
-
-            name:
-              Profile_image.name,
-
-            mime:
-              Profile_image.mime,
-          }
-        : null,
-
-    latest_subscription,
-  },
-});
-
+        user: {
+          ...latestUser,
+          latest_subscription,
+        },
+      });
     } catch (err) {
+      console.error("FACEBOOK LOGIN ERROR:", err.response?.data || err);
 
-      console.error(
-        'FACEBOOK LOGIN ERROR:',
-        err.response?.data || err
-      );
-
-      return ctx.internalServerError(
-        'Facebook Login Failed'
-      );
+      return ctx.internalServerError("Facebook Login Failed");
     }
   },
 };
