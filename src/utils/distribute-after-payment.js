@@ -92,34 +92,29 @@ module.exports = {
     // =========================
     // 3. CREATE PUBLISH
     // =========================
-    const publishData = { ...draft };
-
-    delete publishData.id;
-    delete publishData.createdAt;
-    delete publishData.updatedAt;
-    delete publishData.publishedAt;
-
-    const existingPayment = await strapi.db
-      .query("api::payment-log.payment-log")
-      .findOne({
-        where: {
-          draftId,
-          publish_distribute: {
-            id: {
-              $notNull: true,
-            },
-          },
-        },
-        populate: ["publish_distribute"],
-      });
-
-    if (existingPayment?.publish_distribute) {
-
-      console.log("⚠️ Publish already exists");
-
-      return existingPayment.publish_distribute;
-    }
-
+    const publishData = {
+  ReleaseTitle: draft.ReleaseTitle,
+  ReleaseType: draft.ReleaseType,
+  Version: draft.Version,
+  LanguageOfTheTitles: draft.LanguageOfTheTitles,
+  PrimaryGenre: draft.PrimaryGenre,
+  SecondaryGenre: draft.SecondaryGenre,
+  AddLabel: draft.AddLabel,
+  ReferenceNumber: draft.ReferenceNumber,
+  Priority: draft.Priority,
+  TimeZoneOfReference: draft.TimeZoneOfReference,
+  Countries: draft.Countries,
+  MusicStores: draft.MusicStores,
+  ReleaseTime: draft.ReleaseTime,
+  OriginalReleaseDate: draft.OriginalReleaseDate,
+  DigitalReleaseDate: draft.DigitalReleaseDate,
+  CopyrightholderName: draft.CopyrightholderName,
+  CopyrightYear: draft.CopyrightYear,
+  PhonogramRightsHolderName: draft.PhonogramRightsHolderName,
+  PhonogramRightsHolderYear: draft.PhonogramRightsHolderYear,
+  PriceCategory: draft.PriceCategory,
+  CoverArt: draft.CoverArt?.id || null,
+};
 
     const newPublish = await strapi.db
       .query('api::publish-distribute.publish-distribute')
