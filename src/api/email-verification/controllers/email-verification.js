@@ -64,7 +64,7 @@ body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f7f7f7;te
 </div>
 <div class="footer">
 <p>If you did not request this, please ignore this email.</p>
-<p>Thank you,<br>XYZ MEDIA Team</p>
+<p>Thank you,<br>AMozart Team</p>
 </div>
 </div>
 </body>
@@ -77,7 +77,7 @@ body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f7f7f7;te
         "https://api.brevo.com/v3/smtp/email",
         {
           sender: {
-            name: "XYZ MEDIA",
+            name: "AMozart",
             email: msg.from,
           },
           to: [
