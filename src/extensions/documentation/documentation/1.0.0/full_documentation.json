@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-14T13:11:13.459Z"
+    "x-generation-date": "2026-05-15T09:37:28.119Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2322,6 +2322,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -2550,7 +2554,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -6001,6 +6007,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -6229,7 +6239,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -9727,6 +9739,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -9955,7 +9971,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -13700,6 +13718,10 @@
                                                                                           "type": "number",
                                                                                           "format": "float"
                                                                                         },
+                                                                                        "price_usd": {
+                                                                                          "type": "number",
+                                                                                          "format": "float"
+                                                                                        },
                                                                                         "billingCycle": {
                                                                                           "type": "string",
                                                                                           "enum": [
@@ -13928,7 +13950,9 @@
                                                                               "type": "string",
                                                                               "enum": [
                                                                                 "success",
-                                                                                "failed"
+                                                                                "failed",
+                                                                                "processing",
+                                                                                "locked"
                                                                               ]
                                                                             },
                                                                             "processing": {
@@ -18393,6 +18417,10 @@
                                                                                         "type": "number",
                                                                                         "format": "float"
                                                                                       },
+                                                                                      "price_usd": {
+                                                                                        "type": "number",
+                                                                                        "format": "float"
+                                                                                      },
                                                                                       "billingCycle": {
                                                                                         "type": "string",
                                                                                         "enum": [
@@ -18500,7 +18528,9 @@
                                                                                                       "type": "string",
                                                                                                       "enum": [
                                                                                                         "success",
-                                                                                                        "failed"
+                                                                                                        "failed",
+                                                                                                        "processing",
+                                                                                                        "locked"
                                                                                                       ]
                                                                                                     },
                                                                                                     "processing": {
@@ -22009,6 +22039,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -22237,7 +22271,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -27721,6 +27757,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -27949,7 +27989,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -31317,6 +31359,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -31545,7 +31591,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -34911,6 +34959,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -35139,7 +35191,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -36319,7 +36373,9 @@
                 "type": "string",
                 "enum": [
                   "success",
-                  "failed"
+                  "failed",
+                  "processing",
+                  "locked"
                 ]
               },
               "processing": {
@@ -38552,6 +38608,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -38780,7 +38840,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -39876,7 +39938,9 @@
             "type": "string",
             "enum": [
               "success",
-              "failed"
+              "failed",
+              "processing",
+              "locked"
             ]
           },
           "processing": {
@@ -42250,6 +42314,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -42478,7 +42546,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -44080,6 +44150,10 @@
                 "type": "number",
                 "format": "float"
               },
+              "price_usd": {
+                "type": "number",
+                "format": "float"
+              },
               "billingCycle": {
                 "type": "string",
                 "enum": [
@@ -44194,6 +44268,10 @@
             "format": "float"
           },
           "price_cad": {
+            "type": "number",
+            "format": "float"
+          },
+          "price_usd": {
             "type": "number",
             "format": "float"
           },
@@ -46382,6 +46460,10 @@
                                                                               "type": "number",
                                                                               "format": "float"
                                                                             },
+                                                                            "price_usd": {
+                                                                              "type": "number",
+                                                                              "format": "float"
+                                                                            },
                                                                             "billingCycle": {
                                                                               "type": "string",
                                                                               "enum": [
@@ -46513,7 +46595,9 @@
                                                                   "type": "string",
                                                                   "enum": [
                                                                     "success",
-                                                                    "failed"
+                                                                    "failed",
+                                                                    "processing",
+                                                                    "locked"
                                                                   ]
                                                                 },
                                                                 "processing": {
@@ -49565,6 +49649,10 @@
                                                                                           "type": "number",
                                                                                           "format": "float"
                                                                                         },
+                                                                                        "price_usd": {
+                                                                                          "type": "number",
+                                                                                          "format": "float"
+                                                                                        },
                                                                                         "billingCycle": {
                                                                                           "type": "string",
                                                                                           "enum": [
@@ -49793,7 +49881,9 @@
                                                                               "type": "string",
                                                                               "enum": [
                                                                                 "success",
-                                                                                "failed"
+                                                                                "failed",
+                                                                                "processing",
+                                                                                "locked"
                                                                               ]
                                                                             },
                                                                             "processing": {
@@ -54200,6 +54290,10 @@
                                                                                         "type": "number",
                                                                                         "format": "float"
                                                                                       },
+                                                                                      "price_usd": {
+                                                                                        "type": "number",
+                                                                                        "format": "float"
+                                                                                      },
                                                                                       "billingCycle": {
                                                                                         "type": "string",
                                                                                         "enum": [
@@ -54307,7 +54401,9 @@
                                                                                                       "type": "string",
                                                                                                       "enum": [
                                                                                                         "success",
-                                                                                                        "failed"
+                                                                                                        "failed",
+                                                                                                        "processing",
+                                                                                                        "locked"
                                                                                                       ]
                                                                                                     },
                                                                                                     "processing": {
@@ -57023,6 +57119,10 @@
                                                                                         "type": "number",
                                                                                         "format": "float"
                                                                                       },
+                                                                                      "price_usd": {
+                                                                                        "type": "number",
+                                                                                        "format": "float"
+                                                                                      },
                                                                                       "billingCycle": {
                                                                                         "type": "string",
                                                                                         "enum": [
@@ -57251,7 +57351,9 @@
                                                                             "type": "string",
                                                                             "enum": [
                                                                               "success",
-                                                                              "failed"
+                                                                              "failed",
+                                                                              "processing",
+                                                                              "locked"
                                                                             ]
                                                                           },
                                                                           "processing": {
@@ -61966,6 +62068,10 @@
                                                                             "type": "number",
                                                                             "format": "float"
                                                                           },
+                                                                          "price_usd": {
+                                                                            "type": "number",
+                                                                            "format": "float"
+                                                                          },
                                                                           "billingCycle": {
                                                                             "type": "string",
                                                                             "enum": [
@@ -62194,7 +62300,9 @@
                                                                 "type": "string",
                                                                 "enum": [
                                                                   "success",
-                                                                  "failed"
+                                                                  "failed",
+                                                                  "processing",
+                                                                  "locked"
                                                                 ]
                                                               },
                                                               "processing": {
@@ -66304,6 +66412,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -66532,7 +66644,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -70437,6 +70551,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -70665,7 +70783,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {
@@ -74042,6 +74162,10 @@
                                                                 "type": "number",
                                                                 "format": "float"
                                                               },
+                                                              "price_usd": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                              },
                                                               "billingCycle": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -74270,7 +74394,9 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "success",
-                                                      "failed"
+                                                      "failed",
+                                                      "processing",
+                                                      "locked"
                                                     ]
                                                   },
                                                   "processing": {

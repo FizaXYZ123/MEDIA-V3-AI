@@ -41,7 +41,9 @@
       "type": "enumeration",
       "enum": [
         "success",
-        "failed"
+        "failed",
+        "processing",
+    "locked"
       ]
     },
     "processing": {

@@ -27,6 +27,11 @@ module.exports = {
       return ctx.badRequest("Invalid plan");
     }
 
+    console.log("✅ PLAN FOUND:", {
+      id: plan.id,
+      name: plan.name,
+    });
+
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       userId
@@ -43,8 +48,26 @@ module.exports = {
     let country = await getCountryFromIP(ip);
 
     if (!country) {
-      console.log("⚠️ Falling back to CANADA");
-      country = "CA";
+
+      console.log("⚠️ Country not detected");
+
+      // localhost/dev fallback
+      if (
+        ip === "127.0.0.1" ||
+        ip === "::1" ||
+        ip.includes("192.168")
+      ) {
+
+        console.log("🛠️ LOCALHOST DETECTED → USING INR");
+
+        country = "IN";
+
+      } else {
+
+        console.log("🌍 PRODUCTION FALLBACK → USING USD");
+
+        country = "US";
+      }
     }
 
     console.log("🌍 Country:", country);
@@ -57,56 +80,44 @@ module.exports = {
 
     // 🇮🇳 INDIA
     if (country === "IN") {
+      console.log("INDIA USER DETECTED → APPLYING INR PRICE");
       amount = plan.price_inr;
       currency = "INR";
     }
 
     // 🇨🇦 CANADA
     else if (country === "CA") {
+      console.log("CANADA USER DETECTED → APPLYING CAD PRICE");
       amount = plan.price_cad;
       currency = "CAD";
     }
 
-    // 🌍 OTHER COUNTRIES
     else {
-      try {
-        const countryToCurrency = {
-          US: "USD",
-          GB: "GBP",
-          AU: "AUD",
-          AE: "AED",
-          SG: "SGD",
-          EU: "EUR",
-        };
-
-        const targetCurrency = countryToCurrency[country] || "USD";
-
-        const res = await axios.get(
-          "https://api.exchangerate-api.com/v4/latest/CAD"
-        );
-
-        const rate = res.data.rates[targetCurrency];
-
-        if (!rate) throw new Error("Rate not found");
-
-        amount = plan.price_cad * rate;
-        currency = targetCurrency;
-
-      } catch (err) {
-        console.log("⚠️ Conversion failed → fallback CAD");
-
-        amount = plan.price_cad;
-        currency = "CAD";
-      }
+      amount = plan.price_usd;
+      console.log("USA/OTHER COUNTRY DETECTED → APPLYING USD PRICE");
+      currency = "USD";
     }
 
     // safety fallback
     if (!amount || amount <= 0) {
-      amount = plan.price_cad;
-      currency = "CAD";
+      amount =
+        plan.price_usd ||
+        plan.price_cad ||
+        plan.price_inr;
+
+      currency = "USD";
+      console.log("⚠️ FALLBACK PRICE USED:", {
+        amount,
+        currency,
+      });
     }
 
-    console.log("💰 Final:", amount, currency);
+
+    console.log("✅ FINAL PRICE APPLIED:", {
+      country,
+      amount,
+      currency,
+    });
 
     // =========================
     // ✅ FREE PLAN 
@@ -180,10 +191,13 @@ module.exports = {
             status: "active",
             startDate,
             endDate,
-            publishedAt: new Date(),
+            publishedAt: new Date().toISOString(),
           },
         }
+
       );
+
+      console.log("✅ ENTERPRISE SUBSCRIPTION CREATED:", subscription.id);
 
       // ✅ Update user_type → enterprise
       await strapi.entityService.update(
@@ -207,7 +221,7 @@ module.exports = {
                 plan.defaultCommission || 0,
               effective_from: new Date(),
               users_permissions_user: userId,
-              publishedAt: new Date(),
+              publishedAt: new Date().toISOString(),
             },
           }
         );
@@ -225,9 +239,11 @@ module.exports = {
       });
     }
 
+
     // =========================
     // 💳 STRIPE SESSION
     // =========================
+    console.log("🔥 Creating Stripe Checkout Session...");
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: user.email,
@@ -237,7 +253,7 @@ module.exports = {
       line_items: [
         {
           price_data: {
-            currency: currency.toLowerCase(),
+            currency: currency,
             product_data: { name: plan.name },
             unit_amount: Math.round(amount * 100),
           },
@@ -257,6 +273,13 @@ module.exports = {
       cancel_url: `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
     });
 
+    // console.log("✅ STRIPE SESSION CREATED:", {
+    //   sessionId: session.id,
+    //   amount,
+    //   currency,
+    //   country,
+    //   userId,
+    // });
     return ctx.send({ url: session.url });
   },
 };
