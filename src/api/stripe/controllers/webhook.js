@@ -30,9 +30,17 @@ module.exports = {
     if (event.type === "checkout.session.completed") {
       console.log("💰 PAYMENT SUCCESS EVENT");
 
-      await handleSuccess(event.data.object);
+      console.log("💳 SESSION ID:", event.data.object.id);
 
-      console.log("🎉 handleSuccess EXECUTED");
+      console.log("💳 SESSION METADATA:", event.data.object.metadata);
+
+      try {
+        await handleSuccess(event.data.object);
+
+        console.log("🎉 handleSuccess EXECUTED");
+      } catch (err) {
+        console.log("❌ handleSuccess ERROR:", err);
+      }
     }
 
     ctx.send({ received: true });

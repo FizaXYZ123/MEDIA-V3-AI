@@ -23,6 +23,9 @@
     "price_cad": {
       "type": "decimal"
     },
+    "price_usd":{
+     "type":"decimal"
+    },
     "billingCycle": {
       "type": "enumeration",
       "enum": [

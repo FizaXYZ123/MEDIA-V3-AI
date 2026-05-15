@@ -5,7 +5,10 @@ const { savePriorityPaymentLog } = require("./priority-payment");
 module.exports = async (session) => {
 
   const amountPaid = Number((session.amount_total / 100).toFixed(2));
-  const currency = session.currency.toUpperCase();
+  console.log(session)
+  console.log(session.currency?.toUpperCase())
+  const currency = session.currency?.toUpperCase();
+
   // ✅ SAFE EXTRACTION
   const userId = session.metadata?.userId
     ? parseInt(session.metadata.userId)
@@ -48,25 +51,25 @@ module.exports = async (session) => {
       return;
     }
 
-   const lockResult = await strapi.db
-  .query("api::payment-log.payment-log")
-  .updateMany({
-    where: {
-      id: paymentLog.id,
-      $or: [
-        { processing: false },
-        { processing: null },
-      ],
-    },
-    data: {
-      processing: true,
-    },
-  });
+    const lockResult = await strapi.db
+      .query("api::payment-log.payment-log")
+      .updateMany({
+        where: {
+          id: paymentLog.id,
+          $or: [
+            { processing: false },
+            { processing: null },
+          ],
+        },
+        data: {
+          processing: true,
+        },
+      });
 
-if (!lockResult || lockResult.count === 0) {
-  console.log("⚠️ Already processing");
-  return;
-}
+    if (!lockResult || lockResult.count === 0) {
+      console.log("⚠️ Already processing");
+      return;
+    }
 
     try {
 
@@ -117,7 +120,7 @@ if (!lockResult || lockResult.count === 0) {
   //   return;
   // }
 
-    let paymentLog = await strapi.db
+  let paymentLog = await strapi.db
     .query("api::payment-log.payment-log")
     .findOne({
       where: { stripeSessionId: session.id },
@@ -160,101 +163,123 @@ if (!lockResult || lockResult.count === 0) {
     return;
   }
 
-  // ✅ FETCH PLAN
-  const plan = await strapi.entityService.findOne(
-    "api::plan.plan",
-    planId
-  );
+  try {
+    // ✅ FETCH PLAN
+    const plan = await strapi.entityService.findOne(
+      "api::plan.plan",
+      planId
+    );
 
-  if (!plan) {
-    console.log("❌ Plan not found");
-    return;
-  }
+    if (!plan) {
+      console.log("❌ Plan not found");
+      return;
+    }
 
-
-  // ✅ EXPIRE OLD SUBSCRIPTION 
-  const existing = await strapi.db
-    .query("api::user-subscription.user-subscription")
-    .findOne({
-      where: {
-        users_permissions_user: userId,
-        status: "active",
-      },
+    console.log("✅ PLAN FOUND:", {
+      id: plan.id,
+      name: plan.name,
     });
 
-  if (existing) {
-    await strapi.entityService.update(
+    // ✅ EXPIRE OLD SUBSCRIPTION 
+    const existing = await strapi.db
+      .query("api::user-subscription.user-subscription")
+      .findOne({
+        where: {
+          users_permissions_user: userId,
+          status: "active",
+        },
+      });
+
+    if (existing) {
+      await strapi.entityService.update(
+        "api::user-subscription.user-subscription",
+        existing.id,
+        {
+          data: {
+            status: "expired",
+            endDate: new Date(),
+          },
+        }
+      );
+
+      console.log("♻️ Old subscription expired");
+    }
+
+
+    // ✅ CREATE NEW SUBSCRIPTION
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+
+    endDate.setFullYear(endDate.getFullYear() + 1);
+
+    const subscription = await strapi.entityService.create(
       "api::user-subscription.user-subscription",
-      existing.id,
       {
         data: {
-          status: "expired",
-          endDate: new Date(),
+          users_permissions_user: userId,
+          plan: planId,
+          status: "active",
+          startDate,
+          endDate,
+          publishedAt: new Date().toISOString(),
         },
       }
     );
 
-    console.log("♻️ Old subscription expired");
+    console.log("✅ Subscription created:", subscription.id);
+    console.log("✅ USER SUBSCRIPTION CREATED SUCCESSFULLY");
+
+    // ✅ APPLY FEES
+    await applyPlanFees({
+      userId,
+      plan,
+      subscriptionId: subscription.id,
+    });
+
+    // ✅ UPDATE USER 
+    await strapi.entityService.update(
+      "plugin::users-permissions.user",
+      userId,
+      {
+        data: {
+          plan: planId,
+          user_type: "subscribed",
+        },
+      }
+    );
+
+    await strapi.entityService.update(
+      "api::payment-log.payment-log",
+      paymentLog.id,
+      {
+        data: {
+          users_permissions_user: userId,
+          plan: planId,
+
+          amount: amountPaid,
+          currency: currency,
+          status: "success",
+          paidAt: new Date(),
+        },
+      }
+    );
+
+    console.log("🎉 Subscription + Fees + User Updated + Payment log created");
+  } catch (err) {
+
+    console.log("❌ SUBSCRIPTION FLOW ERROR:", err);
+
+    await strapi.entityService.update(
+      "api::payment-log.payment-log",
+      paymentLog.id,
+      {
+        data: {
+          status: "failed",
+        },
+      }
+    );
+
+    throw err;
   }
-
-
-  // ✅ CREATE NEW SUBSCRIPTION
-  const startDate = new Date();
-  const endDate = new Date(startDate);
-
-  endDate.setFullYear(endDate.getFullYear() + 1);
-
-  const subscription = await strapi.entityService.create(
-    "api::user-subscription.user-subscription",
-    {
-      data: {
-        users_permissions_user: userId,
-        plan: planId,
-        status: "active",
-        startDate,
-        endDate,
-        publishedAt: new Date(),
-      },
-    }
-  );
-
-  console.log("✅ Subscription created:", subscription.id);
-
-  // ✅ APPLY FEES
-  await applyPlanFees({
-    userId,
-    plan,
-    subscriptionId: subscription.id,
-  });
-
-  // ✅ UPDATE USER 
-  await strapi.entityService.update(
-    "plugin::users-permissions.user",
-    userId,
-    {
-      data: {
-        plan: planId,
-        user_type: "subscribed",
-      },
-    }
-  );
-
-await strapi.entityService.update(
-  "api::payment-log.payment-log",
-  paymentLog.id,
-  {
-    data: {
-      users_permissions_user: userId,
-      plan: planId,
-
-      amount: amountPaid,
-      currency: currency,
-      status: "success",
-      paidAt: new Date(),
-    },
-  }
-);
-
-  console.log("🎉 Subscription + Fees + User Updated + Payment log created");
 
 };

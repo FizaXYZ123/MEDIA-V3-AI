@@ -1492,7 +1492,9 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
     paymentIntentId: Attribute.String;
     amount: Attribute.Decimal;
     currency: Attribute.String;
-    status: Attribute.Enumeration<['success', 'failed']>;
+    status: Attribute.Enumeration<
+      ['success', 'failed', 'processing', 'locked']
+    >;
     processing: Attribute.Boolean & Attribute.DefaultTo<false>;
     paidAt: Attribute.DateTime;
     draftId: Attribute.Integer;
@@ -1616,6 +1618,7 @@ export interface ApiPlanPlan extends Schema.CollectionType {
     name: Attribute.String & Attribute.Required & Attribute.Unique;
     price_inr: Attribute.Decimal;
     price_cad: Attribute.Decimal;
+    price_usd: Attribute.Decimal;
     billingCycle: Attribute.Enumeration<['yearly']> &
       Attribute.DefaultTo<'yearly'>;
     defaultCommission: Attribute.Decimal & Attribute.DefaultTo<0>;
