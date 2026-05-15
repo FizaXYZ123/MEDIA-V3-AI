@@ -113,6 +113,7 @@ module.exports = {
 
 
   // client panel earnings endpoint 
+  
   async getTrackEarnings(ctx) {
 
     const user = ctx.state.user;
@@ -121,28 +122,163 @@ module.exports = {
       return ctx.unauthorized("Authentication required");
     }
 
-    const { trackTitle, platform } = ctx.query;
+    const {
+      isrc,
+      songName,
+      platform,
+      country,
+      startDate,
+      endDate,
+    } = ctx.query;
 
     const knex = strapi.db.connection;
 
     let query = knex("royalty_reports")
       .where("user_email", user.email);
 
-    if (trackTitle) {
-      query = query.andWhereRaw(
-        "LOWER(track_title) = LOWER(?)",
-        [trackTitle]
+    // =========================
+    // ISRC (multiple)
+    // =========================
+    if (isrc) {
+
+      const isrcList = isrc
+        .split(",")
+        .map(v => v.trim().toLowerCase());
+
+      query = query.where(function () {
+        isrcList.forEach((item, index) => {
+
+          if (index === 0) {
+            this.whereRaw(
+              "LOWER(isrc) LIKE ?",
+              [`%${item}%`]
+            );
+          } else {
+            this.orWhereRaw(
+              "LOWER(isrc) LIKE ?",
+              [`%${item}%`]
+            );
+          }
+
+        });
+      });
+    }
+
+    // =========================
+    // SONG NAME (multiple)
+    // =========================
+    if (songName) {
+
+      const songList = songName
+        .split(",")
+        .map(v => v.trim().toLowerCase());
+
+      query = query.where(function () {
+        songList.forEach((item, index) => {
+
+          if (index === 0) {
+            this.whereRaw(
+              "LOWER(track_title) LIKE ?",
+              [`%${item}%`]
+            );
+          } else {
+            this.orWhereRaw(
+              "LOWER(track_title) LIKE ?",
+              [`%${item}%`]
+            );
+          }
+
+        });
+      });
+    }
+
+    // =========================
+    // PLATFORM (multiple)
+    // =========================
+    if (platform) {
+
+      const platformList = platform
+        .split(",")
+        .map(v => v.trim().toLowerCase());
+
+      query = query.where(function () {
+        platformList.forEach((item, index) => {
+
+          if (index === 0) {
+            this.whereRaw(
+              "LOWER(platform) LIKE ?",
+              [`%${item}%`]
+            );
+          } else {
+            this.orWhereRaw(
+              "LOWER(platform) LIKE ?",
+              [`%${item}%`]
+            );
+          }
+
+        });
+      });
+    }
+
+    // =========================
+    // COUNTRY (multiple)
+    // =========================
+    if (country) {
+
+      const countryList = country
+        .split(",")
+        .map(v => v.trim().toLowerCase());
+
+      query = query.where(function () {
+        countryList.forEach((item, index) => {
+
+          if (index === 0) {
+            this.whereRaw(
+              "LOWER(country) LIKE ?",
+              [`%${item}%`]
+            );
+          } else {
+            this.orWhereRaw(
+              "LOWER(country) LIKE ?",
+              [`%${item}%`]
+            );
+          }
+
+        });
+      });
+    }
+
+    // =========================
+    // DATE RANGE
+    // =========================
+    if (startDate) {
+      query = query.where(
+        "start_date",
+        ">=",
+        startDate
       );
     }
 
-    if (platform) {
-      query = query.andWhereRaw(
-        "LOWER(platform) = LOWER(?)",
-        [platform]
+    if (endDate) {
+      query = query.where(
+        "start_date",
+        "<=",
+        endDate
       );
     }
+
+    // console.log("📊 TRACK EARNINGS FILTERS:", {
+    //   isrc,
+    //   songName,
+    //   platform,
+    //   country,
+    //   startDate,
+    //   endDate,
+    // });
 
     const results = await query.select("*");
+
+    // console.log("✅ Results Found:", results.length);
 
     ctx.send({
       totalEntries: results.length,
@@ -223,12 +359,14 @@ module.exports = {
           : 0
       }));
 
-      /* 6️⃣ SORT */
-      result.sort((a, b) => b.totalUnits - a.totalUnits);
+      /* 6️⃣ SORT + TOP 4 */
+      const topPlatforms = result
+        .sort((a, b) => b.totalUnits - a.totalUnits)
+        .slice(0, 4);
 
       return ctx.send({
         totalUnits,
-        platforms: result
+        platforms: topPlatforms
       });
 
     } catch (err) {
@@ -358,15 +496,18 @@ module.exports = {
           : 0
       }));
 
-      /* 6️⃣ SORT */
-      result.sort((a, b) => b.totalEarnings - a.totalEarnings);
+      /* 6️⃣ SORT + TOP 4 */
+      const topCountries = result
+        .sort((a, b) => b.totalEarnings - a.totalEarnings)
+        .slice(0, 4);
 
       return ctx.send({
         totalEarnings:
           Number(adjustedTotalEarnings.toFixed(2)),
 
         labelFee,
-        countries: result
+
+        countries: topCountries
       });
 
     } catch (err) {
@@ -496,6 +637,7 @@ module.exports = {
       })),
     };
   },
+
   async getUserStreamsPerPlatform(ctx) {
     const userId = ctx.state.user.id;
 
