@@ -67,7 +67,7 @@ module.exports = async ({ userId, plan, subscriptionId }) => {
 
   console.log("✅ Admin fee created:", adminFee.id);
 
-  console.log("✅ ADMIN FEE ENTRY SUCCESS");
+  // console.log("✅ ADMIN FEE ENTRY SUCCESS");
 
   // =========================
   // ✅ LABEL FEE ENTRY
@@ -87,6 +87,6 @@ module.exports = async ({ userId, plan, subscriptionId }) => {
 
   console.log("✅ Label fee created:", labelFee.id);
 
-  console.log("✅ LABEL FEE ENTRY SUCCESS");
+  // console.log("✅ LABEL FEE ENTRY SUCCESS");
 
 };

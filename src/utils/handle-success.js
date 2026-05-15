@@ -227,7 +227,7 @@ module.exports = async (session) => {
     );
 
     console.log("✅ Subscription created:", subscription.id);
-    console.log("✅ USER SUBSCRIPTION CREATED SUCCESSFULLY");
+    // console.log("✅ USER SUBSCRIPTION CREATED SUCCESSFULLY");
 
     // ✅ APPLY FEES
     await applyPlanFees({

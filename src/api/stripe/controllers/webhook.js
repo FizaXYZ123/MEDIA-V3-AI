@@ -30,9 +30,9 @@ module.exports = {
     if (event.type === "checkout.session.completed") {
       console.log("💰 PAYMENT SUCCESS EVENT");
 
-      console.log("💳 SESSION ID:", event.data.object.id);
+      // console.log("💳 SESSION ID:", event.data.object.id);
 
-      console.log("💳 SESSION METADATA:", event.data.object.metadata);
+      // console.log("💳 SESSION METADATA:", event.data.object.metadata);
 
       try {
         await handleSuccess(event.data.object);
