@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const csv = require("csv-parser");
+const axios = require("axios");
 
 /* FORMAT DATE */
 function formatDate(dateStr) {
@@ -26,6 +27,95 @@ function formatDate(dateStr) {
   if (isNaN(d.getTime())) return null;
 
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/* ================= USD CONVERSION ================= */
+
+const currencyRateCache = {};
+
+async function convertToUSD(
+  amount,
+  currency
+) {
+
+  const value =
+    Number(
+      toDecimal(amount)
+    );
+
+  const curr =
+    (currency || "USD")
+      .trim()
+      .toUpperCase();
+
+  // already USD
+  if (
+    !curr ||
+    curr === "USD"
+  ) {
+    return value;
+  }
+
+  try {
+
+    // cache rates
+    if (
+      !currencyRateCache[curr]
+    ) {
+
+      const url =
+        `https://api.frankfurter.dev/v1/latest` +
+        `?base=${curr}` +
+        `&symbols=USD`;
+
+      const response =
+        await axios.get(url);
+
+      currencyRateCache[curr] =
+        Number(
+          response.data
+            ?.rates
+            ?.USD || 1
+        );
+
+      console.log(
+        "💱 FETCHED RATE",
+        {
+          currency: curr,
+          rate:
+            currencyRateCache[curr]
+        }
+      );
+    }
+
+    const rate =
+      currencyRateCache[curr];
+
+    const converted =
+      value * rate;
+
+    console.log(
+      "💵 USD CONVERSION",
+      {
+        currency: curr,
+        original: value,
+        rate,
+        converted
+      }
+    );
+
+    return converted;
+
+  } catch (err) {
+
+    console.log(
+      "❌ Conversion failed",
+      curr,
+      err.message
+    );
+
+    return value;
+  }
 }
 
 /* SAFE NUMBER */
@@ -289,6 +379,73 @@ module.exports = () => ({
       );
     }
 
+    /* ================= CONVERT ALL VALUES TO USD ================= */
+
+    console.log(
+      `💱 STARTING USD CONVERSION FOR ${rows.length} ROWS`
+    );
+
+    for (const row of rows) {
+
+      const currency =
+        (row.currency || "USD")
+          .trim()
+          .toUpperCase();
+
+      // already USD
+      if (currency === "USD") {
+
+        row.currency = "USD";
+
+        console.log(
+          "✅ ALREADY USD",
+          {
+            isrc: row.isrc,
+            platform: row.channel,
+            netTotal: row.net_total
+          }
+        );
+
+
+        continue;
+      }
+
+      row.gross_total =
+        await convertToUSD(
+          row.gross_total,
+          currency
+        );
+
+      row.net_total =
+        await convertToUSD(
+          row.net_total,
+          currency
+        );
+
+      row.gross_total_client_currency =
+        await convertToUSD(
+          row.gross_total_client_currency,
+          currency
+        );
+
+      row.net_total_client_currency =
+        await convertToUSD(
+          row.net_total_client_currency,
+          currency
+        );
+
+      row.currency = "USD";
+
+      console.log(
+        "✅ ROW CONVERTED TO USD",
+        {
+          isrc: row.isrc,
+          platform: row.channel,
+          currency
+        }
+      );
+    }
+
     /* ================= MERGE DUPLICATE ROWS ================= */
 
     const groupedRowsMap = {};
@@ -475,6 +632,13 @@ module.exports = () => ({
         platformTotal += toNumber(r.net_total);
       });
 
+      console.log(
+        "💰 PLATFORM TOTAL BEFORE COMMISSION",
+        {
+          platform,
+          platformTotal
+        }
+      );
       if (platformTotal === 0) continue;
 
       const commissionToApply =
@@ -484,6 +648,16 @@ module.exports = () => ({
 
       const platformRemaining =
         platformTotal * (1 - rate);
+
+      console.log(
+        "💸 PLATFORM COMMISSION APPLIED",
+        {
+          platform,
+          commissionPercent: commissionToApply,
+          platformTotal,
+          platformRemaining
+        }
+      );
 
       rowsInPlatform.forEach(r => {
 
@@ -562,6 +736,16 @@ module.exports = () => ({
 
       monthlyTotal += adjustedNet;
 
+      console.log(
+        "🧾 INSERTING ROYALTY",
+        {
+          isrc,
+          platform,
+          country: row.country,
+          adjustedNetUSD: adjustedNet
+        }
+      );
+
       const startDate = formatDate(row.start_date);
       const endDate = formatDate(row.end_date);
       const confirmationDate = formatDate(row.confirmation_report_date);
@@ -585,7 +769,7 @@ module.exports = () => ({
 
             Country: row.country,
 
-            Currency: row.currency,
+            Currency: "USD",
 
             StartDate: startDate,
 
@@ -682,7 +866,13 @@ module.exports = () => ({
         }
       });
 
-    console.log({ inserted, skipped });
+    console.log("🎉 IMPORT COMPLETED", {
+      inserted,
+      skipped,
+      monthlyTotal,
+      skippedTotal,
+      originalTotal
+    });
 
     /* 🔥 GENERATE INVOICES */
     await generateInvoices(reportStartDate, reportEndDate);
