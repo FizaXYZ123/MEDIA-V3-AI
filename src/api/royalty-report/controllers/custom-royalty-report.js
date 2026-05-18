@@ -113,7 +113,7 @@ module.exports = {
 
 
   // client panel earnings endpoint 
-  
+
   async getTrackEarnings(ctx) {
 
     const user = ctx.state.user;
@@ -528,7 +528,7 @@ module.exports = {
         },
         fields: [
           "month",
-          "amountPayableBeforeAdminFee"
+          "finalAmountPayable"
         ],
         limit: -1,
       }
@@ -540,10 +540,10 @@ module.exports = {
     invoices.forEach(inv => {
       const index = inv.month - 1;
 
-      const beforeAdmin = Number(inv.amountPayableBeforeAdminFee || 0);
+      const finalPayable = Number(inv.finalAmountPayable || 0);
 
-      months[index] = beforeAdmin;
-      yearlyTotal += beforeAdmin;
+      months[index] = finalPayable;
+      yearlyTotal += finalPayable;
     });
 
     const monthNames = [
@@ -554,10 +554,10 @@ module.exports = {
     return {
       year,
 
-      // ✅ ONLY this total
+      // ✅ yearly total
       totalEarnings: Number(yearlyTotal.toFixed(2)),
 
-      // ✅ ONLY before admin fee per month
+      // ✅ final amount payable per month
       monthly: months.map((total, i) => ({
         month: monthNames[i],
         total: Number(total.toFixed(2)),

@@ -75,7 +75,23 @@ module.exports = {
 
       const upcomingCount = upcomingReleases.length;
 
-      return { trackCount, artistCount, upcomingCount };
+      // 4. Lifetime earnings from invoices
+      const invoices = await strapi.entityService.findMany(
+        "api::invoice.invoice",
+        {
+          filters: {
+            users_permissions_user: userId,
+          },
+          fields: ["finalAmountPayable"],
+          limit: -1,
+        }
+      );
+
+      const totalEarnings = invoices.reduce((sum, inv) => {
+        return sum + Number(inv.finalAmountPayable || 0);
+      }, 0);
+
+      return { trackCount, artistCount, upcomingCount, totalEarnings: Number(totalEarnings.toFixed(2)), };
     } catch (err) {
       ctx.throw(500, err);
     }
@@ -615,7 +631,5 @@ module.exports = {
       return ctx.internalServerError('Failed to fetch your publish distributes');
     }
   }
-
-
 
 };

@@ -247,7 +247,7 @@ module.exports = () => ({
       throw new Error("CSV file is empty");
     }
 
-     /* REPORT PERIOD */
+    /* REPORT PERIOD */
     let minStart = null;
     let maxEnd = null;
 
@@ -311,7 +311,7 @@ module.exports = () => ({
       const key =
         `${isrc}__${platform}__${country}__${startDate}__${endDate}`;
 
-        console.log("🔑 MERGE KEY:", key);
+      console.log("🔑 MERGE KEY:", key);
 
       // ✅ FIRST ENTRY
       if (!groupedRowsMap[key]) {
@@ -847,12 +847,12 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         });
 
 
-      const labelFee =
+      let labelFee =
         labelFeeData[0]?.feePercentage ??
         user.labelFee ??
         0;
 
-      const adminFee =
+      let adminFee =
         adminFeeData[0]?.feePercentage ??
         user.adminFee ??
         0;
@@ -918,20 +918,56 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       // ✅ PRO LABEL
       else if (planName === "pro label") {
 
+        // ✅ Never apply admin/label fee
+        labelFeeAmount = 0;
+        adminFeeAmount = 0;
+
+        labelFee = 0;
+        adminFee = 0;
+
         let totalCommissionAmount = 0;
         let totalPayable = 0;
 
-        // ✅ APPLY COMMISSION SONG-WISE
+        // ✅ If no commission entry exists -> use 0
+        enterpriseCommissionPercentage =
+          Number(enterpriseCommission || 0);
+
+        // ✅ GROUP ROYALTIES BY ISRC
+        const isrcTotals = {};
+
         for (const royalty of userMap[user.id].royalties) {
 
-          const songTotal = Number(
+          const isrc =
+            royalty.ISRC ||
+            royalty.isrc ||
+            "NO_ISRC";
+
+          const amount = Number(
             royalty.NetTotal || 0
+          );
+
+          if (!isrcTotals[isrc]) {
+            isrcTotals[isrc] = 0;
+          }
+
+          isrcTotals[isrc] = Number(
+            (
+              isrcTotals[isrc] + amount
+            ).toFixed(2)
+          );
+        }
+
+        // ✅ APPLY COMMISSION ON TOTAL OF EACH ISRC
+        for (const isrc in isrcTotals) {
+
+          const songTotal = Number(
+            isrcTotals[isrc]
           );
 
           const commissionAmount = Number(
             (
               songTotal *
-              enterpriseCommission /
+              enterpriseCommissionPercentage /
               100
             ).toFixed(2)
           );
@@ -959,9 +995,6 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         }
 
         afterLabel = totalEarnings;
-
-        enterpriseCommissionPercentage =
-          enterpriseCommission;
 
         enterpriseCommissionAmount =
           totalCommissionAmount;
