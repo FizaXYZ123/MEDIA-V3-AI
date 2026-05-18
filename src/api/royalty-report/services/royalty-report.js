@@ -247,6 +247,203 @@ module.exports = () => ({
       throw new Error("CSV file is empty");
     }
 
+     /* REPORT PERIOD */
+    let minStart = null;
+    let maxEnd = null;
+
+    rows.forEach((row) => {
+      const start = new Date(formatDate(row.start_date));
+      const end = new Date(formatDate(row.end_date));
+
+      if (!minStart || start < minStart) minStart = start;
+      if (!maxEnd || end > maxEnd) maxEnd = end;
+    });
+
+    const reportStartDate = formatDate(minStart);
+    const reportEndDate = formatDate(maxEnd);
+
+    console.log("🧠 Calculated Period:", reportStartDate, "→", reportEndDate);
+
+    /* ❌ DO NOT CHANGE (DUPLICATE CHECK) */
+
+    const reportExists = await strapi.db
+      .query("api::imported-report.imported-report")
+      .findMany({
+        where: {
+          $or: [
+            {
+              startDate: reportStartDate,
+              endDate: reportEndDate
+            },
+            {
+              startDate: { $lte: reportEndDate },
+              endDate: { $gte: reportStartDate }
+            }
+          ]
+        }
+      });
+
+    if (reportExists.length > 0) {
+      throw new Error(
+        `Report already exists for overlapping period (${reportStartDate} → ${reportEndDate})`
+      );
+    }
+
+    /* ================= MERGE DUPLICATE ROWS ================= */
+
+    const groupedRowsMap = {};
+
+    rows.forEach((row) => {
+
+      const isrc = normalizeISRC(row.isrc);
+      const platform =
+        normalizePlatform(row.channel);
+      const country =
+        (row.country || "").trim();
+
+      const startDate =
+        formatDate(row.start_date);
+
+      const endDate =
+        formatDate(row.end_date);
+
+      // ✅ MERGE ONLY WHEN ALL MATCH
+      const key =
+        `${isrc}__${platform}__${country}__${startDate}__${endDate}`;
+
+        console.log("🔑 MERGE KEY:", key);
+
+      // ✅ FIRST ENTRY
+      if (!groupedRowsMap[key]) {
+
+        groupedRowsMap[key] = {
+
+          // keep all fields from first row
+          ...row,
+
+          units:
+            Number(
+              toDecimal(
+                row.units,
+                "units"
+              )
+            ),
+
+          gross_total:
+            Number(
+              toDecimal(
+                row.gross_total,
+                "gross_total"
+              )
+            ),
+
+          net_total:
+            Number(
+              toDecimal(
+                row.net_total,
+                "net_total"
+              )
+            ),
+
+          gross_total_client_currency:
+            Number(
+              toDecimal(
+                row.gross_total_client_currency,
+                "gross_total_client_currency"
+              )
+            ),
+
+          net_total_client_currency:
+            Number(
+              toDecimal(
+                row.net_total_client_currency,
+                "net_total_client_currency"
+              )
+            ),
+        };
+
+      } else {
+
+        // ✅ ONLY TOTAL THESE FIELDS
+
+        const convertedUnits =
+          Number(
+            toDecimal(
+              row.units,
+              "units"
+            )
+          );
+
+        const convertedGross =
+          Number(
+            toDecimal(
+              row.gross_total,
+              "gross_total"
+            )
+          );
+
+        const convertedNet =
+          Number(
+            toDecimal(
+              row.net_total,
+              "net_total"
+            )
+          );
+
+        const convertedGrossClient =
+          Number(
+            toDecimal(
+              row.gross_total_client_currency,
+              "gross_total_client_currency"
+            )
+          );
+
+        const convertedNetClient =
+          Number(
+            toDecimal(
+              row.net_total_client_currency,
+              "net_total_client_currency"
+            )
+          );
+
+        console.log("➕ MERGING VALUES", {
+          key,
+          convertedUnits,
+          convertedGross,
+          convertedNet,
+          convertedGrossClient,
+          convertedNetClient
+        });
+
+        groupedRowsMap[key].units +=
+          convertedUnits;
+
+        groupedRowsMap[key].gross_total +=
+          convertedGross;
+
+        groupedRowsMap[key].net_total +=
+          convertedNet;
+
+        groupedRowsMap[key]
+          .gross_total_client_currency +=
+          convertedGrossClient;
+
+        groupedRowsMap[key]
+          .net_total_client_currency +=
+          convertedNetClient;
+      }
+    });
+
+    // replace original rows with merged rows
+    rows.length = 0;
+    rows.push(
+      ...Object.values(groupedRowsMap)
+    );
+
+    console.log(
+      `🧠 Merged Rows Count: ${rows.length}`
+    );
+
     /* ================= GROUP BY PLATFORM ================= */
     const platformGroups = {};
 
@@ -264,7 +461,6 @@ module.exports = () => ({
         __index: index
       });
     });
-
 
     /* ================= APPLY COMMISSION PER PLATFORM ================= */
     const adjustedMap = {};
@@ -306,48 +502,6 @@ module.exports = () => ({
 
         adjustedMap[r.__index] = adjusted;
       });
-    }
-
-    /* REPORT PERIOD */
-    let minStart = null;
-    let maxEnd = null;
-
-    rows.forEach((row) => {
-      const start = new Date(formatDate(row.start_date));
-      const end = new Date(formatDate(row.end_date));
-
-      if (!minStart || start < minStart) minStart = start;
-      if (!maxEnd || end > maxEnd) maxEnd = end;
-    });
-
-    const reportStartDate = formatDate(minStart);
-    const reportEndDate = formatDate(maxEnd);
-
-    console.log("🧠 Calculated Period:", reportStartDate, "→", reportEndDate);
-
-    /* ❌ DO NOT CHANGE (DUPLICATE CHECK) */
-
-    const reportExists = await strapi.db
-      .query("api::imported-report.imported-report")
-      .findMany({
-        where: {
-          $or: [
-            {
-              startDate: reportStartDate,
-              endDate: reportEndDate
-            },
-            {
-              startDate: { $lte: reportEndDate },
-              endDate: { $gte: reportStartDate }
-            }
-          ]
-        }
-      });
-
-    if (reportExists.length > 0) {
-      throw new Error(
-        `Report already exists for overlapping period (${reportStartDate} → ${reportEndDate})`
-      );
     }
 
     /* LOAD TRACKS */
