@@ -27,7 +27,7 @@ module.exports = [
   {
     name: 'strapi::cors',
     config: {
-      origin: ['http://localhost:5173', 'https://v3.amozart.com', 'https://localhost:5173', 'https://admin.amozart.com'],
+      origin: ['http://localhost:5173', 'https://v3.amozart.com', 'https://localhost:5173', 'https://admin.amozart.com', 'https://amozart.com', 'https://www.amozart.com'],
 
       methods: [
         'GET',
