@@ -750,6 +750,52 @@ module.exports = () => ({
       const endDate = formatDate(row.end_date);
       const confirmationDate = formatDate(row.confirmation_report_date);
 
+      // Duplicate Check
+      const existingRoyalty = await strapi.db
+        .query("api::royalty-report.royalty-report")
+        .findOne({
+          where: {
+            ISRC: isrc,
+            Platform: platform,
+            Country: row.country,
+            StartDate: startDate,
+            EndDate: endDate,
+            UserEmail: row.user_email,
+          },
+        });
+
+      if (existingRoyalty) {
+
+        console.log(
+          "⚠️ DUPLICATE ROYALTY SKIPPED",
+          {
+            isrc,
+            platform,
+            country: row.country,
+            startDate,
+            endDate,
+            userEmail: row.user_email,
+            existingRoyaltyId: existingRoyalty.id
+          }
+        );
+
+        skipped++;
+
+        continue;
+      }
+
+      console.log(
+        "✅ NEW ROYALTY INSERT",
+        {
+          isrc,
+          platform,
+          country: row.country,
+          startDate,
+          endDate,
+          userEmail: row.user_email
+        }
+      );
+
       /* ================= CREATE ================= */
 
       const created = await strapi.db
