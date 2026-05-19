@@ -41,7 +41,7 @@ module.exports = {
     {
       method: "GET",
       path: "/user/country-earnings",
-      handler: "custom-royalty-report.userCountryEarnings",
+      handler: "custom-royalty-report.userCountryStreams",
       config: {
         auth: {}
       }

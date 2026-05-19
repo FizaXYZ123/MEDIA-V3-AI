@@ -297,7 +297,11 @@ module.exports = {
         return ctx.unauthorized("Unauthorized");
       }
 
-      /* 2️⃣ GET USER TRACKS (WITH RELATION FILTER) */
+      /* 2️⃣ GET YEAR */
+      const selectedYear =
+        parseInt(ctx.query.year) || new Date().getFullYear();
+
+      /* 2️⃣ GET USER TRACKS */
       const tracks = await strapi.db
         .query("api::distribute-track.distribute-track")
         .findMany({
@@ -325,7 +329,21 @@ module.exports = {
           where: {
             ISRC: {
               $in: isrcList
-            }
+            },
+            $or: [
+              {
+                start_date: {
+                  $gte: `${selectedYear}-01-01`,
+                  $lte: `${selectedYear}-12-31`
+                }
+              },
+              {
+                end_date: {
+                  $gte: `${selectedYear}-01-01`,
+                  $lte: `${selectedYear}-12-31`
+                }
+              }
+            ]
           },
           select: ["Platform", "Units"]
         });
@@ -374,7 +392,7 @@ module.exports = {
     }
   },
 
-  async userCountryEarnings(ctx) {
+  async userCountryStreams(ctx) {
     try {
 
       /* 1️⃣ GET USER */
@@ -384,7 +402,11 @@ module.exports = {
         return ctx.unauthorized("Unauthorized");
       }
 
-      /* 2️⃣ GET USER TRACKS */
+      /* 2️⃣ GET YEAR */
+      const selectedYear =
+        parseInt(ctx.query.year) || new Date().getFullYear();
+
+      /* 3️⃣ GET USER TRACKS */
       const tracks = await strapi.db
         .query("api::distribute-track.distribute-track")
         .findMany({
@@ -398,34 +420,48 @@ module.exports = {
 
       if (!tracks.length) {
         return ctx.send({
-          totalEarnings: 0,
+          totalUnits: 0,
           countries: []
         });
       }
 
       const isrcList = tracks.map(t => t.ISRC).filter(Boolean);
 
-      /* 3️⃣ FETCH ROYALTY DATA */
+      /* 4️⃣ FETCH ROYALTY DATA */
       const data = await strapi.db
         .query("api::royalty-report.royalty-report")
         .findMany({
           where: {
             ISRC: {
               $in: isrcList
-            }
+            },
+            $or: [
+              {
+                start_date: {
+                  $gte: `${selectedYear}-01-01`,
+                  $lte: `${selectedYear}-12-31`
+                }
+              },
+              {
+                end_date: {
+                  $gte: `${selectedYear}-01-01`,
+                  $lte: `${selectedYear}-12-31`
+                }
+              }
+            ]
           },
-          select: ["Country", "NetTotal"]
+          select: ["Country", "Units"]
         });
 
       if (!data.length) {
         return ctx.send({
-          totalEarnings: 0,
+          totalUnits: 0,
           countries: []
         });
       }
 
-      /* 4️⃣ GROUP BY COUNTRY */
-      let totalEarnings = 0;
+      /* 5️⃣ GROUP BY COUNTRY */
+      let totalUnits = 0;
 
       const countryMap = {};
 
@@ -433,80 +469,41 @@ module.exports = {
 
         const country = item.Country || "Unknown";
 
-        const earnings = Number(item.NetTotal || 0);
+        const units = Number(item.Units || 0);
 
-        totalEarnings += earnings;
+        totalUnits += units;
 
         if (!countryMap[country]) {
           countryMap[country] = {
             country,
-            originalEarnings: 0,
-            totalEarnings: 0,
+            totalUnits: 0,
             percentage: 0
           };
         }
 
-        countryMap[country].originalEarnings += earnings;
+        countryMap[country].totalUnits += units;
       });
 
-      /* 5️⃣ FETCH LATEST LABEL FEE */
-      const labelFeeData = await strapi.db
-        .query("api::label-fee-history.label-fee-history")
-        .findMany({
-          where: {
-            users_permissions_user: user.id,
-          },
-          orderBy: {
-            effective_from: "desc"
-          },
-          limit: 1,
-        });
-
-      const labelFee =
-        labelFeeData[0]?.feePercentage ?? 0;
-
-      /* 6️⃣ DEDUCT LABEL FEE */
-      const adjustedTotalEarnings =
-        totalEarnings -
-        (totalEarnings * labelFee / 100);
-
-      /* 7️⃣ REDISTRIBUTE PROPORTIONALLY */
-      Object.values(countryMap).forEach(country => {
-
-        country.totalEarnings =
-          totalEarnings > 0
-            ? (
-              (country.originalEarnings / totalEarnings)
-              * adjustedTotalEarnings
-            )
-            : 0;
-      });
-
-      /* 8️⃣ CALCULATE % */
+      /* 6️⃣ CALCULATE % */
       const result = Object.values(countryMap).map(c => ({
         country: c.country,
 
-        totalEarnings:
-          Number(c.totalEarnings.toFixed(2)),
+        totalUnits: c.totalUnits,
 
-        percentage: adjustedTotalEarnings
+        percentage: totalUnits
           ? (
-            (c.totalEarnings / adjustedTotalEarnings) * 100
+            (c.totalUnits / totalUnits) * 100
           ).toFixed(2)
           : 0
       }));
 
-      /* 6️⃣ SORT + TOP 4 */
+      /* 7️⃣ SORT + TOP 4 */
       const topCountries = result
-        .sort((a, b) => b.totalEarnings - a.totalEarnings)
+        .sort((a, b) => b.totalUnits - a.totalUnits)
         .slice(0, 4);
 
       return ctx.send({
-        totalEarnings:
-          Number(adjustedTotalEarnings.toFixed(2)),
-
-        labelFee,
-
+        totalUnits,
         countries: topCountries
       });
 
