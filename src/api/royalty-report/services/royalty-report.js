@@ -2,7 +2,6 @@
 
 const fs = require("fs");
 const csv = require("csv-parser");
-const axios = require("axios");
 
 /* FORMAT DATE */
 function formatDate(dateStr) {
@@ -27,95 +26,6 @@ function formatDate(dateStr) {
   if (isNaN(d.getTime())) return null;
 
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-/* ================= USD CONVERSION ================= */
-
-const currencyRateCache = {};
-
-async function convertToUSD(
-  amount,
-  currency
-) {
-
-  const value =
-    Number(
-      toDecimal(amount)
-    );
-
-  const curr =
-    (currency || "USD")
-      .trim()
-      .toUpperCase();
-
-  // already USD
-  if (
-    !curr ||
-    curr === "USD"
-  ) {
-    return value;
-  }
-
-  try {
-
-    // cache rates
-    if (
-      !currencyRateCache[curr]
-    ) {
-
-      const url =
-        `https://api.frankfurter.dev/v1/latest` +
-        `?base=${curr}` +
-        `&symbols=USD`;
-
-      const response =
-        await axios.get(url);
-
-      currencyRateCache[curr] =
-        Number(
-          response.data
-            ?.rates
-            ?.USD || 1
-        );
-
-      console.log(
-        "💱 FETCHED RATE",
-        {
-          currency: curr,
-          rate:
-            currencyRateCache[curr]
-        }
-      );
-    }
-
-    const rate =
-      currencyRateCache[curr];
-
-    const converted =
-      value * rate;
-
-    console.log(
-      "💵 USD CONVERSION",
-      {
-        currency: curr,
-        original: value,
-        rate,
-        converted
-      }
-    );
-
-    return converted;
-
-  } catch (err) {
-
-    console.log(
-      "❌ Conversion failed",
-      curr,
-      err.message
-    );
-
-    return value;
-  }
 }
 
 /* SAFE NUMBER */
@@ -376,73 +286,6 @@ module.exports = () => ({
     if (reportExists.length > 0) {
       throw new Error(
         `Report already exists for overlapping period (${reportStartDate} → ${reportEndDate})`
-      );
-    }
-
-    /* ================= CONVERT ALL VALUES TO USD ================= */
-
-    console.log(
-      `💱 STARTING USD CONVERSION FOR ${rows.length} ROWS`
-    );
-
-    for (const row of rows) {
-
-      const currency =
-        (row.currency || "USD")
-          .trim()
-          .toUpperCase();
-
-      // already USD
-      if (currency === "USD") {
-
-        row.currency = "USD";
-
-        console.log(
-          "✅ ALREADY USD",
-          {
-            isrc: row.isrc,
-            platform: row.channel,
-            netTotal: row.net_total
-          }
-        );
-
-
-        continue;
-      }
-
-      row.gross_total =
-        await convertToUSD(
-          row.gross_total,
-          currency
-        );
-
-      row.net_total =
-        await convertToUSD(
-          row.net_total,
-          currency
-        );
-
-      row.gross_total_client_currency =
-        await convertToUSD(
-          row.gross_total_client_currency,
-          currency
-        );
-
-      row.net_total_client_currency =
-        await convertToUSD(
-          row.net_total_client_currency,
-          currency
-        );
-
-      row.currency = "USD";
-
-      console.log(
-        "✅ ROW CONVERTED TO USD",
-        {
-          isrc: row.isrc,
-          platform: row.channel,
-          currency
-        }
       );
     }
 
@@ -742,7 +585,7 @@ module.exports = () => ({
           isrc,
           platform,
           country: row.country,
-          adjustedNetUSD: adjustedNet
+          adjustedNet: adjustedNet
         }
       );
 
@@ -784,18 +627,6 @@ module.exports = () => ({
         continue;
       }
 
-      // console.log(
-      //   "✅ NEW ROYALTY INSERT",
-      //   {
-      //     isrc,
-      //     platform,
-      //     country: row.country,
-      //     startDate,
-      //     endDate,
-      //     userEmail: row.user_email
-      //   }
-      // );
-
       /* ================= CREATE ================= */
 
       const created = await strapi.db
@@ -815,7 +646,7 @@ module.exports = () => ({
 
             Country: row.country,
 
-            Currency: "USD",
+            Currency: row.currency,
 
             StartDate: startDate,
 
