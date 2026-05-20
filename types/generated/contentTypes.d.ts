@@ -1436,6 +1436,7 @@ export interface ApiNotificationNotification extends Schema.CollectionType {
     singularName: 'notification';
     pluralName: 'notifications';
     displayName: 'Notifications';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1448,6 +1449,7 @@ export interface ApiNotificationNotification extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    is_read: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

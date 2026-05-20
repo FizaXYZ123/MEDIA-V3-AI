@@ -4,7 +4,8 @@
   "info": {
     "singularName": "notification",
     "pluralName": "notifications",
-    "displayName": "Notifications"
+    "displayName": "Notifications",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -22,6 +23,10 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "notifications"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

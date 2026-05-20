@@ -784,17 +784,18 @@ module.exports = () => ({
         continue;
       }
 
-      console.log(
-        "✅ NEW ROYALTY INSERT",
-        {
-          isrc,
-          platform,
-          country: row.country,
-          startDate,
-          endDate,
-          userEmail: row.user_email
-        }
       );
+      // console.log(
+      //   "✅ NEW ROYALTY INSERT",
+      //   {
+      //     isrc,
+      //     platform,
+      //     country: row.country,
+      //     startDate,
+      //     endDate,
+      //     userEmail: row.user_email
+      //   }
+      // );
 
       /* ================= CREATE ================= */
 
