@@ -23,6 +23,7 @@
     "csv-parser": "^3.2.0",
     "geoip-lite": "^1.4.10",
     "google-auth-library": "^10.6.2",
+    "json2csv": "^6.0.0-alpha.2",
     "node-cron": "^4.2.1",
     "patch-package": "^8.0.0",
     "pg": "8.8.0",

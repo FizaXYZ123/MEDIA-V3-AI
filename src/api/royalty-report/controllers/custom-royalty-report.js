@@ -111,6 +111,15 @@ module.exports = {
 
   },
 
+    async generateCsvReport(ctx) {
+
+      return await strapi
+        .service(
+          "api::royalty-report.custom-royalty-service"
+        )
+        .generateCsvReport(ctx);
+    },
+
 
   // client panel earnings endpoint 
 

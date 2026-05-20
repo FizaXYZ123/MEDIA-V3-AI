@@ -757,7 +757,7 @@ module.exports = () => ({
     return { inserted, skipped, monthlyTotal, skippedTotal, commissionPercent, originalTotal };
 
 
-  }
+  },
 
 });
 

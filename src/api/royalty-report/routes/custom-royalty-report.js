@@ -104,5 +104,15 @@ module.exports = {
         auth: false, 
       },
     },
+
+    // export royalty file
+    {
+      method: "GET",
+      path: "/royalty-report/export-csv",
+      handler: "custom-royalty-report.generateCsvReport",
+      config: {
+        auth: {},
+      },
+    },
   ]
 };
