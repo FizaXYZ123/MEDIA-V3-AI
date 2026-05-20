@@ -784,7 +784,6 @@ module.exports = () => ({
         continue;
       }
 
-      );
       // console.log(
       //   "✅ NEW ROYALTY INSERT",
       //   {
