@@ -115,11 +115,10 @@ module.exports = {
 
       return await strapi
         .service(
-          "api::royalty-report.custom-royalty-service"
+          "api::royalty-report.generate-royalty-csv-service"
         )
         .generateCsvReport(ctx);
     },
-
 
   // client panel earnings endpoint 
 
@@ -522,54 +521,60 @@ module.exports = {
   },
 
   async getUserEarningsPerMonth(ctx) {
-    const userId = ctx.state.user.id;
-    const year = parseInt(ctx.query.year) || new Date().getFullYear();
+  const userId = ctx.state.user.id;
+  const range = ctx.query.range || "1M";
 
-    const invoices = await strapi.entityService.findMany(
-      "api::invoice.invoice",
-      {
-        filters: {
-          users_permissions_user: userId,
-          year,
-        },
-        fields: [
-          "month",
-          "finalAmountPayable"
-        ],
-        limit: -1,
-      }
-    );
+  let limit = 1;
 
-    const months = Array(12).fill(0);
-    let yearlyTotal = 0;
+  if (range === "3M") {
+    limit = 3;
+  } else if (range === "6M") {
+    limit = 6;
+  }
 
-    invoices.forEach(inv => {
-      const index = inv.month - 1;
+  const invoices = await strapi.entityService.findMany(
+    "api::invoice.invoice",
+    {
+      filters: {
+        users_permissions_user: userId,
+      },
+      fields: [
+        "month",
+        "year",
+        "invoiceDate",
+        "finalAmountPayable",
+      ],
+      sort: ["invoiceDate:desc"],
+      limit,
+    }
+  );
 
-      const finalPayable = Number(inv.finalAmountPayable || 0);
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
 
-      months[index] = finalPayable;
-      yearlyTotal += finalPayable;
-    });
+  // oldest -> latest for frontend chart
+  const monthly = invoices
+    .reverse()
+    .map(inv => ({
+      month: `${monthNames[inv.month - 1]} ${inv.year}`,
+      total: Number(
+        Number(inv.finalAmountPayable || 0).toFixed(2)
+      ),
+    }));
 
-    const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
+  const totalEarnings = monthly.reduce(
+    (sum, item) => sum + item.total,
+    0
+  );
 
-    return {
-      year,
-
-      // ✅ yearly total
-      totalEarnings: Number(yearlyTotal.toFixed(2)),
-
-      // ✅ final amount payable per month
-      monthly: months.map((total, i) => ({
-        month: monthNames[i],
-        total: Number(total.toFixed(2)),
-      })),
-    };
-  },
+  return {
+    range,
+    totalEarnings,
+    monthly,
+  };
+},
 
   async getUserStreamsPerMonth(ctx) {
     const userId = ctx.state.user.id;

@@ -182,6 +182,12 @@
       "relation": "oneToMany",
       "target": "api::enterprise-commission.enterprise-commission",
       "mappedBy": "users_permissions_user"
+    },
+    "csv_report_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::csv-report-log.csv-report-log",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

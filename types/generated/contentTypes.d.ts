@@ -837,6 +837,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::enterprise-commission.enterprise-commission'
     >;
+    csv_report_logs: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::csv-report-log.csv-report-log'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1015,6 +1020,45 @@ export interface ApiBlogBlog extends Schema.CollectionType {
     createdBy: Attribute.Relation<'api::blog.blog', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::blog.blog', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiCsvReportLogCsvReportLog extends Schema.CollectionType {
+  collectionName: 'csv_report_logs';
+  info: {
+    singularName: 'csv-report-log';
+    pluralName: 'csv-report-logs';
+    displayName: 'csv-report-log';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    startMonth: Attribute.String;
+    endMonth: Attribute.String;
+    csvData: Attribute.Text;
+    reportName: Attribute.String;
+    users_permissions_user: Attribute.Relation<
+      'api::csv-report-log.csv-report-log',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::csv-report-log.csv-report-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::csv-report-log.csv-report-log',
+      'oneToOne',
+      'admin::user'
+    > &
       Attribute.Private;
   };
 }
@@ -2060,6 +2104,7 @@ declare module '@strapi/types' {
       'api::artist-detail.artist-detail': ApiArtistDetailArtistDetail;
       'api::audit-log.audit-log': ApiAuditLogAuditLog;
       'api::blog.blog': ApiBlogBlog;
+      'api::csv-report-log.csv-report-log': ApiCsvReportLogCsvReportLog;
       'api::distribute-draft.distribute-draft': ApiDistributeDraftDistributeDraft;
       'api::distribute-track.distribute-track': ApiDistributeTrackDistributeTrack;
       'api::enterprise-commission.enterprise-commission': ApiEnterpriseCommissionEnterpriseCommission;

@@ -54,6 +54,39 @@ module.exports = createCoreService(
 
                 console.log("👤 User ID:", userId);
 
+                /* ================= CHECK EXISTING REPORT ================= */
+
+                const existingReport =
+                    await strapi.db
+                        .query("api::csv-report-log.csv-report-log")
+                        .findOne({
+                            where: {
+                                users_permissions_user:
+                                    userId,
+
+                                startMonth,
+
+                                endMonth,
+                            },
+                        });
+
+                if (existingReport) {
+
+                    console.log(
+                        "⚠️ Report already generated"
+                    );
+
+                    return ctx.send({
+                        success: true,
+
+                        message:
+                            "Report already generated. Download it from logs",
+
+                        reportId:
+                            existingReport.id,
+                    });
+                }
+
                 /* ================= FETCH ROYALTIES ================= */
 
                 const royalties =
@@ -692,6 +725,37 @@ module.exports = createCoreService(
 
                 console.log(
                     "✅ CSV Generated Successfully"
+                );
+
+                /* ================= CREATE CSV LOG ================= */
+
+                const fileName =
+                    `earnings-report-${Date.now()}.csv`;
+
+                await strapi.db
+                    .query("api::csv-report-log.csv-report-log")
+                    .create({
+                        data: {
+                            startMonth,
+
+                            endMonth,
+
+                            reportName:
+                                fileName,
+
+                            csvData:
+                                csv,
+
+                            users_permissions_user:
+                                userId,
+
+                            publishedAt:
+                                new Date(),
+                        },
+                    });
+
+                console.log(
+                    "📝 CSV Log Created"
                 );
 
                 /* ================= RESPONSE ================= */
