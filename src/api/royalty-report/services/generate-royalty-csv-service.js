@@ -85,6 +85,7 @@ module.exports = createCoreService(
                         reportId:
                             existingReport.id,
                     });
+                      return;
                 }
 
                 /* ================= FETCH ROYALTIES ================= */
@@ -133,12 +134,15 @@ module.exports = createCoreService(
                 if (!royalties.length) {
 
                     console.log(
-                        "⚠️ No royalties found"
+                        "⚠️ Report does not exist"
                     );
 
-                    return ctx.badRequest(
-                        "No royalties found"
-                    );
+                    ctx.body = {
+                        success: false,
+                        message: "Report does not exist",
+                    };
+
+                    return;
                 }
 
                 /* ================= USER ================= */
