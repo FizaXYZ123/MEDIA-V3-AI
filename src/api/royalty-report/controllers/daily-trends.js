@@ -7,8 +7,14 @@ const axios = require("axios");
 const TINYBIRD_BASE_URL =
     "https://api.us-east.aws.tinybird.co/v0/pipes";
 
+const TOKEN = process.env.SONU_SUITE_ACCESS_TOKEN;
+
+if (!TOKEN) {
+  throw new Error("Tinybird token missing");
+}
+
 const HEADERS = {
-    Authorization: `Bearer ${process.env.sonu_suite_access_token}`,
+  Authorization: `Bearer ${TOKEN}`,
 };
 
 /* =========================================================
