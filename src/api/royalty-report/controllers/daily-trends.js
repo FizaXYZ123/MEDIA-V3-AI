@@ -10,11 +10,11 @@ const TINYBIRD_BASE_URL =
 const TOKEN = process.env.SONU_SUITE_ACCESS_TOKEN;
 
 if (!TOKEN) {
-  throw new Error("Tinybird token missing");
+    throw new Error("Tinybird token missing");
 }
 
 const HEADERS = {
-  Authorization: `Bearer ${TOKEN}`,
+    Authorization: `Bearer ${TOKEN}`,
 };
 
 /* =========================================================
@@ -335,6 +335,52 @@ module.exports = {
         try {
             const user = ctx.state.user;
 
+            /* =========================================
+   PERIOD MAP
+========================================= */
+
+            const period =
+                ctx.query.period || "7days";
+
+            const PERIOD_MAP = {
+                "7days": 7,
+                "14days": 14,
+                "30days": 30,
+            };
+
+            const totalDays =
+                PERIOD_MAP[period] || 7;
+
+            /* =========================================
+               DATE RANGE
+               Tinybird data delayed by 2 days
+            ========================================= */
+
+            const endDateObj = new Date();
+
+            endDateObj.setDate(
+                endDateObj.getDate() - 2
+            );
+
+            const startDateObj = new Date(
+                endDateObj
+            );
+
+            startDateObj.setDate(
+                startDateObj.getDate() -
+                totalDays
+            );
+
+            const startDate =
+                startDateObj
+                    .toISOString()
+                    .split("T")[0];
+
+            const endDate =
+                endDateObj
+                    .toISOString()
+                    .split("T")[0];
+
             if (!user) {
                 return ctx.unauthorized("Unauthorized");
             }
@@ -402,16 +448,6 @@ module.exports = {
             // );
 
             /* =========================================
-               CURRENT YEAR
-            ========================================= */
-
-            const currentYear =
-                new Date().getFullYear();
-
-            let { startDate, endDate } =
-                getYearDates(currentYear);
-
-            /* =========================================
                FETCH COUNTRY STREAMS
             ========================================= */
 
@@ -426,29 +462,6 @@ module.exports = {
                     );
 
                 allCountryStreams.push(...streams);
-            }
-
-            /* =========================================
-               FALLBACK TO PREVIOUS YEAR
-            ========================================= */
-
-            if (!allCountryStreams.length) {
-                const previousYear =
-                    currentYear - 1;
-
-                ({ startDate, endDate } =
-                    getYearDates(previousYear));
-
-                for (const track of matchedTracks) {
-                    const streams =
-                        await getCountryStreams(
-                            track.trackId,
-                            startDate,
-                            endDate
-                        );
-
-                    allCountryStreams.push(...streams);
-                }
             }
 
             /* =========================================
@@ -509,8 +522,16 @@ module.exports = {
 
             return ctx.send({
                 success: true,
+
+                period,
+
+                startDate,
+
+                endDate,
+
                 totalCountries:
                     topCountries.length,
+
                 data: topCountries,
             });
         } catch (error) {
@@ -533,6 +554,52 @@ module.exports = {
     async bestPerformingChannels(ctx) {
         try {
             const user = ctx.state.user;
+
+            /* =========================================
+              PERIOD MAP
+========================================= */
+
+            const period =
+                ctx.query.period || "7days";
+
+            const PERIOD_MAP = {
+                "7days": 7,
+                "14days": 14,
+                "30days": 30,
+            };
+
+            const totalDays =
+                PERIOD_MAP[period] || 7;
+
+            /* =========================================
+               DATE RANGE
+               Tinybird data delayed by 2 days
+            ========================================= */
+
+            const endDateObj = new Date();
+
+            endDateObj.setDate(
+                endDateObj.getDate() - 2
+            );
+
+            const startDateObj = new Date(
+                endDateObj
+            );
+
+            startDateObj.setDate(
+                startDateObj.getDate() -
+                totalDays
+            );
+
+            const startDate =
+                startDateObj
+                    .toISOString()
+                    .split("T")[0];
+
+            const endDate =
+                endDateObj
+                    .toISOString()
+                    .split("T")[0];
 
             if (!user) {
                 return ctx.unauthorized(
@@ -616,16 +683,6 @@ module.exports = {
             // );
 
             /* =========================================
-               CURRENT YEAR
-            ========================================= */
-
-            const currentYear =
-                new Date().getFullYear();
-
-            let { startDate, endDate } =
-                getYearDates(currentYear);
-
-            /* =========================================
                FETCH CHANNEL STREAMS
             ========================================= */
 
@@ -660,55 +717,6 @@ module.exports = {
                 allChannelStreams.push(
                     ...streams
                 );
-            }
-
-            /* =========================================
-               FALLBACK TO PREVIOUS YEAR
-            ========================================= */
-
-            if (!allChannelStreams.length) {
-                const previousYear =
-                    currentYear - 1;
-
-                ({
-                    startDate,
-                    endDate,
-                } = getYearDates(
-                    previousYear
-                ));
-
-                for (const track of matchedTracks) {
-                    const response =
-                        await axios.get(
-                            `${TINYBIRD_BASE_URL}/streams.json`,
-                            {
-                                headers:
-                                    HEADERS,
-
-                                params: {
-                                    track_id:
-                                        track.trackId,
-
-                                    dimension:
-                                        "channel",
-
-                                    date_start:
-                                        startDate,
-
-                                    date_end:
-                                        endDate,
-                                },
-                            }
-                        );
-
-                    const streams =
-                        response.data.data ||
-                        [];
-
-                    allChannelStreams.push(
-                        ...streams
-                    );
-                }
             }
 
             /* =========================================
@@ -786,6 +794,12 @@ module.exports = {
 
             return ctx.send({
                 success: true,
+
+                period,
+
+                startDate,
+
+                endDate,
 
                 totalChannels:
                     topChannels.length,
