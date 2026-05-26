@@ -565,6 +565,7 @@ module.exports = {
       });
 
       return ctx.send({
+        success: true,
         message: 'Draft moved to PublishDistribute successfully and original draft deleted',
         publishId: newPublish.id,
       });

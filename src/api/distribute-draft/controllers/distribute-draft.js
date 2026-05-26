@@ -657,7 +657,11 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
 
     console.log("🚀 Draft published");
 
-    ctx.body = { data: draft };
+    ctx.body = {
+      success: true,
+      message: "Draft published successfully",
+      data: draft
+    };
   },
   async createFromTracks(ctx) {
     const payload = ctx.request.body?.data || ctx.request.body || {};
