@@ -32,6 +32,16 @@
         "canceled"
       ]
     },
+    "subscriptionType": {
+      "type": "enumeration",
+      "enum": [
+        "subscription",
+        "upgrade"
+      ]
+    },
+    "upgradedAt": {
+      "type": "datetime"
+    },
     "plan": {
       "type": "relation",
       "relation": "manyToOne",

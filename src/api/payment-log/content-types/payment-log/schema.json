@@ -67,7 +67,8 @@
       "type": "enumeration",
       "enum": [
         "subscription",
-        "priority-upload"
+        "priority-upload",
+        "upgrade"
       ]
     }
   }

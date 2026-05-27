@@ -1549,7 +1549,7 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
       'manyToOne',
       'api::publish-distribute.publish-distribute'
     >;
-    type: Attribute.Enumeration<['subscription', 'priority-upload']>;
+    type: Attribute.Enumeration<['subscription', 'priority-upload', 'upgrade']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1672,6 +1672,7 @@ export interface ApiPlanPlan extends Schema.CollectionType {
     default_label_fee: Attribute.Integer;
     default_admin_fee: Attribute.Integer;
     maxPrimaryArtists: Attribute.String;
+    priority_order: Attribute.Integer;
     user_subscriptions: Attribute.Relation<
       'api::plan.plan',
       'oneToMany',
@@ -2059,6 +2060,8 @@ export interface ApiUserSubscriptionUserSubscription
     startDate: Attribute.DateTime;
     endDate: Attribute.DateTime;
     status: Attribute.Enumeration<['active', 'expired', 'canceled']>;
+    subscriptionType: Attribute.Enumeration<['subscription', 'upgrade']>;
+    upgradedAt: Attribute.DateTime;
     plan: Attribute.Relation<
       'api::user-subscription.user-subscription',
       'manyToOne',

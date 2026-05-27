@@ -23,8 +23,8 @@
     "price_cad": {
       "type": "decimal"
     },
-    "price_usd":{
-     "type":"decimal"
+    "price_usd": {
+      "type": "decimal"
     },
     "billingCycle": {
       "type": "enumeration",
@@ -49,6 +49,9 @@
     },
     "maxPrimaryArtists": {
       "type": "string"
+    },
+    "priority_order": {
+      "type": "integer"
     },
     "user_subscriptions": {
       "type": "relation",

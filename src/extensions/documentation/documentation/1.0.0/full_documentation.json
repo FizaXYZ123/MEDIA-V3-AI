@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-26T06:37:39.019Z"
+    "x-generation-date": "2026-05-27T15:29:38.532Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2348,6 +2348,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -2394,6 +2397,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -2590,7 +2604,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -6132,6 +6147,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -6178,6 +6196,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -6374,7 +6403,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -9963,6 +9993,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -10009,6 +10042,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -10205,7 +10249,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -14506,6 +14551,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -14552,6 +14600,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -14748,7 +14807,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -17752,6 +17812,9 @@
                                                                                         "maxPrimaryArtists": {
                                                                                           "type": "string"
                                                                                         },
+                                                                                        "priority_order": {
+                                                                                          "type": "integer"
+                                                                                        },
                                                                                         "user_subscriptions": {
                                                                                           "type": "object",
                                                                                           "properties": {
@@ -17798,6 +17861,17 @@
                                                                                                           "expired",
                                                                                                           "canceled"
                                                                                                         ]
+                                                                                                      },
+                                                                                                      "subscriptionType": {
+                                                                                                        "type": "string",
+                                                                                                        "enum": [
+                                                                                                          "subscription",
+                                                                                                          "upgrade"
+                                                                                                        ]
+                                                                                                      },
+                                                                                                      "upgradedAt": {
+                                                                                                        "type": "string",
+                                                                                                        "format": "date-time"
                                                                                                       },
                                                                                                       "plan": {
                                                                                                         "type": "object",
@@ -17994,7 +18068,8 @@
                                                                               "type": "string",
                                                                               "enum": [
                                                                                 "subscription",
-                                                                                "priority-upload"
+                                                                                "priority-upload",
+                                                                                "upgrade"
                                                                               ]
                                                                             },
                                                                             "createdAt": {
@@ -22504,6 +22579,17 @@
                                                                               "canceled"
                                                                             ]
                                                                           },
+                                                                          "subscriptionType": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                              "subscription",
+                                                                              "upgrade"
+                                                                            ]
+                                                                          },
+                                                                          "upgradedAt": {
+                                                                            "type": "string",
+                                                                            "format": "date-time"
+                                                                          },
                                                                           "plan": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -22552,6 +22638,9 @@
                                                                                       },
                                                                                       "maxPrimaryArtists": {
                                                                                         "type": "string"
+                                                                                      },
+                                                                                      "priority_order": {
+                                                                                        "type": "integer"
                                                                                       },
                                                                                       "user_subscriptions": {
                                                                                         "type": "object",
@@ -22674,7 +22763,8 @@
                                                                                                       "type": "string",
                                                                                                       "enum": [
                                                                                                         "subscription",
-                                                                                                        "priority-upload"
+                                                                                                        "priority-upload",
+                                                                                                        "upgrade"
                                                                                                       ]
                                                                                                     },
                                                                                                     "createdAt": {
@@ -26271,6 +26361,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -26317,6 +26410,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -26513,7 +26617,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -32088,6 +32193,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -32134,6 +32242,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -32330,7 +32449,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -35789,6 +35909,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -35835,6 +35958,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -36031,7 +36165,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -39491,6 +39626,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -39537,6 +39675,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -39733,7 +39882,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -41011,7 +41161,8 @@
                 "type": "string",
                 "enum": [
                   "subscription",
-                  "priority-upload"
+                  "priority-upload",
+                  "upgrade"
                 ]
               }
             }
@@ -43242,6 +43393,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -43288,6 +43442,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -43484,7 +43649,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -44681,7 +44847,8 @@
             "type": "string",
             "enum": [
               "subscription",
-              "priority-upload"
+              "priority-upload",
+              "upgrade"
             ]
           },
           "createdAt": {
@@ -47047,6 +47214,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -47093,6 +47263,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -47289,7 +47470,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -48982,6 +49164,9 @@
               "maxPrimaryArtists": {
                 "type": "string"
               },
+              "priority_order": {
+                "type": "integer"
+              },
               "user_subscriptions": {
                 "type": "array",
                 "items": {
@@ -49102,6 +49287,9 @@
           },
           "maxPrimaryArtists": {
             "type": "string"
+          },
+          "priority_order": {
+            "type": "integer"
           },
           "user_subscriptions": {
             "type": "object",
@@ -51292,6 +51480,9 @@
                                                                             "maxPrimaryArtists": {
                                                                               "type": "string"
                                                                             },
+                                                                            "priority_order": {
+                                                                              "type": "integer"
+                                                                            },
                                                                             "user_subscriptions": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -51437,7 +51628,8 @@
                                                                   "type": "string",
                                                                   "enum": [
                                                                     "subscription",
-                                                                    "priority-upload"
+                                                                    "priority-upload",
+                                                                    "upgrade"
                                                                   ]
                                                                 },
                                                                 "createdAt": {
@@ -52579,6 +52771,17 @@
                             "expired",
                             "canceled"
                           ]
+                        },
+                        "subscriptionType": {
+                          "type": "string",
+                          "enum": [
+                            "subscription",
+                            "upgrade"
+                          ]
+                        },
+                        "upgradedAt": {
+                          "type": "string",
+                          "format": "date-time"
                         },
                         "plan": {
                           "type": "object",
@@ -54580,6 +54783,9 @@
                                                                                         "maxPrimaryArtists": {
                                                                                           "type": "string"
                                                                                         },
+                                                                                        "priority_order": {
+                                                                                          "type": "integer"
+                                                                                        },
                                                                                         "user_subscriptions": {
                                                                                           "type": "object",
                                                                                           "properties": {
@@ -54626,6 +54832,17 @@
                                                                                                           "expired",
                                                                                                           "canceled"
                                                                                                         ]
+                                                                                                      },
+                                                                                                      "subscriptionType": {
+                                                                                                        "type": "string",
+                                                                                                        "enum": [
+                                                                                                          "subscription",
+                                                                                                          "upgrade"
+                                                                                                        ]
+                                                                                                      },
+                                                                                                      "upgradedAt": {
+                                                                                                        "type": "string",
+                                                                                                        "format": "date-time"
                                                                                                       },
                                                                                                       "plan": {
                                                                                                         "type": "object",
@@ -54822,7 +55039,8 @@
                                                                               "type": "string",
                                                                               "enum": [
                                                                                 "subscription",
-                                                                                "priority-upload"
+                                                                                "priority-upload",
+                                                                                "upgrade"
                                                                               ]
                                                                             },
                                                                             "createdAt": {
@@ -59274,6 +59492,17 @@
                                                                               "canceled"
                                                                             ]
                                                                           },
+                                                                          "subscriptionType": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                              "subscription",
+                                                                              "upgrade"
+                                                                            ]
+                                                                          },
+                                                                          "upgradedAt": {
+                                                                            "type": "string",
+                                                                            "format": "date-time"
+                                                                          },
                                                                           "plan": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -59322,6 +59551,9 @@
                                                                                       },
                                                                                       "maxPrimaryArtists": {
                                                                                         "type": "string"
+                                                                                      },
+                                                                                      "priority_order": {
+                                                                                        "type": "integer"
                                                                                       },
                                                                                       "user_subscriptions": {
                                                                                         "type": "object",
@@ -59444,7 +59676,8 @@
                                                                                                       "type": "string",
                                                                                                       "enum": [
                                                                                                         "subscription",
-                                                                                                        "priority-upload"
+                                                                                                        "priority-upload",
+                                                                                                        "upgrade"
                                                                                                       ]
                                                                                                     },
                                                                                                     "createdAt": {
@@ -62248,6 +62481,9 @@
                                                                                       "maxPrimaryArtists": {
                                                                                         "type": "string"
                                                                                       },
+                                                                                      "priority_order": {
+                                                                                        "type": "integer"
+                                                                                      },
                                                                                       "user_subscriptions": {
                                                                                         "type": "object",
                                                                                         "properties": {
@@ -62294,6 +62530,17 @@
                                                                                                         "expired",
                                                                                                         "canceled"
                                                                                                       ]
+                                                                                                    },
+                                                                                                    "subscriptionType": {
+                                                                                                      "type": "string",
+                                                                                                      "enum": [
+                                                                                                        "subscription",
+                                                                                                        "upgrade"
+                                                                                                      ]
+                                                                                                    },
+                                                                                                    "upgradedAt": {
+                                                                                                      "type": "string",
+                                                                                                      "format": "date-time"
                                                                                                     },
                                                                                                     "plan": {
                                                                                                       "type": "object",
@@ -62490,7 +62737,8 @@
                                                                             "type": "string",
                                                                             "enum": [
                                                                               "subscription",
-                                                                              "priority-upload"
+                                                                              "priority-upload",
+                                                                              "upgrade"
                                                                             ]
                                                                           },
                                                                           "createdAt": {
@@ -67296,6 +67544,9 @@
                                                                           "maxPrimaryArtists": {
                                                                             "type": "string"
                                                                           },
+                                                                          "priority_order": {
+                                                                            "type": "integer"
+                                                                          },
                                                                           "user_subscriptions": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -67342,6 +67593,17 @@
                                                                                             "expired",
                                                                                             "canceled"
                                                                                           ]
+                                                                                        },
+                                                                                        "subscriptionType": {
+                                                                                          "type": "string",
+                                                                                          "enum": [
+                                                                                            "subscription",
+                                                                                            "upgrade"
+                                                                                          ]
+                                                                                        },
+                                                                                        "upgradedAt": {
+                                                                                          "type": "string",
+                                                                                          "format": "date-time"
                                                                                         },
                                                                                         "plan": {
                                                                                           "type": "object",
@@ -67538,7 +67800,8 @@
                                                                 "type": "string",
                                                                 "enum": [
                                                                   "subscription",
-                                                                  "priority-upload"
+                                                                  "priority-upload",
+                                                                  "upgrade"
                                                                 ]
                                                               },
                                                               "createdAt": {
@@ -71739,6 +72002,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -71785,6 +72051,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -71981,7 +72258,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -75977,6 +76255,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -76023,6 +76304,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -76219,7 +76511,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -77447,6 +77740,17 @@
                   "expired",
                   "canceled"
                 ]
+              },
+              "subscriptionType": {
+                "type": "string",
+                "enum": [
+                  "subscription",
+                  "upgrade"
+                ]
+              },
+              "upgradedAt": {
+                "type": "string",
+                "format": "date-time"
               },
               "plan": {
                 "oneOf": [
@@ -79687,6 +79991,9 @@
                                                               "maxPrimaryArtists": {
                                                                 "type": "string"
                                                               },
+                                                              "priority_order": {
+                                                                "type": "integer"
+                                                              },
                                                               "user_subscriptions": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -79733,6 +80040,17 @@
                                                                                 "expired",
                                                                                 "canceled"
                                                                               ]
+                                                                            },
+                                                                            "subscriptionType": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "subscription",
+                                                                                "upgrade"
+                                                                              ]
+                                                                            },
+                                                                            "upgradedAt": {
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "plan": {
                                                                               "type": "object",
@@ -79929,7 +80247,8 @@
                                                     "type": "string",
                                                     "enum": [
                                                       "subscription",
-                                                      "priority-upload"
+                                                      "priority-upload",
+                                                      "upgrade"
                                                     ]
                                                   },
                                                   "createdAt": {
@@ -81071,6 +81390,17 @@
               "expired",
               "canceled"
             ]
+          },
+          "subscriptionType": {
+            "type": "string",
+            "enum": [
+              "subscription",
+              "upgrade"
+            ]
+          },
+          "upgradedAt": {
+            "type": "string",
+            "format": "date-time"
           },
           "plan": {
             "type": "object",

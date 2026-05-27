@@ -2,6 +2,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const axios = require("axios");
 
+
 const getCountryFromIP = async (ip) => {
   try {
     const res = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -12,7 +13,10 @@ const getCountryFromIP = async (ip) => {
   }
 };
 
+
+
 module.exports = {
+ 
   async createSession(ctx) {
     console.log("🔥 Creating Stripe session NOW");
 
