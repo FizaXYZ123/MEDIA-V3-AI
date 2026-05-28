@@ -221,6 +221,7 @@ module.exports = async (session) => {
           status: "active",
           startDate,
           endDate,
+          subscriptionType:"subscription",
           publishedAt: new Date().toISOString(),
         },
       }
