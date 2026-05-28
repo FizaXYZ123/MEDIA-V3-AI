@@ -221,6 +221,9 @@ module.exports = async (session) => {
           status: "active",
           startDate,
           endDate,
+          artistsAllowed:
+          plan.maxPrimaryArtists || "1",
+          subscriptionType:"subscription",
           publishedAt: new Date().toISOString(),
         },
       }
