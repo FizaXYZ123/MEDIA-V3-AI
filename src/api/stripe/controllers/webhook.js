@@ -356,6 +356,18 @@ module.exports = {
             "💸 FEES APPLIED SUCCESSFULLY"
           );
 
+          // ✅ UPDATE ARTISTS ALLOWED
+          await strapi.entityService.update(
+            "api::user-subscription.user-subscription",
+            newSubscription.id,
+            {
+              data: {
+                artistsAllowed:
+                  plan.maxPrimaryArtists || "1",
+              },
+            }
+          );
+
           // ====================================
           // ✅ UPDATE USER
           // ====================================

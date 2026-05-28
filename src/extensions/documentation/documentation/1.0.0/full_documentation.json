@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-28T09:37:14.908Z"
+    "x-generation-date": "2026-05-28T11:42:13.113Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2425,6 +2425,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -6447,6 +6450,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -10517,6 +10523,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -14518,6 +14527,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -19273,6 +19285,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -22756,6 +22771,9 @@
                                                                                                             }
                                                                                                           }
                                                                                                         }
+                                                                                                      },
+                                                                                                      "artistsAllowed": {
+                                                                                                        "type": "string"
                                                                                                       },
                                                                                                       "createdAt": {
                                                                                                         "type": "string",
@@ -27958,6 +27976,9 @@
                                                                               }
                                                                             }
                                                                           },
+                                                                          "artistsAllowed": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -31751,6 +31772,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -37807,6 +37831,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -41745,6 +41772,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -45685,6 +45715,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -49675,6 +49708,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -53719,6 +53755,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -59674,6 +59713,9 @@
                             }
                           }
                         },
+                        "artistsAllowed": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -61734,6 +61776,9 @@
                                                                                                             }
                                                                                                           }
                                                                                                         }
+                                                                                                      },
+                                                                                                      "artistsAllowed": {
+                                                                                                        "type": "string"
                                                                                                       },
                                                                                                       "createdAt": {
                                                                                                         "type": "string",
@@ -66878,6 +66923,9 @@
                                                                               }
                                                                             }
                                                                           },
+                                                                          "artistsAllowed": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -69878,6 +69926,9 @@
                                                                                                           }
                                                                                                         }
                                                                                                       }
+                                                                                                    },
+                                                                                                    "artistsAllowed": {
+                                                                                                      "type": "string"
                                                                                                     },
                                                                                                     "createdAt": {
                                                                                                       "type": "string",
@@ -75165,6 +75216,9 @@
                                                                                             }
                                                                                           }
                                                                                         },
+                                                                                        "artistsAllowed": {
+                                                                                          "type": "string"
+                                                                                        },
                                                                                         "createdAt": {
                                                                                           "type": "string",
                                                                                           "format": "date-time"
@@ -79846,6 +79900,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -84322,6 +84379,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -88331,6 +88391,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -89987,6 +90050,9 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "artistsAllowed": {
+                "type": "string"
               }
             }
           }
@@ -92294,6 +92360,9 @@
                                                                                 }
                                                                               }
                                                                             },
+                                                                            "artistsAllowed": {
+                                                                              "type": "string"
+                                                                            },
                                                                             "createdAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
@@ -93866,6 +93935,9 @@
                 }
               }
             }
+          },
+          "artistsAllowed": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",

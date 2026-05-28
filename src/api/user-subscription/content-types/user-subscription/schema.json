@@ -47,6 +47,10 @@
       "relation": "manyToOne",
       "target": "api::plan.plan",
       "inversedBy": "user_subscriptions"
+    },
+    "artistsAllowed": {
+      "type": "string",
+      "default": "1"
     }
   }
 }

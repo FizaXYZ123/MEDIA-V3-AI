@@ -2164,6 +2164,7 @@ export interface ApiUserSubscriptionUserSubscription
       'manyToOne',
       'api::plan.plan'
     >;
+    artistsAllowed: Attribute.String & Attribute.DefaultTo<'1'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

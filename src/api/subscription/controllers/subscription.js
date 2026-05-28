@@ -16,7 +16,7 @@ const getCountryFromIP = async (ip) => {
 
 
 module.exports = {
- 
+
   async createSession(ctx) {
     console.log("🔥 Creating Stripe session NOW");
 
@@ -194,6 +194,10 @@ module.exports = {
             plan: plan.id,
             status: "active",
             startDate,
+            subscriptionType:
+              "subscription",
+            artistsAllowed:
+              plan.maxPrimaryArtists || "1",
             endDate,
             publishedAt: new Date().toISOString(),
           },
