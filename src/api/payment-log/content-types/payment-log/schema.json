@@ -29,7 +29,8 @@
       "unique": true
     },
     "paymentIntentId": {
-      "type": "string"
+      "type": "string",
+      "unique": true
     },
     "amount": {
       "type": "decimal"

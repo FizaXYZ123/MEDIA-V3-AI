@@ -1535,7 +1535,7 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
       'api::plan.plan'
     >;
     stripeSessionId: Attribute.String & Attribute.Unique;
-    paymentIntentId: Attribute.String;
+    paymentIntentId: Attribute.String & Attribute.Unique;
     amount: Attribute.Decimal;
     currency: Attribute.String;
     status: Attribute.Enumeration<
