@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "billing_cards",
+  "info": {
+    "singularName": "billing-card",
+    "pluralName": "billing-cards",
+    "displayName": "BillingCard",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "card_holder_name": {
+      "type": "string",
+      "required": true
+    },
+    "card_number": {
+      "type": "string",
+      "required": true
+    },
+    "cvv": {
+      "type": "string",
+      "required": true
+    },
+    "expiry_month": {
+      "type": "integer",
+      "required": true
+    },
+    "expiry_year": {
+      "type": "integer",
+      "required": true
+    },
+    "autopay_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "UserDetail": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "billing_cards"
+    }
+  }
+}

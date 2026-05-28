@@ -188,6 +188,18 @@
       "relation": "oneToMany",
       "target": "api::csv-report-log.csv-report-log",
       "mappedBy": "users_permissions_user"
+    },
+    "billing_cards": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::billing-card.billing-card",
+      "mappedBy": "UserDetail"
+    },
+    "user_payout_details": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-payout-detail.user-payout-detail",
+      "mappedBy": "userDetail"
     }
   }
 }

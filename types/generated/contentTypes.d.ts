@@ -842,6 +842,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::csv-report-log.csv-report-log'
     >;
+    billing_cards: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::billing-card.billing-card'
+    >;
+    user_payout_details: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::user-payout-detail.user-payout-detail'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -987,6 +997,47 @@ export interface ApiAuditLogAuditLog extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::audit-log.audit-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBillingCardBillingCard extends Schema.CollectionType {
+  collectionName: 'billing_cards';
+  info: {
+    singularName: 'billing-card';
+    pluralName: 'billing-cards';
+    displayName: 'BillingCard';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    card_holder_name: Attribute.String & Attribute.Required;
+    card_number: Attribute.String & Attribute.Required;
+    cvv: Attribute.String & Attribute.Required;
+    expiry_month: Attribute.Integer & Attribute.Required;
+    expiry_year: Attribute.Integer & Attribute.Required;
+    autopay_enabled: Attribute.Boolean & Attribute.DefaultTo<false>;
+    UserDetail: Attribute.Relation<
+      'api::billing-card.billing-card',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::billing-card.billing-card',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::billing-card.billing-card',
       'oneToOne',
       'admin::user'
     > &
@@ -2039,6 +2090,52 @@ export interface ApiUserLabelUserLabel extends Schema.CollectionType {
   };
 }
 
+export interface ApiUserPayoutDetailUserPayoutDetail
+  extends Schema.CollectionType {
+  collectionName: 'user_payout_details';
+  info: {
+    singularName: 'user-payout-detail';
+    pluralName: 'user-payout-details';
+    displayName: 'UserPayoutDetails';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    country: Attribute.Enumeration<['India', 'Canada', 'United States']> &
+      Attribute.Required;
+    currency: Attribute.Enumeration<['INR', 'CAD', 'USD']> & Attribute.Required;
+    account_holder_name: Attribute.String & Attribute.Required;
+    bank_name: Attribute.String & Attribute.Required;
+    account_number: Attribute.String & Attribute.Required;
+    ifsc_code: Attribute.String;
+    transit_number: Attribute.String;
+    institution_number: Attribute.String;
+    routing_number: Attribute.String;
+    userDetail: Attribute.Relation<
+      'api::user-payout-detail.user-payout-detail',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::user-payout-detail.user-payout-detail',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::user-payout-detail.user-payout-detail',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiUserSubscriptionUserSubscription
   extends Schema.CollectionType {
   collectionName: 'user_subscriptions';
@@ -2106,6 +2203,7 @@ declare module '@strapi/types' {
       'api::admin-fee-history.admin-fee-history': ApiAdminFeeHistoryAdminFeeHistory;
       'api::artist-detail.artist-detail': ApiArtistDetailArtistDetail;
       'api::audit-log.audit-log': ApiAuditLogAuditLog;
+      'api::billing-card.billing-card': ApiBillingCardBillingCard;
       'api::blog.blog': ApiBlogBlog;
       'api::csv-report-log.csv-report-log': ApiCsvReportLogCsvReportLog;
       'api::distribute-draft.distribute-draft': ApiDistributeDraftDistributeDraft;
@@ -2130,6 +2228,7 @@ declare module '@strapi/types' {
       'api::ticket-message.ticket-message': ApiTicketMessageTicketMessage;
       'api::ticket-raise.ticket-raise': ApiTicketRaiseTicketRaise;
       'api::user-label.user-label': ApiUserLabelUserLabel;
+      'api::user-payout-detail.user-payout-detail': ApiUserPayoutDetailUserPayoutDetail;
       'api::user-subscription.user-subscription': ApiUserSubscriptionUserSubscription;
     }
   }

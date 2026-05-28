@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_payout_details",
+  "info": {
+    "singularName": "user-payout-detail",
+    "pluralName": "user-payout-details",
+    "displayName": "UserPayoutDetails",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "country": {
+      "type": "enumeration",
+      "enum": [
+        "India",
+        "Canada",
+        "United States"
+      ],
+      "required": true
+    },
+    "currency": {
+      "type": "enumeration",
+      "enum": [
+        "INR",
+        "CAD",
+        "USD"
+      ],
+      "required": true
+    },
+    "account_holder_name": {
+      "type": "string",
+      "required": true
+    },
+    "bank_name": {
+      "type": "string",
+      "required": true
+    },
+    "account_number": {
+      "type": "string",
+      "required": true
+    },
+    "ifsc_code": {
+      "type": "string"
+    },
+    "transit_number": {
+      "type": "string"
+    },
+    "institution_number": {
+      "type": "string"
+    },
+    "routing_number": {
+      "type": "string"
+    },
+    "userDetail": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "user_payout_details"
+    }
+  }
+}
