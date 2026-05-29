@@ -447,7 +447,7 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
     await checkPrimaryArtistLimit(userId, incomingTracks);
 
     // Roles we want to auto-create as artist-detail
-    const rolesToAutoSave = ["Primary Artist", "Lyricist", "Vocals", "Composer"];
+    const rolesToAutoSave = ["Primary Artist", "Lyricist", "Producer", "Composer"];
 
     // 1) Link existing tracks by id to the DraftRelease
     if (Array.isArray(payload.trackIds) && payload.trackIds.length) {

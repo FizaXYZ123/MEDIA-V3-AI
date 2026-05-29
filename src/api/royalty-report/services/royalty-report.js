@@ -525,11 +525,27 @@ module.exports = () => ({
     const tracks = await strapi.db
       .query("api::distribute-track.distribute-track")
       .findMany({
-        select: ["id", "ISRC"]
+        where: {
+          Status: "Completed",
+        },
+        populate: {
+          PublishedRelease: {
+            select: ["id", "Status"]
+          }
+        },
+        select: ["id", "ISRC", "Status"]
       });
 
     const trackMap = {};
-    tracks.forEach(t => {
+
+    tracks.forEach((t) => {
+
+      if (
+        t.Status !== "Completed" ||
+        t.PublishedRelease?.Status !== "Completed"
+      ) {
+        return;
+      }
 
       const cleanISRC = normalizeISRC(t.ISRC);
 

@@ -198,7 +198,6 @@ module.exports = {
               "subscription",
             artistsAllowed:
               plan.maxPrimaryArtists || "1",
-            endDate,
             publishedAt: new Date().toISOString(),
           },
         }

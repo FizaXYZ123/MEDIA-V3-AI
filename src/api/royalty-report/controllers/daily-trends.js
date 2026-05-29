@@ -158,18 +158,30 @@ module.exports = {
                                 fields: [
                                     "TrackName",
                                     "ISRC",
+                                    "Status",
                                 ],
+
+                                populate: {
+                                    PublishedRelease: {
+                                        fields: ["Status"],
+                                    },
+                                },
                             },
                         },
                     }
                 );
 
-            const userTracks =
-                artistDetails.flatMap(
+            const userTracks = artistDetails
+                .flatMap(
                     (artist) =>
                         artist.tracks || []
+                )
+                .filter(
+                    (track) =>
+                        track.Status === "Completed" &&
+                        track.PublishedRelease?.Status ===
+                        "Completed"
                 );
-
             /* =========================================
                GET TINYBIRD TRACKS
             ========================================= */
@@ -336,8 +348,8 @@ module.exports = {
             const user = ctx.state.user;
 
             /* =========================================
-   PERIOD MAP
-========================================= */
+                PERIOD MAP
+            ========================================= */
 
             const period =
                 ctx.query.period || "7days";
@@ -401,15 +413,32 @@ module.exports = {
 
                         populate: {
                             tracks: {
-                                fields: ["TrackName", "ISRC"],
+                                fields: [
+                                    "TrackName",
+                                    "ISRC",
+                                    "Status",
+                                ],
+
+                                populate: {
+                                    PublishedRelease: {
+                                        fields: ["Status"],
+                                    },
+                                },
                             },
                         },
                     }
                 );
 
-            const userTracks =
-                artistDetails.flatMap(
-                    (artist) => artist.tracks || []
+            const userTracks = artistDetails
+                .flatMap(
+                    (artist) =>
+                        artist.tracks || []
+                )
+                .filter(
+                    (track) =>
+                        track.Status === "Completed" &&
+                        track.PublishedRelease?.Status ===
+                        "Completed"
                 );
 
             /* =========================================
@@ -557,7 +586,7 @@ module.exports = {
 
             /* =========================================
               PERIOD MAP
-========================================= */
+            ========================================= */
 
             const period =
                 ctx.query.period || "7days";
@@ -626,16 +655,29 @@ module.exports = {
                                 fields: [
                                     "TrackName",
                                     "ISRC",
+                                    "Status",
                                 ],
+
+                                populate: {
+                                    PublishedRelease: {
+                                        fields: ["Status"],
+                                    },
+                                },
                             },
                         },
                     }
                 );
 
-            const userTracks =
-                artistDetails.flatMap(
+            const userTracks = artistDetails
+                .flatMap(
                     (artist) =>
                         artist.tracks || []
+                )
+                .filter(
+                    (track) =>
+                        track.Status === "Completed" &&
+                        track.PublishedRelease?.Status ===
+                        "Completed"
                 );
 
             /* =========================================
