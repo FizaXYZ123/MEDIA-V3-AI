@@ -230,7 +230,7 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
       'PrimaryGenre', 'SecondaryGenre', 'AddLabel',
       'CopyrightYear', 'CopyrightholderName',
       'PhonogramRightsHolderName', 'PhonogramRightsHolderYear',
-      'RequestANewReferenceNumber',
+      'RequestANewReferenceNumber', 'ReleaseCredits'
     ]);
 
     const s = v => (v == null ? null : String(v).trim() || null);
@@ -392,6 +392,7 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
       PhonogramRightsHolderName: s(raw.PhonogramRightsHolderName),
       PhonogramRightsHolderYear: toInt(raw.PhonogramRightsHolderYear),
       RequestANewReferenceNumber: !!raw.RequestANewReferenceNumber,
+      ReleaseCredits: s(raw.ReleaseCredits),
     };
 
     if (!data.ReleaseType || !data.ReleaseTitle) return ctx.badRequest('ReleaseType and ReleaseTitle are required.');

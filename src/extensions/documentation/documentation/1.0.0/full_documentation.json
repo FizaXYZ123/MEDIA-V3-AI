@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-29T13:02:00.092Z"
+    "x-generation-date": "2026-05-29T14:10:16.497Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1353,6 +1353,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -5379,6 +5380,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -9452,6 +9454,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -13458,6 +13461,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -18216,6 +18220,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -21008,6 +21013,7 @@
               "CopyrightholderName": {
                 "type": "string"
               },
+              "ReleaseCredits": {},
               "UserDetail": {
                 "oneOf": [
                   {
@@ -22030,6 +22036,7 @@
                                     "CopyrightholderName": {
                                       "type": "string"
                                     },
+                                    "ReleaseCredits": {},
                                     "UserDetail": {
                                       "type": "object",
                                       "properties": {
@@ -25085,6 +25092,7 @@
           "CopyrightholderName": {
             "type": "string"
           },
+          "ReleaseCredits": {},
           "UserDetail": {
             "type": "object",
             "properties": {
@@ -29061,6 +29069,7 @@
                       "CopyrightholderName": {
                         "type": "string"
                       },
+                      "ReleaseCredits": {},
                       "UserDetail": {
                         "type": "object",
                         "properties": {
@@ -30707,6 +30716,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -36766,6 +36776,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -40709,6 +40720,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -44653,6 +44665,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -48648,6 +48661,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -52697,6 +52711,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -57190,6 +57205,7 @@
                                                                             "CopyrightholderName": {
                                                                               "type": "string"
                                                                             },
+                                                                            "ReleaseCredits": {},
                                                                             "UserDetail": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -61046,6 +61062,7 @@
                                     "CopyrightholderName": {
                                       "type": "string"
                                     },
+                                    "ReleaseCredits": {},
                                     "UserDetail": {
                                       "type": "object",
                                       "properties": {
@@ -65285,6 +65302,7 @@
                                                 "CopyrightholderName": {
                                                   "type": "string"
                                                 },
+                                                "ReleaseCredits": {},
                                                 "UserDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -69198,6 +69216,7 @@
                                   "CopyrightholderName": {
                                     "type": "string"
                                   },
+                                  "ReleaseCredits": {},
                                   "UserDetail": {
                                     "type": "object",
                                     "properties": {
@@ -74162,6 +74181,7 @@
                                                                           "CopyrightholderName": {
                                                                             "type": "string"
                                                                           },
+                                                                          "ReleaseCredits": {},
                                                                           "UserDetail": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -78847,6 +78867,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -83327,6 +83348,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -87340,6 +87362,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -91310,6 +91333,7 @@
                                                               "CopyrightholderName": {
                                                                 "type": "string"
                                                               },
+                                                              "ReleaseCredits": {},
                                                               "UserDetail": {
                                                                 "type": "object",
                                                                 "properties": {

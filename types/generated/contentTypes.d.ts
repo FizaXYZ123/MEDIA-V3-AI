@@ -1154,6 +1154,7 @@ export interface ApiDistributeDraftDistributeDraft
     DigitalReleaseDate: Attribute.Date;
     ReleaseTime: Attribute.Time;
     CopyrightholderName: Attribute.String;
+    ReleaseCredits: Attribute.JSON;
     UserDetail: Attribute.Relation<
       'api::distribute-draft.distribute-draft',
       'manyToOne',

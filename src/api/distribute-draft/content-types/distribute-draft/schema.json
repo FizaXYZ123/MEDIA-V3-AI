@@ -13,11 +13,7 @@
   "attributes": {
     "ReleaseType": {
       "type": "enumeration",
-      "enum": [
-        "Single",
-        "EP",
-        "Album"
-      ],
+      "enum": ["Single", "EP", "Album"],
       "required": true
     },
     "ReleaseTitle": {
@@ -26,12 +22,7 @@
     },
     "Version": {
       "type": "enumeration",
-      "enum": [
-        "Remaster",
-        "Live",
-        "Remix",
-        "Other"
-      ]
+      "enum": ["Remaster", "Live", "Remix", "Other"]
     },
     "LanguageOfTheTitles": {
       "type": "string"
@@ -49,16 +40,11 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
     "Priority": {
       "type": "enumeration",
-      "enum": [
-        "Standard",
-        "Priority"
-      ],
+      "enum": ["Standard", "Priority"],
       "default": "Standard"
     },
     "TimeZoneOfReference": {
@@ -84,12 +70,7 @@
     },
     "PriceCategory": {
       "type": "enumeration",
-      "enum": [
-        "Budget",
-        "Mid",
-        "Full",
-        "Premium"
-      ]
+      "enum": ["Budget", "Mid", "Full", "Premium"]
     },
     "TrackList": {
       "type": "relation",
@@ -105,6 +86,9 @@
     },
     "CopyrightholderName": {
       "type": "string"
+    },
+    "ReleaseCredits": {
+      "type": "json"
     },
     "UserDetail": {
       "type": "relation",
