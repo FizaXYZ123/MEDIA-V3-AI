@@ -206,16 +206,16 @@ module.exports = {
       Math.max(amount, 1).toFixed(2)
     );
 
-    console.log(
-      "🔥 UPGRADE PRICE:",
-      {
-        currentPlanPrice,
-        newPlanPrice,
-        remainingCredit,
-        amount,
-        currency,
-      }
-    );
+    // console.log(
+    //   "🔥 UPGRADE PRICE:",
+    //   {
+    //     currentPlanPrice,
+    //     newPlanPrice,
+    //     remainingCredit,
+    //     amount,
+    //     currency,
+    //   }
+    // );
 
     // =========================
     // ✅ STRIPE SESSION
@@ -264,10 +264,10 @@ module.exports = {
           },
 
           success_url:
-            `${process.env.FRONTEND_BASE_URL}/payment-success`,
+            `${process.env.FRONTEND_BASE_URL}/profile`,
 
           cancel_url:
-            `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
+            `${process.env.FRONTEND_BASE_URL}/upgrade-plan`,
         }
       );
 

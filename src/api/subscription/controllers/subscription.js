@@ -18,7 +18,7 @@ const getCountryFromIP = async (ip) => {
 module.exports = {
 
   async createSession(ctx) {
-    console.log("🔥 Creating Stripe session NOW");
+    // console.log("🔥 Creating Stripe session NOW");
 
     const userId = ctx.state.user.id;
     const { planName } = ctx.request.body;
@@ -31,10 +31,10 @@ module.exports = {
       return ctx.badRequest("Invalid plan");
     }
 
-    console.log("✅ PLAN FOUND:", {
-      id: plan.id,
-      name: plan.name,
-    });
+    // console.log("✅ PLAN FOUND:", {
+    //   id: plan.id,
+    //   name: plan.name,
+    // });
 
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
@@ -53,7 +53,7 @@ module.exports = {
 
     if (!country) {
 
-      console.log("⚠️ Country not detected");
+      // console.log("⚠️ Country not detected");
 
       // localhost/dev fallback
       if (
@@ -62,19 +62,19 @@ module.exports = {
         ip.includes("192.168")
       ) {
 
-        console.log("🛠️ LOCALHOST DETECTED → USING INR");
+        // console.log("🛠️ LOCALHOST DETECTED → USING INR");
 
         country = "IN";
 
       } else {
 
-        console.log("🌍 PRODUCTION FALLBACK → USING USD");
+        // console.log("🌍 PRODUCTION FALLBACK → USING USD");
 
         country = "US";
       }
     }
 
-    console.log("🌍 Country:", country);
+    // // console.log("🌍 Country:", country);
 
     // =========================
     // 💰 PRICE LOGIC
@@ -84,21 +84,21 @@ module.exports = {
 
     // 🇮🇳 INDIA
     if (country === "IN") {
-      console.log("INDIA USER DETECTED → APPLYING INR PRICE");
+      // console.log("INDIA USER DETECTED → APPLYING INR PRICE");
       amount = plan.price_inr;
       currency = "INR";
     }
 
     // 🇨🇦 CANADA
     else if (country === "CA") {
-      console.log("CANADA USER DETECTED → APPLYING CAD PRICE");
+      // console.log("CANADA USER DETECTED → APPLYING CAD PRICE");
       amount = plan.price_cad;
       currency = "CAD";
     }
 
     else {
       amount = plan.price_usd;
-      console.log("USA/OTHER COUNTRY DETECTED → APPLYING USD PRICE");
+      // // console.log("USA/OTHER COUNTRY DETECTED → APPLYING USD PRICE");
       currency = "USD";
     }
 
@@ -110,24 +110,24 @@ module.exports = {
         plan.price_inr;
 
       currency = "USD";
-      console.log("⚠️ FALLBACK PRICE USED:", {
-        amount,
-        currency,
-      });
+      // console.log("⚠️ FALLBACK PRICE USED:", {
+      //   amount,
+      //   currency,
+      // });
     }
 
 
-    console.log("✅ FINAL PRICE APPLIED:", {
-      country,
-      amount,
-      currency,
-    });
+    // console.log("✅ FINAL PRICE APPLIED:", {
+    //   country,
+    //   amount,
+    //   currency,
+    // });
 
     // =========================
     // ✅ FREE PLAN 
     // =========================
     if (plan.name.toLowerCase() === "pro label") {
-      console.log("🆓 Free plan selected");
+      // console.log("🆓 Free plan selected");
 
       const alreadySubscribed = await strapi.db
         .query("api::user-subscription.user-subscription")
@@ -140,7 +140,7 @@ module.exports = {
         });
 
       if (alreadySubscribed) {
-        console.log("⚠️ Already subscribed to this plan");
+        // console.log("⚠️ Already subscribed to this plan");
 
         return ctx.send({
           message: "Already subscribed",
@@ -172,11 +172,11 @@ module.exports = {
           );
         }
 
-        console.log("♻️ Old subscriptions expired");
+        // console.log("♻️ Old subscriptions expired");
 
       } else {
 
-        console.log("ℹ️ No existing active subscription");
+        // console.log("ℹ️ No existing active subscription");
 
       }
 
@@ -205,7 +205,7 @@ module.exports = {
 
       );
 
-      console.log("✅ ENTERPRISE SUBSCRIPTION CREATED:", subscription.id);
+      // console.log("✅ ENTERPRISE SUBSCRIPTION CREATED:", subscription.id);
 
       // ✅ Update user_type → enterprise
       await strapi.entityService.update(
@@ -234,10 +234,10 @@ module.exports = {
           }
         );
 
-      console.log(
-        "✅ Enterprise commission created:",
-        enterpriseCommission.id
-      );
+      // console.log(
+      //   "✅ Enterprise commission created:",
+      //   enterpriseCommission.id
+      // );
 
       console.log("✅ enterprise plan activated successfully");
 

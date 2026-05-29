@@ -5,8 +5,8 @@ const { savePriorityPaymentLog } = require("./priority-payment");
 module.exports = async (session) => {
 
   const amountPaid = Number((session.amount_total / 100).toFixed(2));
-  console.log(session)
-  console.log(session.currency?.toUpperCase())
+  // console.log(session)
+  // console.log(session.currency?.toUpperCase())
   const currency = session.currency?.toUpperCase();
 
   // ✅ SAFE EXTRACTION
@@ -19,7 +19,7 @@ module.exports = async (session) => {
     : null;
 
 
-  console.log("PARSED:", { userId, planId });
+  // console.log("PARSED:", { userId, planId });
 
   const isPriority = session.metadata?.type === "priority-upload";
 
@@ -29,7 +29,7 @@ module.exports = async (session) => {
     let paymentLog = await savePriorityPaymentLog(session);
 
     if (!paymentLog) {
-      console.log("⚠️ Payment log already exists, fetching...");
+      // console.log("⚠️ Payment log already exists, fetching...");
 
       paymentLog = await strapi.db
         .query("api::payment-log.payment-log")
@@ -175,10 +175,10 @@ module.exports = async (session) => {
       return;
     }
 
-    console.log("✅ PLAN FOUND:", {
-      id: plan.id,
-      name: plan.name,
-    });
+    // console.log("✅ PLAN FOUND:", {
+    //   id: plan.id,
+    //   name: plan.name,
+    // });
 
     // ✅ EXPIRE OLD SUBSCRIPTION 
     const existing = await strapi.db
@@ -202,7 +202,7 @@ module.exports = async (session) => {
         }
       );
 
-      console.log("♻️ Old subscription expired");
+      // console.log("♻️ Old subscription expired");
     }
 
 
@@ -229,7 +229,7 @@ module.exports = async (session) => {
       }
     );
 
-    console.log("✅ Subscription created:", subscription.id);
+    // console.log("✅ Subscription created:", subscription.id);
     // console.log("✅ USER SUBSCRIPTION CREATED SUCCESSFULLY");
 
     // ✅ APPLY FEES

@@ -126,7 +126,7 @@ module.exports = {
         },
       });
 
-    console.log("✅ PUBLISH CREATED:", newPublish.id);
+    // console.log("✅ PUBLISH CREATED:", newPublish.id);
 
     // =========================
     // 4. UPDATE TRACKS + ARTISTS
@@ -156,7 +156,7 @@ module.exports = {
       }
     }
 
-    console.log("✅ TRACKS + ARTISTS PUBLISHED");
+    // console.log("✅ TRACKS + ARTISTS PUBLISHED");
 
     // =========================
     // 5. DELETE DRAFT
@@ -165,7 +165,7 @@ module.exports = {
       where: { id: draftId },
     });
 
-    console.log("🗑️ DRAFT DELETED");
+    // console.log("🗑️ DRAFT DELETED");
 
     console.log("🎉 DISTRIBUTION DONE");
 

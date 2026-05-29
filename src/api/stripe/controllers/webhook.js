@@ -24,10 +24,10 @@ module.exports = {
             .STRIPE_WEBHOOK_SECRET
         );
 
-      console.log(
-        "✅ EVENT RECEIVED:",
-        event.type
-      );
+      // console.log(
+      //   "✅ EVENT RECEIVED:",
+      //   event.type
+      // );
 
     } catch (err) {
 
@@ -49,24 +49,24 @@ module.exports = {
       "checkout.session.completed"
     ) {
 
-      console.log(
-        "💰 PAYMENT SUCCESS EVENT"
-      );
+      // console.log(
+      //   "💰 PAYMENT SUCCESS EVENT"
+      // );
 
       const session =
         event.data.object;
 
-      console.log(
-        "📦 SESSION METADATA:",
-        session.metadata
-      );
+      // console.log(
+      //   "📦 SESSION METADATA:",
+      //   session.metadata
+      // );
 
       let paymentLog;
 
-      console.log(
-        "🆔 SESSION ID:",
-        session.id
-      );
+      // console.log(
+      //   "🆔 SESSION ID:",
+      //   session.id
+      // );
 
       try {
 
@@ -144,16 +144,16 @@ module.exports = {
                 }
               );
 
-            console.log(
-              "🔒 ARTIST ADDON LOCK CREATED:",
-              paymentLog.id
-            );
+            // console.log(
+            //   "🔒 ARTIST ADDON LOCK CREATED:",
+            //   paymentLog.id
+            // );
 
           } catch (err) {
 
-            console.log(
-              "⚠️ DUPLICATE ARTIST ADDON BLOCKED"
-            );
+            // console.log(
+            //   "⚠️ DUPLICATE ARTIST ADDON BLOCKED"
+            // );
 
             console.log(
               err?.message || err
@@ -191,10 +191,10 @@ module.exports = {
               );
             }
 
-            console.log(
-              "📄 ACTIVE SUB:",
-              activeSubscription.id
-            );
+            // console.log(
+            //   "📄 ACTIVE SUB:",
+            //   activeSubscription.id
+            // );
 
             // ====================================
             // ✅ UPDATE ARTIST LIMIT
@@ -220,20 +220,20 @@ module.exports = {
               }
             );
 
-            console.log(
-              "✅ ARTIST LIMIT UPDATED:",
-              {
-                previous:
-                  currentArtists,
+            // console.log(
+            //   "✅ ARTIST LIMIT UPDATED:",
+            //   {
+            //     previous:
+            //       currentArtists,
 
-                purchased:
-                  artists,
+            //     purchased:
+            //       artists,
 
-                newLimit:
-                  currentArtists +
-                  artists,
-              }
-            );
+            //     newLimit:
+            //       currentArtists +
+            //       artists,
+            //   }
+            // );
 
             // ====================================
             // ✅ MARK PAYMENT SUCCESS
@@ -362,16 +362,16 @@ module.exports = {
                 }
               );
 
-            console.log(
-              "🔒 PAYMENT LOCK CREATED:",
-              paymentLog.id
-            );
+            // console.log(
+            //   "🔒 PAYMENT LOCK CREATED:",
+            //   paymentLog.id
+            // );
 
           } catch (err) {
 
-            console.log(
-              "⚠️ DUPLICATE WEBHOOK BLOCKED"
-            );
+            // console.log(
+            //   "⚠️ DUPLICATE WEBHOOK BLOCKED"
+            // );
 
             console.log(
               err?.message || err
@@ -400,10 +400,10 @@ module.exports = {
                 },
               });
 
-          console.log(
-            "📄 ACTIVE SUB:",
-            activeSubscription?.id
-          );
+          // console.log(
+          //   "📄 ACTIVE SUB:",
+          //   activeSubscription?.id
+          // );
 
           // ====================================
           // ✅ EXPIRE OLD SUB
@@ -426,10 +426,10 @@ module.exports = {
                 },
               });
 
-            console.log(
-              "♻️ OLD SUB EXPIRED:",
-              activeSubscription.id
-            );
+            // console.log(
+            //   "♻️ OLD SUB EXPIRED:",
+            //   activeSubscription.id
+            // );
           }
 
           // ====================================
@@ -467,19 +467,19 @@ module.exports = {
               }
             );
 
-          console.log(
-            "✅ NEW UPGRADE SUB CREATED:",
-            {
-              id:
-                newSubscription.id,
+          // console.log(
+          //   "✅ NEW UPGRADE SUB CREATED:",
+          //   {
+          //     id:
+          //       newSubscription.id,
 
-              subscriptionType:
-                newSubscription.subscriptionType,
+          //     subscriptionType:
+          //       newSubscription.subscriptionType,
 
-              upgradedAt:
-                newSubscription.upgradedAt,
-            }
-          );
+          //     upgradedAt:
+          //       newSubscription.upgradedAt,
+          //   }
+          // );
 
           // ====================================
           // ✅ GET PLAN
@@ -500,9 +500,9 @@ module.exports = {
               newSubscription.id,
           });
 
-          console.log(
-            "💸 FEES APPLIED SUCCESSFULLY"
-          );
+          // console.log(
+          //   "💸 FEES APPLIED SUCCESSFULLY"
+          // );
 
           // ✅ UPDATE ARTISTS ALLOWED
           await strapi.entityService.update(
@@ -559,9 +559,9 @@ module.exports = {
               },
             });
 
-          console.log(
-            "✅ PAYMENT MARKED SUCCESS"
-          );
+          // console.log(
+          //   "✅ PAYMENT MARKED SUCCESS"
+          // );
 
           console.log(
             "✅ UPGRADE COMPLETED"
@@ -575,9 +575,9 @@ module.exports = {
         // ====================================
         // ✅ NORMAL SUBSCRIPTION FLOW
         // ====================================
-        console.log(
-          "🟢 NORMAL SUBSCRIPTION FLOW"
-        );
+        // console.log(
+        //   "🟢 NORMAL SUBSCRIPTION FLOW"
+        // );
 
         await handleSuccess(session);
 

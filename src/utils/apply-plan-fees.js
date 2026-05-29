@@ -40,14 +40,14 @@ module.exports = async ({ userId, plan, subscriptionId }) => {
 
   const now = new Date();
 
-  console.log("📊 Applying fees for:", plan.name);
+  // console.log("📊 Applying fees for:", plan.name);
 
-  console.log("📊 Fee Details:", {
-    userId,
-    subscriptionId,
-    adminFee: plan.default_admin_fee,
-    labelFee: plan.default_label_fee,
-  });
+  // console.log("📊 Fee Details:", {
+  //   userId,
+  //   subscriptionId,
+  //   adminFee: plan.default_admin_fee,
+  //   labelFee: plan.default_label_fee,
+  // });
 
   // =========================
   // ✅ ADMIN FEE ENTRY
@@ -65,7 +65,7 @@ module.exports = async ({ userId, plan, subscriptionId }) => {
     }
   );
 
-  console.log("✅ Admin fee created:", adminFee.id);
+  // console.log("✅ Admin fee created:", adminFee.id);
 
   // console.log("✅ ADMIN FEE ENTRY SUCCESS");
 
@@ -85,7 +85,7 @@ module.exports = async ({ userId, plan, subscriptionId }) => {
     }
   );
 
-  console.log("✅ Label fee created:", labelFee.id);
+  // console.log("✅ Label fee created:", labelFee.id);
 
   // console.log("✅ LABEL FEE ENTRY SUCCESS");
 
