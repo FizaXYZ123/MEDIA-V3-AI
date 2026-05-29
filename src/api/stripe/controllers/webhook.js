@@ -56,40 +56,6 @@ module.exports = {
       const session =
         event.data.object;
 
-      // // ====================================
-      // // ✅ GLOBAL DUPLICATE LOCK
-      // // ====================================
-      // const existingPayment =
-      //   await strapi.db
-      //     .query(
-      //       "api::payment-log.payment-log"
-      //     )
-      //     .findOne({
-      //       where: {
-      //         $or: [
-      //           {
-      //             stripeSessionId:
-      //               session.id,
-      //           },
-      //           {
-      //             paymentIntentId:
-      //               session.payment_intent,
-      //           },
-      //         ],
-      //       },
-      //     });
-
-      // if (existingPayment) {
-
-      //   console.log(
-      //     "⚠️ WEBHOOK ALREADY PROCESSED"
-      //   );
-
-      //   return ctx.send({
-      //     received: true,
-      //   });
-      // }
-
       console.log(
         "📦 SESSION METADATA:",
         session.metadata
@@ -103,6 +69,237 @@ module.exports = {
       );
 
       try {
+
+        // ====================================
+        // ✅ ARTIST ADDON FLOW
+        // ====================================
+        if (
+          session.metadata?.type ===
+          "artist-addon"
+        ) {
+
+          console.log(
+            "🔥 PROCESSING ARTIST ADDON"
+          );
+
+          const userId =
+            session.metadata.userId;
+
+          const artists =
+            Number(
+              session.metadata.artists
+            );
+
+          if (
+            ![5, 10, 15, 20, 25].includes(
+              artists
+            )
+          ) {
+            throw new Error(
+              `Invalid artist count: ${artists}`
+            );
+          }
+
+          // ====================================
+          // ✅ CREATE PAYMENT LOG FIRST
+          // ====================================
+
+          try {
+
+            paymentLog =
+              await strapi.entityService.create(
+                "api::payment-log.payment-log",
+                {
+                  data: {
+                    users_permissions_user:
+                      userId,
+
+                    stripeSessionId:
+                      session.id,
+
+                    paymentIntentId:
+                      session.payment_intent,
+
+                    amount:
+                      session.amount_total / 100,
+
+                    currency:
+                      session.currency.toUpperCase(),
+
+                    status:
+                      "processing",
+
+                    processing:
+                      true,
+
+                    type:
+                      "artist-addon",
+
+                    paidAt:
+                      new Date(),
+
+                    publishedAt:
+                      new Date().toISOString(),
+                  },
+                }
+              );
+
+            console.log(
+              "🔒 ARTIST ADDON LOCK CREATED:",
+              paymentLog.id
+            );
+
+          } catch (err) {
+
+            console.log(
+              "⚠️ DUPLICATE ARTIST ADDON BLOCKED"
+            );
+
+            console.log(
+              err?.message || err
+            );
+
+            return ctx.send({
+              received: true,
+            });
+          }
+
+          try {
+
+            // ====================================
+            // ✅ FIND ACTIVE SUBSCRIPTION
+            // ====================================
+
+            const activeSubscription =
+              await strapi.db
+                .query(
+                  "api::user-subscription.user-subscription"
+                )
+                .findOne({
+                  where: {
+                    users_permissions_user:
+                      userId,
+
+                    status:
+                      "active",
+                  },
+                });
+
+            if (!activeSubscription) {
+              throw new Error(
+                "No active subscription found"
+              );
+            }
+
+            console.log(
+              "📄 ACTIVE SUB:",
+              activeSubscription.id
+            );
+
+            // ====================================
+            // ✅ UPDATE ARTIST LIMIT
+            // ====================================
+
+            const currentArtists =
+              parseInt(
+                activeSubscription.artistsAllowed || "0",
+                10
+              ) || 0;
+
+            await strapi.entityService.update(
+              "api::user-subscription.user-subscription",
+              activeSubscription.id,
+              {
+                data: {
+                  artistsAllowed:
+                    String(
+                      currentArtists +
+                      artists
+                    ),
+                },
+              }
+            );
+
+            console.log(
+              "✅ ARTIST LIMIT UPDATED:",
+              {
+                previous:
+                  currentArtists,
+
+                purchased:
+                  artists,
+
+                newLimit:
+                  currentArtists +
+                  artists,
+              }
+            );
+
+            // ====================================
+            // ✅ MARK PAYMENT SUCCESS
+            // ====================================
+
+            await strapi.db
+              .query(
+                "api::payment-log.payment-log"
+              )
+              .update({
+                where: {
+                  id:
+                    paymentLog.id,
+                },
+
+                data: {
+                  status:
+                    "success",
+
+                  processing:
+                    false,
+                },
+              });
+
+            console.log(
+              "✅ ARTIST ADDON COMPLETED"
+            );
+
+            return ctx.send({
+              received: true,
+            });
+
+          } catch (err) {
+
+            console.log(
+              "❌ ARTIST ADDON ERROR:",
+              err
+            );
+
+            if (paymentLog?.id) {
+
+              await strapi.db
+                .query(
+                  "api::payment-log.payment-log"
+                )
+                .update({
+                  where: {
+                    id:
+                      paymentLog.id,
+                  },
+
+                  data: {
+                    status:
+                      "failed",
+
+                    processing:
+                      false,
+                  },
+                });
+            }
+
+            return ctx.send({
+              received: true,
+            });
+          }
+        }
 
         // ====================================
         // ✅ UPGRADE FLOW
@@ -121,55 +318,6 @@ module.exports = {
 
           const planId =
             session.metadata.planId;
-
-          // ====================================
-          // ✅ CREATE PAYMENT LOG FIRST
-          // ====================================
-          // const paymentLog =
-          //   await strapi.entityService.create(
-          //     "api::payment-log.payment-log",
-          //     {
-          //       data: {
-          //         users_permissions_user:
-          //           userId,
-
-          //         plan:
-          //           planId,
-
-          //         stripeSessionId:
-          //           session.id,
-
-          //         paymentIntentId:
-          //           session.payment_intent,
-
-          //         amount:
-          //           session.amount_total / 100,
-
-          //         currency:
-          //           session.currency.toUpperCase(),
-
-          //         status:
-          //           "success",
-
-          //         type:
-          //           "upgrade",
-
-          //         publishedAt:
-          //           new Date().toISOString(),
-          //       },
-          //     }
-          //   );
-
-          // console.log(
-          //   "🧾 PAYMENT LOG CREATED:",
-          //   {
-          //     id:
-          //       paymentLog.id,
-
-          //     type:
-          //       paymentLog.type,
-          //   }
-          // );
 
           try {
 

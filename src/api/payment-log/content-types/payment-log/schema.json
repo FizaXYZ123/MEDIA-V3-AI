@@ -44,7 +44,7 @@
         "success",
         "failed",
         "processing",
-    "locked"
+        "locked"
       ]
     },
     "processing": {
@@ -69,7 +69,8 @@
       "enum": [
         "subscription",
         "priority-upload",
-        "upgrade"
+        "upgrade",
+        "artist-addon"
       ]
     }
   }

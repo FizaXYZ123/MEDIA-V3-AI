@@ -1600,7 +1600,9 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
       'manyToOne',
       'api::publish-distribute.publish-distribute'
     >;
-    type: Attribute.Enumeration<['subscription', 'priority-upload', 'upgrade']>;
+    type: Attribute.Enumeration<
+      ['subscription', 'priority-upload', 'upgrade', 'artist-addon']
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
