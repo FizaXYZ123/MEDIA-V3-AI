@@ -196,37 +196,59 @@ module.exports = {
         .query('plugin::users-permissions.user')
         .findMany({
           where: filters,
+          select: [
+            'id',
+            'firstName',
+            'lastName',
+            'email',
+            'blocked',
+            'createdAt',
+          ],
           populate: {
             Profile_image: true,
-            role: true,
-            notifications: true,
-            artist_details: true,
-            invoices: true,
-            label_fee_histories: true,
-            admin_fee_histories: true,
-            published_track_update_logs: true,
-            distribute_drafts: {
-              populate: true,
-            }
+            role: {
+              select: ['id', 'name', 'description', 'type'],
+            },
           },
         });
 
       // ✅ Add counts (no structure change)
       const result = await Promise.all(
         users.map(async (user) => {
-          const [artistDetailsCount, distributeDraftsCount] = await Promise.all([
+          const [artistDetailsCount, distributeDraftsCount, latestSubscription,] = await Promise.all([
             strapi.db.query('api::artist-detail.artist-detail').count({
               where: { owner: user.id },
             }),
             strapi.db.query('api::publish-distribute.publish-distribute').count({
               where: { UserDetail: user.id },
             }),
+            strapi.db
+              .query('api::user-subscription.user-subscription')
+              .findOne({
+                where: {
+                  users_permissions_user: user.id,
+                },
+                populate: {
+                  plan: true,
+                },
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              }),
           ]);
 
           return {
-            ...user, // ✅ keeps your exact response
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            blocked: user.blocked,
+            createdAt: user.createdAt,
+            Profile_image: user.Profile_image,
+            role: user.role,
             artist_details_count: artistDetailsCount,
             distribute_drafts_count: distributeDraftsCount,
+            latest_subscription: latestSubscription,
           };
         })
       );

@@ -98,8 +98,24 @@ module.exports = createCoreController(
           return ctx.notFound("Published release not found");
         }
 
-        // Check ownership
-        if (!entity.UserDetail || entity.UserDetail.id !== user.id) {
+        // Authenticated role can access all releases
+        const userWithRole = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          user.id,
+          {
+            populate: {
+              role: true,
+            },
+          }
+        );
+
+        const roleName = userWithRole?.role?.name;
+
+        // Only Client users are restricted to their own releases
+        if (
+          roleName === "Client" &&
+          (!entity.UserDetail || entity.UserDetail.id !== user.id)
+        ) {
           return ctx.send({
             data: {
               message: "You are not allowed to access this release",
