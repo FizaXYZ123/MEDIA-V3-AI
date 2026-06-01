@@ -852,6 +852,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::user-payout-detail.user-payout-detail'
     >;
+    ticket_messages: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::ticket-message.ticket-message'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1972,12 +1977,12 @@ export interface ApiTicketMessageTicketMessage extends Schema.CollectionType {
     >;
     sender: Attribute.Relation<
       'api::ticket-message.ticket-message',
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     message: Attribute.Text & Attribute.Required;
     attachments: Attribute.Media;
-    isInternal: Attribute.Boolean & Attribute.DefaultTo<false>;
+    is_read: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

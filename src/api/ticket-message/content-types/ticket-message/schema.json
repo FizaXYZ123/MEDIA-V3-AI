@@ -20,8 +20,9 @@
     },
     "sender": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "ticket_messages"
     },
     "message": {
       "type": "text",
@@ -38,7 +39,7 @@
         "audios"
       ]
     },
-    "isInternal": {
+    "is_read": {
       "type": "boolean",
       "default": false
     }

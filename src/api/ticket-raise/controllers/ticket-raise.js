@@ -12,6 +12,12 @@ module.exports = createCoreController('api::ticket-raise.ticket-raise', ({ strap
       ...query,
       populate: {
         attachment: true,
+        messages: {
+          populate: {
+            sender: true,
+            attachments: true
+          }
+        },
         user: {
           populate: {
             Profile_image: true, // directly populate profile image
@@ -31,6 +37,12 @@ module.exports = createCoreController('api::ticket-raise.ticket-raise', ({ strap
     const entity = await strapi.service('api::ticket-raise.ticket-raise').findOne(id, {
       populate: {
         attachment: true,
+         messages: {
+          populate: {
+            sender: true,
+            attachments: true
+          }
+        },
         user: {
           populate: {
             Profile_image: true,

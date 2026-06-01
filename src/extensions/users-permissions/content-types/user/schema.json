@@ -200,6 +200,12 @@
       "relation": "oneToMany",
       "target": "api::user-payout-detail.user-payout-detail",
       "mappedBy": "userDetail"
+    },
+    "ticket_messages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-message.ticket-message",
+      "mappedBy": "users_permissions_user"
     }
   }
 }
