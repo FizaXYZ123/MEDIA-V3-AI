@@ -16,7 +16,9 @@ function isAdminRequest(ctx) {
     name === 'super admin' ||
     name === 'super-admin' ||
     type === 'admin' ||
-    type === 'super-admin'
+    type === 'super-admin' ||
+    name === 'authenticated' ||
+    type === 'authenticated'
   );
 }
 

@@ -40,29 +40,71 @@ module.exports = createCoreController(
       }
     },
 
+    // async find(ctx) {
+    //   const { q, priority } = ctx.query;
+
+    //   const filters = {};
+
+    //   if (q && q.trim() !== "") {
+    //     filters.ReleaseTitle = { $containsi: q };
+    //   }
+
+    //   if (priority) {
+    //     filters.Priority = priority;
+    //   }
+
+    //   ctx.query.filters = {
+    //     ...(ctx.query.filters || {}),
+    //     ...filters,
+    //   };
+
+    //   ctx.query.populate = POPULATE;
+    //   ctx.query.sort = ctx.query.sort || ["id:desc"];
+
+    //   // ✅ Get all data without pagination
+    //   ctx.query.pagination = undefined;
+    //   ctx.query.limit = -1;
+    //   ctx.query.start = 0;
+
+    //   const { data } = await super.find(ctx);
+    //   return {
+    //     data,
+    //     message: "Data fetched successfully",
+    //     success: true,
+    //     totalItems: data.length,
+    //   };
+    // },
     async find(ctx) {
       const { q, priority } = ctx.query;
 
       const filters = {};
 
-      if (q && q.trim() !== "") {
-        filters.ReleaseTitle = { $containsi: q }; // case-insensitive search
+      if (q?.trim()) {
+        filters.ReleaseTitle = {
+          $containsi: q,
+        };
       }
 
       if (priority) {
-        filters.Priority = priority; // filter Standard / Priority
+        filters.Priority = priority;
       }
 
-      ctx.query.filters = {
-        ...(ctx.query.filters || {}),
-        ...filters,
+      const data = await strapi.entityService.findMany(
+        "api::publish-distribute.publish-distribute",
+        {
+          filters,
+          populate: POPULATE,
+          sort: { id: "DESC" },
+          limit: -1, // all records
+        }
+      );
+
+      return {
+        data,
+        success: true,
+        message: "Data fetched successfully",
+        totalItems: data.length,
       };
-
-      ctx.query.populate = POPULATE;
-      ctx.query.sort = ctx.query.sort || ["id:desc"];
-
-      const { data } = await super.find(ctx);
-      return data;
     },
 
     async findOne(ctx) {
@@ -134,6 +176,7 @@ module.exports = createCoreController(
         return ctx.internalServerError("Something went wrong");
       }
     },
+
     async getOnlyPriority(ctx) {
       try {
         const results = await strapi.db

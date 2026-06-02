@@ -1,14 +1,14 @@
+const { sort } = require("../../../../config/middlewares");
 const distributeDraft = require("../../distribute-draft/controllers/distribute-draft");
 
 const { ApplicationError } = require("@strapi/utils").errors;
-
 
 module.exports = {
   // GET /api/email-exists?email=someone@example.com
   async checkEmailExists(ctx) {
     try {
       const raw = ctx.request.query?.email;
-      if (!raw || typeof raw !== 'string') {
+      if (!raw || typeof raw !== "string") {
         return ctx.badRequest('Query param "email" is required');
       }
 
@@ -17,18 +17,18 @@ module.exports = {
       // optional format check
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!isEmail.test(email)) {
-        return ctx.badRequest('Invalid email');
+        return ctx.badRequest("Invalid email");
       }
 
       const users = await strapi.entityService.findMany(
-        'plugin::users-permissions.user',
-        { filters: { email }, fields: ['id'], limit: 1 }
+        "plugin::users-permissions.user",
+        { filters: { email }, fields: ["id"], limit: 1 }
       );
 
       ctx.body = { exists: users.length > 0 };
     } catch (err) {
-      strapi.log.error('checkEmailExists error:', err);
-      ctx.internalServerError('Internal error');
+      strapi.log.error("checkEmailExists error:", err);
+      ctx.internalServerError("Internal error");
     }
   },
   /// Count published tracks + artist count + upcoming releases by userId
@@ -91,7 +91,12 @@ module.exports = {
         return sum + Number(inv.finalAmountPayable || 0);
       }, 0);
 
-      return { trackCount, artistCount, upcomingCount, totalEarnings: Number(totalEarnings.toFixed(2)), };
+      return {
+        trackCount,
+        artistCount,
+        upcomingCount,
+        totalEarnings: Number(totalEarnings.toFixed(2)),
+      };
     } catch (err) {
       ctx.throw(500, err);
     }
@@ -149,7 +154,7 @@ module.exports = {
   async checkEmailExistsPost(ctx) {
     try {
       const raw = ctx.request.body?.email;
-      if (!raw || typeof raw !== 'string') {
+      if (!raw || typeof raw !== "string") {
         return ctx.badRequest('Body field "email" is required');
       }
 
@@ -157,20 +162,21 @@ module.exports = {
 
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!isEmail.test(email)) {
-        return ctx.badRequest('Invalid email');
+        return ctx.badRequest("Invalid email");
       }
 
       const users = await strapi.entityService.findMany(
-        'plugin::users-permissions.user',
-        { filters: { email }, fields: ['id'], limit: 1 }
+        "plugin::users-permissions.user",
+        { filters: { email }, fields: ["id"], limit: 1 }
       );
 
       ctx.body = { exists: users.length > 0 };
     } catch (err) {
-      strapi.log.error('checkEmailExistsPost error:', err);
-      ctx.internalServerError('Internal error');
+      strapi.log.error("checkEmailExistsPost error:", err);
+      ctx.internalServerError("Internal error");
     }
   },
+
   async getAllWithCounts(ctx) {
     try {
       const { search } = ctx.query;
@@ -178,12 +184,12 @@ module.exports = {
       // ✅ Base filter (Client users)
       const filters = {
         role: {
-          name: 'Client',
+          name: "Client",
         },
       };
 
       // ✅ Search filter (ONLY if provided)
-      if (search && search.trim() !== '') {
+      if (search && search.trim() !== "") {
         filters.$or = [
           { firstName: { $containsi: search.trim() } },
           { lastName: { $containsi: search.trim() } },
@@ -193,37 +199,46 @@ module.exports = {
 
       // ✅ Fetch users with ALL schema relations
       const users = await strapi.db
-        .query('plugin::users-permissions.user')
+        .query("plugin::users-permissions.user")
         .findMany({
           where: filters,
           select: [
-            'id',
-            'firstName',
-            'lastName',
-            'email',
-            'blocked',
-            'createdAt',
+            "id",
+            "firstName",
+            "lastName",
+            "email",
+            "blocked",
+            "createdAt",
           ],
           populate: {
             Profile_image: true,
             role: {
-              select: ['id', 'name', 'description', 'type'],
+              select: ["id", "name", "description", "type"],
             },
+          },
+          orderBy: {
+            id: "desc",
           },
         });
 
       // ✅ Add counts (no structure change)
       const result = await Promise.all(
         users.map(async (user) => {
-          const [artistDetailsCount, distributeDraftsCount, latestSubscription,] = await Promise.all([
-            strapi.db.query('api::artist-detail.artist-detail').count({
+          const [
+            artistDetailsCount,
+            distributeDraftsCount,
+            latestSubscription,
+          ] = await Promise.all([
+            strapi.db.query("api::artist-detail.artist-detail").count({
               where: { owner: user.id },
             }),
-            strapi.db.query('api::publish-distribute.publish-distribute').count({
-              where: { UserDetail: user.id },
-            }),
             strapi.db
-              .query('api::user-subscription.user-subscription')
+              .query("api::publish-distribute.publish-distribute")
+              .count({
+                where: { UserDetail: user.id },
+              }),
+            strapi.db
+              .query("api::user-subscription.user-subscription")
               .findOne({
                 where: {
                   users_permissions_user: user.id,
@@ -232,7 +247,7 @@ module.exports = {
                   plan: true,
                 },
                 orderBy: {
-                  createdAt: 'desc',
+                  createdAt: "desc",
                 },
               }),
           ]);
@@ -252,41 +267,48 @@ module.exports = {
           };
         })
       );
-
+      result.sort((a, b) => b.id - a.id);
       ctx.send(result);
     } catch (err) {
       ctx.throw(500, err);
     }
   },
+
   async getOneWithCounts(ctx) {
     try {
       const { id } = ctx.params; // Get user ID from URL params
 
       // Fetch the user with role = Client and populate profile image
-      const user = await strapi.db.query('plugin::users-permissions.user').findOne({
-        where: {
-          id: id,
-          role: {
-            name: 'Client',
+      const user = await strapi.db
+        .query("plugin::users-permissions.user")
+        .findOne({
+          where: {
+            id: id,
+            role: {
+              name: "Client",
+            },
           },
-        },
-        populate: {
-          Profile_image: true,
-        },
-      });
+          populate: {
+            Profile_image: true,
+          },
+        });
 
       if (!user) {
-        return ctx.notFound('User not found or not a Client');
+        return ctx.notFound("User not found or not a Client");
       }
 
       // Get counts for related records
-      const artistDetailsCount = await strapi.db.query('api::artist-detail.artist-detail').count({
-        where: { owner: user.id },
-      });
+      const artistDetailsCount = await strapi.db
+        .query("api::artist-detail.artist-detail")
+        .count({
+          where: { owner: user.id },
+        });
 
-      const distributeDraftsCount = await strapi.db.query('api::publish-distribute.publish-distribute').count({
-        where: { UserDetail: user.id },
-      });
+      const distributeDraftsCount = await strapi.db
+        .query("api::publish-distribute.publish-distribute")
+        .count({
+          where: { UserDetail: user.id },
+        });
 
       const result = {
         ...user,
@@ -305,23 +327,26 @@ module.exports = {
       const userId = ctx.params.userId || ctx.state.user?.id;
 
       if (!userId) {
-        return ctx.badRequest('User ID is required');
+        return ctx.badRequest("User ID is required");
       }
 
       // Fetch publish_distributes for this user
-      const entries = await strapi.entityService.findMany('api::publish-distribute.publish-distribute', {
-        filters: { UserDetail: userId },
-        populate: {
-          TrackList: true, // populate TrackList relation
-          CoverArt: true,  // populate CoverArt media
-        },
-        sort: { createdAt: 'desc' },
-      });
+      const entries = await strapi.entityService.findMany(
+        "api::publish-distribute.publish-distribute",
+        {
+          filters: { UserDetail: userId },
+          populate: {
+            TrackList: true, // populate TrackList relation
+            CoverArt: true, // populate CoverArt media
+          },
+          sort: { createdAt: "desc" },
+        }
+      );
 
       return ctx.send({ data: entries });
     } catch (err) {
-      strapi.log.error('findByUser error:', err);
-      return ctx.internalServerError('Failed to fetch publish distributes');
+      strapi.log.error("findByUser error:", err);
+      return ctx.internalServerError("Failed to fetch publish distributes");
     }
   },
   async findMy(ctx) {
@@ -360,7 +385,9 @@ module.exports = {
       return ctx.send({ data: transformed });
     } catch (err) {
       strapi.log.error("findMy error:", err);
-      return ctx.internalServerError("Failed to fetch your publish distributes");
+      return ctx.internalServerError(
+        "Failed to fetch your publish distributes"
+      );
     }
   },
   async getPublishedTrackCount(ctx) {
@@ -371,9 +398,8 @@ module.exports = {
         publishedReleaseCount,
         importedReports,
       ] = await Promise.all([
-
         // ✅ Published tracks
-        strapi.db.query('api::distribute-track.distribute-track').count({
+        strapi.db.query("api::distribute-track.distribute-track").count({
           where: {
             PublishedRelease: {
               id: { $notNull: true },
@@ -382,22 +408,22 @@ module.exports = {
         }),
 
         // ✅ Clients
-        strapi.db.query('plugin::users-permissions.user').count({
+        strapi.db.query("plugin::users-permissions.user").count({
           where: {
             role: {
-              name: 'Client',
+              name: "Client",
             },
           },
         }),
 
         // ✅ Published releases
-        strapi.db.query('api::publish-distribute.publish-distribute').count({
-          publicationState: 'live',
+        strapi.db.query("api::publish-distribute.publish-distribute").count({
+          publicationState: "live",
         }),
 
         // ✅ Imported reports (use totalNet)
-        strapi.db.query('api::imported-report.imported-report').findMany({
-          select: ['totalNet'],
+        strapi.db.query("api::imported-report.imported-report").findMany({
+          select: ["totalNet"],
         }),
       ]);
 
@@ -412,7 +438,6 @@ module.exports = {
         publishedReleaseCount,
         totalEarnings,
       });
-
     } catch (err) {
       ctx.throw(500, err);
     }
@@ -420,23 +445,24 @@ module.exports = {
   async getOnlyPriority(ctx) {
     try {
       const results = await strapi.db
-        .query('api::publish-distribute.publish-distribute')
+        .query("api::publish-distribute.publish-distribute")
         .findMany({
-          where: { Priority: 'Priority' },
+          where: { Priority: "Priority" },
           select: [
-            'ReleaseTitle',
-            'ReleaseType',
-            'DigitalReleaseDate',
-            'ReleaseTime',
-            'Status',
-            'AddLabel', // ✅ AddLabel field
+            "ReleaseTitle",
+            "ReleaseType",
+            "DigitalReleaseDate",
+            "ReleaseTime",
+            "Status",
+            "AddLabel", // ✅ AddLabel field
           ],
           populate: {
-            UserDetail: {        // or artist if you have a separate artist relation
-              select: ['username', 'email'], // adjust as needed
+            UserDetail: {
+              // or artist if you have a separate artist relation
+              select: ["username", "email"], // adjust as needed
             },
             CoverArt: {
-              fields: ['url', 'alternativeText', 'caption'], // ✅ populate image
+              fields: ["url", "alternativeText", "caption"], // ✅ populate image
             },
           },
         });
@@ -450,23 +476,24 @@ module.exports = {
   async getOnlyStandard(ctx) {
     try {
       const results = await strapi.db
-        .query('api::publish-distribute.publish-distribute')
+        .query("api::publish-distribute.publish-distribute")
         .findMany({
-          where: { Priority: 'Standard' },
+          where: { Priority: "Standard" },
           select: [
-            'ReleaseTitle',
-            'ReleaseType',
-            'DigitalReleaseDate',
-            'ReleaseTime',
-            'Status',
-            'AddLabel', // ✅ AddLabel field
+            "ReleaseTitle",
+            "ReleaseType",
+            "DigitalReleaseDate",
+            "ReleaseTime",
+            "Status",
+            "AddLabel", // ✅ AddLabel field
           ],
           populate: {
-            UserDetail: {        // or artist if you have a separate artist relation
-              select: ['username', 'email'], // adjust as needed
+            UserDetail: {
+              // or artist if you have a separate artist relation
+              select: ["username", "email"], // adjust as needed
             },
             CoverArt: {
-              fields: ['url', 'alternativeText', 'caption'], // ✅ populate image
+              fields: ["url", "alternativeText", "caption"], // ✅ populate image
             },
           },
         });
@@ -485,20 +512,16 @@ module.exports = {
       const data = ctx.request.body;
 
       // Update with entityService (supports relations like Profile_image)
-      await strapi.entityService.update(
-        "plugin::users-permissions.user",
-        id,
-        {
-          data: {
-            ...(data.currency && { currency: data.currency }),
-            ...(data.dob && { dob: data.dob }),
-            ...(data.firstName && { firstName: data.firstName }),
-            ...(data.lastName && { lastName: data.lastName }),
-            ...(data.phoneNumber && { phoneNumber: data.phoneNumber }),
-            ...(data.Profile_image && { Profile_image: data.Profile_image }), // link existing media
-          },
-        }
-      );
+      await strapi.entityService.update("plugin::users-permissions.user", id, {
+        data: {
+          ...(data.currency && { currency: data.currency }),
+          ...(data.dob && { dob: data.dob }),
+          ...(data.firstName && { firstName: data.firstName }),
+          ...(data.lastName && { lastName: data.lastName }),
+          ...(data.phoneNumber && { phoneNumber: data.phoneNumber }),
+          ...(data.Profile_image && { Profile_image: data.Profile_image }), // link existing media
+        },
+      });
 
       // Fetch again with populate
       const updatedUser = await strapi.entityService.findOne(
@@ -521,23 +544,25 @@ module.exports = {
   async publishDraft(ctx) {
     try {
       const { id } = ctx.params;
-      if (!id) return ctx.badRequest('Draft ID is required');
+      if (!id) return ctx.badRequest("Draft ID is required");
 
       // 1. Fetch draft with relations
-      const draft = await strapi.db.query('api::distribute-draft.distribute-draft').findOne({
-        where: { id },
-        populate: {
-          CoverArt: true,
-          UserDetail: true,
-          TrackList: {
-            populate: {
-              artistDetails: true, // adjust if your relation key is different
+      const draft = await strapi.db
+        .query("api::distribute-draft.distribute-draft")
+        .findOne({
+          where: { id },
+          populate: {
+            CoverArt: true,
+            UserDetail: true,
+            TrackList: {
+              populate: {
+                artistDetails: true, // adjust if your relation key is different
+              },
             },
           },
-        },
-      });
+        });
 
-      if (!draft) return ctx.notFound('Draft not found');
+      if (!draft) return ctx.notFound("Draft not found");
 
       // 2. Create new PublishDistribute from draft
       const publishData = { ...draft };
@@ -546,18 +571,20 @@ module.exports = {
       delete publishData.updatedAt;
       delete publishData.publishedAt;
 
-      const newPublish = await strapi.db.query('api::publish-distribute.publish-distribute').create({
-        data: {
-          ...publishData,
-          publishedAt: new Date(),
-          UserDetail: draft.UserDetail?.id,
-        },
-      });
+      const newPublish = await strapi.db
+        .query("api::publish-distribute.publish-distribute")
+        .create({
+          data: {
+            ...publishData,
+            publishedAt: new Date(),
+            UserDetail: draft.UserDetail?.id,
+          },
+        });
 
       // 3. Handle TrackList
       for (const track of draft.TrackList || []) {
         // publish track & link to new PublishDistribute
-        await strapi.db.query('api::distribute-track.distribute-track').update({
+        await strapi.db.query("api::distribute-track.distribute-track").update({
           where: { id: track.id },
           data: {
             publishedAt: new Date(),
@@ -568,13 +595,13 @@ module.exports = {
         // publish artistDetails
         if (Array.isArray(track.artistDetails)) {
           for (const artist of track.artistDetails) {
-            await strapi.db.query('api::artist-detail.artist-detail').update({
+            await strapi.db.query("api::artist-detail.artist-detail").update({
               where: { id: artist.id },
               data: { publishedAt: new Date() },
             });
           }
         } else if (track.artistDetails) {
-          await strapi.db.query('api::artist-detail.artist-detail').update({
+          await strapi.db.query("api::artist-detail.artist-detail").update({
             where: { id: track.artistDetails.id },
             data: { publishedAt: new Date() },
           });
@@ -582,35 +609,36 @@ module.exports = {
       }
 
       // 4. Delete original draft after successful publish
-      await strapi.db.query('api::distribute-draft.distribute-draft').delete({
+      await strapi.db.query("api::distribute-draft.distribute-draft").delete({
         where: { id },
       });
 
       return ctx.send({
         success: true,
-        message: 'Draft moved to PublishDistribute successfully and original draft deleted',
+        message:
+          "Draft moved to PublishDistribute successfully and original draft deleted",
         publishId: newPublish.id,
       });
     } catch (err) {
-      strapi.log.error('Error publishing draft:', err);
-      return ctx.internalServerError('Failed to publish draft');
+      strapi.log.error("Error publishing draft:", err);
+      return ctx.internalServerError("Failed to publish draft");
     }
   },
   async findMyCal(ctx) {
     try {
       const user = ctx.state.user; // currently logged-in user
       if (!user) {
-        return ctx.unauthorized('Authentication required');
+        return ctx.unauthorized("Authentication required");
       }
 
       const entries = await strapi.entityService.findMany(
-        'api::publish-distribute.publish-distribute',
+        "api::publish-distribute.publish-distribute",
         {
           filters: { UserDetail: user.id },
           populate: {
             TrackList: true, // populate tracks
           },
-          sort: { createdAt: 'desc' },
+          sort: { createdAt: "desc" },
         }
       );
 
@@ -650,9 +678,10 @@ module.exports = {
 
       return ctx.send({ data: transformed });
     } catch (err) {
-      strapi.log.error('findMyCal error:', err);
-      return ctx.internalServerError('Failed to fetch your publish distributes');
+      strapi.log.error("findMyCal error:", err);
+      return ctx.internalServerError(
+        "Failed to fetch your publish distributes"
+      );
     }
-  }
-
+  },
 };
