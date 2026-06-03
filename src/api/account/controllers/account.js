@@ -179,7 +179,7 @@ module.exports = {
 
   async getAllWithCounts(ctx) {
     try {
-      const { search } = ctx.query;
+      const { search, status, plan, recent } = ctx.query;
 
       // ✅ Base filter (Client users)
       const filters = {
@@ -195,6 +195,24 @@ module.exports = {
           { lastName: { $containsi: search.trim() } },
           { email: { $containsi: search.trim() } },
         ];
+      }
+
+      if (status === "blocked") {
+        filters.blocked = true;
+      }
+
+      if (status === "active") {
+        filters.blocked = false;
+      }
+
+      if (recent === "true") {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+
+        filters.createdAt = {
+          $gte: yesterday.toISOString(),
+        };
       }
 
       // ✅ Fetch users with ALL schema relations
@@ -267,8 +285,22 @@ module.exports = {
           };
         })
       );
-      result.sort((a, b) => b.id - a.id);
-      ctx.send(result);
+      let finalResult = result;
+
+      if (plan) {
+        finalResult = result.filter(
+          (user) =>
+            user.latest_subscription?.plan?.name
+              ?.toLowerCase()
+              .trim() === plan.toLowerCase().trim()
+        );
+      }
+
+      if (recent !== "true") {
+        finalResult.sort((a, b) => b.id - a.id);
+      }
+
+      ctx.send(finalResult);
     } catch (err) {
       ctx.throw(500, err);
     }
