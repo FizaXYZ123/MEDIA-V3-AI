@@ -308,20 +308,37 @@ module.exports = {
 
   async getOneWithCounts(ctx) {
     try {
-      const { id } = ctx.params; // Get user ID from URL params
+      const { id } = ctx.params;
 
-      // Fetch the user with role = Client and populate profile image
       const user = await strapi.db
         .query("plugin::users-permissions.user")
         .findOne({
           where: {
-            id: id,
+            id,
             role: {
               name: "Client",
             },
           },
           populate: {
             Profile_image: true,
+
+            artist_details: {
+              select: ["artistName", "roleName"],
+              populate: {
+                Profile_image: true,
+              },
+            },
+
+            distribute_drafts: {
+              populate: {
+                CoverArt: true,
+                TrackList: {
+                  populate: {
+                    TrackUpload: true,
+                  },
+                },
+              },
+            },
           },
         });
 
@@ -329,28 +346,76 @@ module.exports = {
         return ctx.notFound("User not found or not a Client");
       }
 
-      // Get counts for related records
-      const artistDetailsCount = await strapi.db
-        .query("api::artist-detail.artist-detail")
-        .count({
-          where: { owner: user.id },
+      const latestSubscription = await strapi.db
+        .query("api::user-subscription.user-subscription")
+        .findOne({
+          where: {
+            users_permissions_user: user.id,
+          },
+          populate: {
+            plan: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
 
-      const distributeDraftsCount = await strapi.db
-        .query("api::publish-distribute.publish-distribute")
-        .count({
-          where: { UserDetail: user.id },
-        });
+      let latestAdminFee = null;
+      let latestLabelFee = null;
+      let latestEnterpriseCommission = null;
 
-      const result = {
+      const planName = latestSubscription?.plan?.name;
+
+      if (
+        planName === "Artist" ||
+        planName === "Artist Plus"
+      ) {
+        latestAdminFee = await strapi.db
+          .query("api::admin-fee-history.admin-fee-history")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+            },
+            orderBy: {
+              effective_from: "desc",
+            },
+          });
+
+        latestLabelFee = await strapi.db
+          .query("api::label-fee-history.label-fee-history")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+            },
+            orderBy: {
+              effective_from: "desc",
+            },
+          });
+      }
+
+      if (planName === "Pro Label") {
+        latestEnterpriseCommission = await strapi.db
+          .query("api::enterprise-commission.enterprise-commission")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+            },
+            orderBy: {
+              effective_from: "desc",
+            },
+          });
+      }
+
+      return ctx.send({
         ...user,
-        artist_details_count: artistDetailsCount,
-        distribute_drafts_count: distributeDraftsCount,
-      };
-
-      ctx.send(result);
+        user_subscription: latestSubscription,
+        admin_fee: latestAdminFee,
+        label_fee: latestLabelFee,
+        enterprise_commission: latestEnterpriseCommission,
+      });
     } catch (err) {
-      ctx.throw(500, err);
+      strapi.log.error("Error fetching user details:", err);
+      return ctx.throw(500, "Failed to fetch user details");
     }
   },
   async findByUser(ctx) {
