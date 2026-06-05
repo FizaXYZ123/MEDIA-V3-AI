@@ -107,15 +107,52 @@ module.exports = {
         }
       );
 
+      const latestAdminFee = await strapi.entityService.findMany(
+        "api::admin-fee-history.admin-fee-history",
+        {
+          filters: {
+            users_permissions_user: id,
+          },
+          sort: ["createdAt:desc"],
+          limit: 1,
+        }
+      );
+
+      const latestLabelFee = await strapi.entityService.findMany(
+        "api::label-fee-history.label-fee-history",
+        {
+          filters: {
+            users_permissions_user: id,
+          },
+          sort: ["createdAt:desc"],
+          limit: 1,
+        }
+      );
+
+      const latestEnterpriseCommission = await strapi.entityService.findMany(
+        "api::enterprise-commission.enterprise-commission",
+        {
+          filters: {
+            users_permissions_user: id,
+          },
+          sort: ["createdAt:desc"],
+          limit: 1,
+        }
+      );
+
       if (!user) {
         return ctx.notFound("User not found");
       }
 
       return {
         success: true,
-        data:{
+        data: {
           user,
           availablePlans: plans,
+          latestAdminFee: latestAdminFee?.[0] || null,
+          latestLabelFee: latestLabelFee?.[0] || null,
+          latestEnterpriseCommission:
+            latestEnterpriseCommission?.[0] || null,
         },
       };
     } catch (error) {
@@ -132,6 +169,9 @@ module.exports = {
         user,
         subscription,
         artists,
+        adminFee,
+        labelFee,
+        enterpriseCommission,
       } = ctx.request.body;
 
       /*
@@ -176,6 +216,123 @@ module.exports = {
             },
           }
         );
+      }
+
+      /*
+ * ADMIN FEE HISTORY
+ */
+
+      if (
+        adminFee !== undefined &&
+        adminFee !== null &&
+        adminFee !== ""
+      ) {
+        const latestAdminFee = await strapi.db
+          .query("api::admin-fee-history.admin-fee-history")
+          .findOne({
+            where: {
+              users_permissions_user: id,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          });
+
+        if (
+          !latestAdminFee ||
+          Number(latestAdminFee.feePercentage) !== Number(adminFee)
+        ) {
+          await strapi.entityService.create(
+            "api::admin-fee-history.admin-fee-history",
+            {
+              data: {
+                feePercentage: Number(adminFee),
+                users_permissions_user: id,
+                effective_from: new Date(),
+                publishedAt: new Date()
+              },
+            }
+          );
+        }
+      }
+
+      /*
+       * LABEL FEE HISTORY
+       */
+
+      if (
+        labelFee !== undefined &&
+        labelFee !== null &&
+        labelFee !== ""
+      ) {
+        const latestLabelFee = await strapi.db
+          .query("api::label-fee-history.label-fee-history")
+          .findOne({
+            where: {
+              users_permissions_user: id,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          });
+
+        if (
+          !latestLabelFee ||
+          Number(latestLabelFee.feePercentage) !== Number(labelFee)
+        ) {
+          await strapi.entityService.create(
+            "api::label-fee-history.label-fee-history",
+            {
+              data: {
+                feePercentage: Number(labelFee),
+                users_permissions_user: id,
+                effective_from: new Date(),
+                publishedAt:new Date()
+              },
+            }
+          );
+        }
+      }
+
+      /*
+       * ENTERPRISE COMMISSION HISTORY
+       */
+
+      if (
+        enterpriseCommission !== undefined &&
+        enterpriseCommission !== null &&
+        enterpriseCommission !== ""
+      ) {
+        const latestCommission = await strapi.db
+          .query(
+            "api::enterprise-commission.enterprise-commission"
+          )
+          .findOne({
+            where: {
+              users_permissions_user: id,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          });
+
+        if (
+          !latestCommission ||
+          Number(latestCommission.commission_percentage) !==
+          Number(enterpriseCommission)
+        ) {
+          await strapi.entityService.create(
+            "api::enterprise-commission.enterprise-commission",
+            {
+              data: {
+                commission_percentage: Number(enterpriseCommission),
+                users_permissions_user: id,
+                effective_from: new Date(),
+                publishedAt: new Date(),
+              },
+            }
+          );
+        }
       }
 
       /*
