@@ -72,12 +72,16 @@ return ctx.send({
     id: targetUser.id,
     email: targetUser.email,
     username: targetUser.username,
-    role: targetUser.role?.type,
+    role: targetUser.role,
   },
 
   impersonation: {
     actorId: authUser.id,
     actorEmail: authUser.email,
+    targetId: targetUser.id,
+    targetEmail: targetUser.email,
+    startedAt: new Date().toISOString(),
+    expiresInSeconds: 2592000,
   },
 });
     } catch (err) {
