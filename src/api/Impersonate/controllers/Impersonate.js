@@ -1,8 +1,11 @@
-module.exports = {
+"use strict";
 
+module.exports = {
   async impersonate(ctx) {
     try {
-      // Logged-in requester
+      console.log("🚀 IMPERSONATE API CALLED");
+
+      // Logged-in user
       const authUser = await strapi.entityService.findOne(
         "plugin::users-permissions.user",
         ctx.state.user.id,
@@ -17,23 +20,29 @@ module.exports = {
         return ctx.unauthorized("Authentication required");
       }
 
-      // Only Authenticated users can impersonate
+      console.log("Auth User:", authUser.id);
+      console.log("Role:", authUser.role);
+
+      // Only authenticated users can impersonate
       if (
         !authUser.role ||
         authUser.role.type !== "authenticated"
       ) {
         return ctx.forbidden(
-          "Only Authenticated users can impersonate clients"
+          "Only authenticated users can impersonate"
         );
       }
 
       const { id } = ctx.params;
 
+      // Target user
       const targetUser = await strapi.entityService.findOne(
         "plugin::users-permissions.user",
         id,
         {
-          populate: ["role", "Profile_image"],
+          populate: {
+            role: true,
+          },
         }
       );
 
@@ -41,66 +50,45 @@ module.exports = {
         return ctx.notFound("User not found");
       }
 
-
-      if (
-        !targetUser.role ||
-        targetUser.role.type !== "client"
-      ) {
-        return ctx.forbidden(
-          "Only Client users can be impersonated"
-        );
-      }
-
       if (targetUser.blocked) {
-        return ctx.badRequest("User is blocked");
+        return ctx.badRequest("Target user is blocked");
       }
 
-      const subscription = await strapi.db
-        .query("api::user-subscription.user-subscription")
-        .findMany({
-          where: {
-            users_permissions_user: targetUser.id,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          limit: 1,
-          populate: ["plan"],
-        });
-
-      const latest_subscription = subscription[0] || null;
-
-      const jwt = strapi
+      // Create impersonation token
+      const impersonationToken = strapi
         .plugin("users-permissions")
         .service("jwt")
         .issue({
           id: targetUser.id,
+          isImpersonation: true,
+          impersonatedBy: authUser.id,
+          impersonatedByEmail: authUser.email,
         });
 
-      return ctx.send({
-        jwt,
-        user: {
-          ...targetUser,
+return ctx.send({
+  jwt: impersonationToken,
 
-          profileImage: targetUser.Profile_image
-            ? {
-              id: targetUser.Profile_image.id,
-              url: targetUser.Profile_image.url,
-              name: targetUser.Profile_image.name,
-              mime: targetUser.Profile_image.mime,
-            }
-            : null,
+  user: {
+    id: targetUser.id,
+    email: targetUser.email,
+    username: targetUser.username,
+    role: targetUser.role?.type,
+  },
 
-          latest_subscription,
-        },
-      });
+  impersonation: {
+    actorId: authUser.id,
+    actorEmail: authUser.email,
+  },
+});
     } catch (err) {
-      console.error("IMPERSONATION ERROR:", err);
+      console.error("========== IMPERSONATION ERROR ==========");
+      console.error(err);
 
-      return ctx.badRequest(
-        err.message || "Impersonation failed"
-      );
+      return ctx.send({
+        success: false,
+        error: err.message,
+        stack: err.stack,
+      });
     }
-  }
-
-}
+  },
+};
