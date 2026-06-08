@@ -392,7 +392,7 @@ module.exports = createCoreController('api::distribute-draft.distribute-draft', 
       PhonogramRightsHolderName: s(raw.PhonogramRightsHolderName),
       PhonogramRightsHolderYear: toInt(raw.PhonogramRightsHolderYear),
       RequestANewReferenceNumber: !!raw.RequestANewReferenceNumber,
-      ReleaseCredits: s(raw.ReleaseCredits),
+     ReleaseCredits: raw.ReleaseCredits || [],
     };
 
     if (!data.ReleaseType || !data.ReleaseTitle) return ctx.badRequest('ReleaseType and ReleaseTitle are required.');

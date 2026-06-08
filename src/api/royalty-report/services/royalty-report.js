@@ -1085,6 +1085,16 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         finalAmount = totalPayable;
       };
 
+      console.log("=================================");
+      console.log("USER ID:", user.id);
+      console.log("PLAN:", planName);
+      console.log("TOTAL EARNINGS:", totalEarnings);
+      console.log("FINAL AMOUNT PAYABLE:", finalAmount);
+      console.log("LABEL FEE:", labelFee);
+      console.log("ADMIN FEE:", adminFee);
+      console.log("ENTERPRISE COMMISSION:", enterpriseCommission);
+      console.log("=================================");
+
       /* ================= CREATE INVOICE ================= */
       const createdInvoice = await strapi.entityService.create(
         "api::invoice.invoice",

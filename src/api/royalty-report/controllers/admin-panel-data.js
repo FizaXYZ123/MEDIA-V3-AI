@@ -55,49 +55,54 @@ module.exports = createCoreController(
     ========================================= */
     async getEarningsSummary(ctx) {
       try {
-        const reports = await strapi.db
-          .query("api::imported-report.imported-report")
+        const months = Number(ctx.query.months || 1);
+
+        const invoices = await strapi.db
+          .query("api::invoice.invoice")
           .findMany({
-            select: [
-              "totalNet",
-              "skippedNet",
-              "startDate",
-              "endDate",
-              "createdAt",
+            select: ["month", "year", "finalAmountPayable"],
+            orderBy: [
+              { year: "desc" },
+              { month: "desc" },
             ],
-            orderBy: { createdAt: "desc" },
           });
 
-        if (!reports.length) {
+        if (!invoices.length) {
           return ctx.send({
             totalEarnings: 0,
-            skippedEarnings: 0,
-            monthsCount: 0,
-            lastMonth: null,
           });
         }
 
-        let total = 0;
-        let skipped = 0;
+        const latestYear = invoices[0].year;
+        const latestMonth = invoices[0].month;
 
-        for (const r of reports) {
-          total += Number(r.totalNet || 0);
-          skipped += Number(r.skippedNet || 0);
+        const latestDate = new Date(latestYear, latestMonth - 1, 1);
+
+        const startDate = new Date(latestDate);
+        startDate.setMonth(startDate.getMonth() - (months - 1));
+
+        let totalEarnings = 0;
+
+        for (const invoice of invoices) {
+          const invoiceDate = new Date(
+            invoice.year,
+            invoice.month - 1,
+            1
+          );
+
+          if (
+            invoiceDate >= startDate &&
+            invoiceDate <= latestDate
+          ) {
+            totalEarnings += Number(
+              invoice.finalAmountPayable || 0
+            );
+          }
         }
 
-        const last = reports[0];
-
         return ctx.send({
-          totalEarnings: total,
-          skippedEarnings: skipped,
-          monthsCount: reports.length,
-          lastMonth: {
-            period: `${last.startDate} to ${last.endDate}`,
-            totalEarnings: Number(last.totalNet || 0),
-            skippedEarnings: Number(last.skippedNet || 0),
-          },
+          totalEarnings,
         });
-
       } catch (err) {
         ctx.throw(500, err);
       }
@@ -108,7 +113,9 @@ module.exports = createCoreController(
     ========================================= */
     async singleTrackEarnings(ctx) {
       try {
-        const data = await strapi.db
+        const months = Number(ctx.query.months || 1);
+
+        const allRoyalties = await strapi.db
           .query("api::royalty-report.royalty-report")
           .findMany({
             select: [
@@ -117,30 +124,402 @@ module.exports = createCoreController(
               "Artist",
               "NetTotal",
               "Units",
+              "StartDate",
+              "EndDate",
             ],
+            populate: {
+              distribute_track: {
+                populate: {
+                  PublishedRelease: {
+                    populate: {
+                      UserDetail: true,
+                    },
+                  },
+                },
+              },
+            },
           });
+
+        console.log("allRoyalties:", allRoyalties.length);
+
+        if (allRoyalties.length) {
+          console.log(
+            "sample royalty:",
+            JSON.stringify(allRoyalties[0], null, 2)
+          );
+        }
+
+        if (!allRoyalties.length) {
+          return ctx.send([]);
+        }
+
+        /* ================= FIND LATEST ROYALTY PERIOD ================= */
+
+        const sortedRoyalties = [...allRoyalties].sort((a, b) => {
+          const dateA = new Date(a.EndDate || a.StartDate);
+          const dateB = new Date(b.EndDate || b.StartDate);
+
+          return dateB - dateA;
+        });
+
+        const latestRoyaltyDate = new Date(
+          sortedRoyalties[0].EndDate ||
+          sortedRoyalties[0].StartDate
+        );
+
+        const latestYear = latestRoyaltyDate.getFullYear();
+        const latestMonth = latestRoyaltyDate.getMonth() + 1;
+
+        const latestDate = new Date(
+          latestYear,
+          latestMonth - 1,
+          1
+        );
+
+        const startDate = new Date(latestDate);
+        startDate.setMonth(
+          startDate.getMonth() - (months - 1)
+        );
+
+        const royalties = allRoyalties.filter((royalty) => {
+          const royaltyDate = new Date(
+            royalty.EndDate || royalty.StartDate
+          );
+
+          const royaltyMonthDate = new Date(
+            royaltyDate.getFullYear(),
+            royaltyDate.getMonth(),
+            1
+          );
+
+          return (
+            royaltyMonthDate >= startDate &&
+            royaltyMonthDate <= latestDate
+          );
+        });
+
+        /* ================= GROUP BY ISRC ================= */
 
         const trackMap = {};
 
-        for (const item of data) {
-          const key = item.ISRC || "UNKNOWN";
+        for (const royalty of royalties) {
+          const isrc = royalty.ISRC || "UNKNOWN";
 
-          if (!trackMap[key]) {
-            trackMap[key] = {
-              ISRC: item.ISRC,
-              TrackTitle: item.TrackTitle,
-              Artist: item.Artist,
-              totalEarnings: 0,
+          if (!trackMap[isrc]) {
+            trackMap[isrc] = {
+              ISRC: royalty.ISRC,
+              TrackTitle: royalty.TrackTitle,
+              Artist: royalty.Artist,
               totalUnits: 0,
+              grossEarnings: 0,
+              user:
+                royalty.distribute_track?.PublishedRelease
+                  ?.UserDetail || null,
             };
           }
 
-          trackMap[key].totalEarnings += Number(item.NetTotal || 0);
-          trackMap[key].totalUnits += Number(item.Units || 0);
+          trackMap[isrc].grossEarnings = Number(
+            (
+              trackMap[isrc].grossEarnings +
+              Number(royalty.NetTotal || 0)
+            ).toFixed(2)
+          );
+
+          trackMap[isrc].totalUnits += Number(
+            royalty.Units || 0
+          );
         }
 
-        return ctx.send(Object.values(trackMap));
+        const userTotals = {};
 
+        for (const isrc in trackMap) {
+          const track = trackMap[isrc];
+          const userId = track.user?.id;
+
+          if (!userId) continue;
+
+          if (!userTotals[userId]) {
+            userTotals[userId] = 0;
+          }
+
+          userTotals[userId] = Number(
+            (
+              userTotals[userId] +
+              Number(track.grossEarnings || 0)
+            ).toFixed(2)
+          );
+        }
+
+        console.log("=================================");
+        console.log(
+          "Tracks Found:",
+          Object.keys(trackMap).length
+        );
+        console.log(
+          "Sample Track:",
+          trackMap[Object.keys(trackMap)[0]]
+        );
+        console.log("=================================");
+
+        const results = [];
+        const userCache = {};
+
+        /* ================= APPLY FFE LOGIC ================= */
+
+        for (const isrc in trackMap) {
+          const track = trackMap[isrc];
+
+          const user = track.user;
+
+          if (!user) {
+            console.log(
+              "❌ NO USER FOUND FOR TRACK:",
+              track.TrackTitle,
+              track.ISRC
+            );
+            continue;
+          }
+
+          if (!userCache[user.id]) {
+            const currentDate = new Date();
+
+            const subscriptions = await strapi.db
+              .query("api::user-subscription.user-subscription")
+              .findMany({
+                where: {
+                  users_permissions_user: user.id,
+                },
+                populate: {
+                  plan: true,
+                },
+                orderBy: {
+                  startDate: "asc",
+                },
+              });
+
+            const labelFeeData = await strapi.db
+              .query("api::label-fee-history.label-fee-history")
+              .findMany({
+                where: {
+                  users_permissions_user: user.id,
+                  effective_from: {
+                    $lte: currentDate,
+                  },
+                },
+                orderBy: {
+                  effective_from: "desc",
+                },
+                limit: 1,
+              });
+
+            const adminFeeData = await strapi.db
+              .query("api::admin-fee-history.admin-fee-history")
+              .findMany({
+                where: {
+                  users_permissions_user: user.id,
+                  effective_from: {
+                    $lte: currentDate,
+                  },
+                },
+                orderBy: {
+                  effective_from: "desc",
+                },
+                limit: 1,
+              });
+
+            const enterpriseCommissionData = await strapi.db
+              .query(
+                "api::enterprise-commission.enterprise-commission"
+              )
+              .findMany({
+                where: {
+                  users_permissions_user: user.id,
+                  effective_from: {
+                    $lte: currentDate,
+                  },
+                },
+                orderBy: {
+                  effective_from: "desc",
+                },
+                limit: 1,
+              });
+
+            userCache[user.id] = {
+              subscriptions,
+              labelFeeData,
+              adminFeeData,
+              enterpriseCommissionData,
+            };
+          }
+
+          const {
+            subscriptions,
+            labelFeeData,
+            adminFeeData,
+            enterpriseCommissionData,
+          } = userCache[user.id];
+
+
+          console.log(
+            "Subscriptions Found:",
+            subscriptions.length
+          );
+
+          if (!subscriptions.length) {
+            console.log(
+              "❌ NO SUBSCRIPTIONS FOUND FOR USER:",
+              user.id
+            );
+
+            results.push({
+              ISRC: track.ISRC,
+              TrackTitle: track.TrackTitle,
+              Artist: track.Artist,
+              totalUnits: track.totalUnits,
+              totalEarnings: Number(
+                track.grossEarnings.toFixed(2)
+              ),
+            });
+
+            continue;
+          }
+
+          const latestSubscription =
+            subscriptions[subscriptions.length - 1];
+
+          console.log("=================================");
+          console.log(
+            "Selected Subscription:",
+            latestSubscription.id
+          );
+          console.log(
+            "Status:",
+            latestSubscription.status
+          );
+          console.log(
+            "Plan:",
+            latestSubscription.plan?.name
+          );
+          console.log(
+            "Start Date:",
+            latestSubscription.startDate
+          );
+          console.log(
+            "End Date:",
+            latestSubscription.endDate
+          );
+          console.log("=================================");
+
+          const activePlan =
+            latestSubscription.plan;
+
+          const planName =
+            activePlan?.name?.toLowerCase()?.trim();
+
+
+          let labelFee =
+            labelFeeData[0]?.feePercentage ??
+            user.labelFee ??
+            0;
+
+          let adminFee =
+            adminFeeData[0]?.feePercentage ??
+            user.adminFee ??
+            0;
+
+          const enterpriseCommission =
+            enterpriseCommissionData[0]
+              ?.commission_percentage ?? 0;
+
+          console.log("Label Fee:", labelFee);
+          console.log("Admin Fee:", adminFee);
+          console.log(
+            "Enterprise Commission:",
+            enterpriseCommission
+          );
+
+          const songTotal = Number(
+            track.grossEarnings || 0
+          );
+
+          const totalUserEarnings =
+            userTotals[user.id] || 0;
+
+          let finalAmount = songTotal;
+
+          /* ================= ARTIST / ARTIST PLUS ================= */
+
+          if (
+            planName === "artist" ||
+            planName === "artist plus"
+          ) {
+            const labelFeeAmount = Number(
+              (
+                (totalUserEarnings * labelFee) /
+                100
+              ).toFixed(2)
+            );
+
+            const afterLabel = Number(
+              (
+                totalUserEarnings -
+                labelFeeAmount
+              ).toFixed(2)
+            );
+
+            const adminFeeAmount = Number(
+              (
+                (afterLabel * adminFee) /
+                100
+              ).toFixed(2)
+            );
+
+            const userFinalAmount = Number(
+              (
+                afterLabel -
+                adminFeeAmount
+              ).toFixed(2)
+            );
+
+            const ratio =
+              totalUserEarnings > 0
+                ? songTotal / totalUserEarnings
+                : 0;
+
+            finalAmount =
+              userFinalAmount * ratio;
+          }
+          /* ================= PRO LABEL ================= */
+
+          else if (planName === "pro label") {
+            const commissionAmount = Number(
+              (
+                (songTotal *
+                  enterpriseCommission) /
+                100
+              ).toFixed(2)
+            );
+
+            finalAmount = Number(
+              (
+                songTotal -
+                commissionAmount
+              ).toFixed(2)
+            );
+          }
+
+          results.push({
+            ISRC: track.ISRC,
+            TrackTitle: track.TrackTitle,
+            Artist: track.Artist,
+            totalUnits: track.totalUnits,
+            totalEarnings: Number(
+              finalAmount.toFixed(2)
+            ),
+          });
+        }
+
+        return ctx.send(results);
       } catch (err) {
         ctx.throw(500, err);
       }
