@@ -1,4 +1,5 @@
 'use strict';
+const createActivityLog = require("../../../utils/activity-log");
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -193,16 +194,45 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
   },
 
   // Update by ID
-  async update(ctx) {
-    try {
-      const { id } = ctx.params;
-      const { body } = ctx.request;
-      const entity = await strapi.service('api::artist-detail.artist-detail').update(id, { data: body });
-      return entity;
-    } catch (err) {
-      ctx.throw(400, err);
+async update(ctx) {
+  try {
+    const { id } = ctx.params;
+    const { body } = ctx.request;
+
+    const existingArtist = await strapi.entityService.findOne(
+      "api::artist-detail.artist-detail",
+      id
+    );
+
+    const entity = await strapi.service(
+      "api::artist-detail.artist-detail"
+    ).update(id, {
+      data: body,
+    });
+
+    if (
+      Object.prototype.hasOwnProperty.call(body, "itsVerified") &&
+      existingArtist?.itsVerified !== body.itsVerified
+    ) {
+      await createActivityLog({
+        user: ctx.state.user,
+        action: body.itsVerified
+          ? "Verification"
+          : "Verification Rejected",
+        module: "Artist",
+        entityId: entity.id,
+        entityName: entity.artistName,
+        description: body.itsVerified
+          ? `${entity.artistName} was verified`
+          : `${entity.artistName} was unverified`,
+      });
     }
-  },
+
+    return entity;
+  } catch (err) {
+    ctx.throw(400, err);
+  }
+},
 
   // Delete by ID
   async delete(ctx) {

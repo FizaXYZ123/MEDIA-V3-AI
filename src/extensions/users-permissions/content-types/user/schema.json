@@ -206,6 +206,12 @@
       "relation": "oneToMany",
       "target": "api::ticket-message.ticket-message",
       "mappedBy": "users_permissions_user"
+    },
+    "activity_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::activity-log.activity-log",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

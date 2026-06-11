@@ -857,6 +857,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::ticket-message.ticket-message'
     >;
+    activity_logs: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::activity-log.activity-log'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -867,6 +872,46 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'plugin::users-permissions.user',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiActivityLogActivityLog extends Schema.CollectionType {
+  collectionName: 'activity_logs';
+  info: {
+    singularName: 'activity-log';
+    pluralName: 'activity-logs';
+    displayName: 'ActivityLog';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    users_permissions_user: Attribute.Relation<
+      'api::activity-log.activity-log',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    userRole: Attribute.String;
+    action: Attribute.String & Attribute.Required;
+    module: Attribute.String & Attribute.Required;
+    entityId: Attribute.String;
+    entityName: Attribute.String;
+    description: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::activity-log.activity-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::activity-log.activity-log',
       'oneToOne',
       'admin::user'
     > &
@@ -2209,6 +2254,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::activity-log.activity-log': ApiActivityLogActivityLog;
       'api::admin-fee-history.admin-fee-history': ApiAdminFeeHistoryAdminFeeHistory;
       'api::artist-detail.artist-detail': ApiArtistDetailArtistDetail;
       'api::audit-log.audit-log': ApiAuditLogAuditLog;
