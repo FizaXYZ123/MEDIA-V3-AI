@@ -1,4 +1,5 @@
 'use strict';
+const createActivityLog = require("../../../utils/activity-log");
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -92,9 +93,9 @@ async function ensureArtistForUser(ctx, primaryArtist) {
 }
 
 module.exports = createCoreController('api::distribute-track.distribute-track', ({ strapi }) => ({
-  
+
   async find(ctx) {
-    ctx.query = { ...ctx.query, populate: TRACK_POPULATE, sort: ctx.query.sort || 'id:desc',};
+    ctx.query = { ...ctx.query, populate: TRACK_POPULATE, sort: ctx.query.sort || 'id:desc', };
     const { data, meta } = await super.find(ctx);
     return { data, meta };
   },
@@ -124,6 +125,15 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
     return await this.findOne({ params: { id: res.data.id }, state: ctx.state, request: ctx.request });
   },
   async update(ctx) {
+
+    const existingTrack = await strapi.entityService.findOne(
+      "api::distribute-track.distribute-track",
+      ctx.params.id,
+      {
+        fields: ["Status", "TrackName"],
+      }
+    );
+
     // 1) perform normal Strapi update (this updates other track fields as usual)
     const res = await super.update(ctx);
 
@@ -138,6 +148,36 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
     const track = await strapi.entityService.findOne('api::distribute-track.distribute-track', trackId, {
       populate: ['RoleCredits', 'artistDetails'],
     });
+
+
+
+    const oldStatus = existingTrack?.Status;
+    const newStatus = track?.Status;
+
+    if (oldStatus && newStatus && oldStatus !== newStatus) {
+      let description = `${track.TrackName} status changed to ${newStatus}`;
+
+      if (newStatus === "Completed") {
+        description = `${track.TrackName} was marked as completed`;
+      }
+
+      if (newStatus === "Cancelled") {
+        description = `${track.TrackName} was cancelled`;
+      }
+
+      if (newStatus === "In-Progress") {
+        description = `${track.TrackName} was marked as in progress`;
+      }
+
+      await createActivityLog({
+        user: ctx.state.user,
+        action: "Track Status Updated",
+        module: "Track",
+        entityId: track.id,
+        entityName: track.TrackName,
+        description,
+      });
+    }
 
     if (!track) {
       strapi.log.error(`update: could not fetch track id=${trackId}`);
@@ -234,7 +274,7 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
       state: ctx.state,
       request: ctx.request,
     });
-  }, // end update
+  }, 
 
   async delete(ctx) {
     const { id } = ctx.params;

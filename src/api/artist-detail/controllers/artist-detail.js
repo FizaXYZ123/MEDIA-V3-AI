@@ -210,21 +210,32 @@ async update(ctx) {
       data: body,
     });
 
-    if (
+    const verificationApproved =
       Object.prototype.hasOwnProperty.call(body, "itsVerified") &&
-      existingArtist?.itsVerified !== body.itsVerified
-    ) {
+      existingArtist?.itsVerified !== body.itsVerified &&
+      body.itsVerified === true;
+
+    const verificationRejected =
+      Object.prototype.hasOwnProperty.call(
+        body,
+        "requiredVerification"
+      ) &&
+      existingArtist?.requiredVerification === true &&
+      body.requiredVerification === false &&
+      existingArtist?.itsVerified === false;
+
+    if (verificationApproved || verificationRejected) {
       await createActivityLog({
         user: ctx.state.user,
-        action: body.itsVerified
-          ? "Verification"
+        action: verificationApproved
+          ? "Verification approved"
           : "Verification Rejected",
         module: "Artist",
         entityId: entity.id,
         entityName: entity.artistName,
-        description: body.itsVerified
+        description: verificationApproved
           ? `${entity.artistName} was verified`
-          : `${entity.artistName} was unverified`,
+          : `${entity.artistName}'s verification request was rejected`,
       });
     }
 

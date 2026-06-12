@@ -1,6 +1,8 @@
 "use strict";
+const createActivityLog = require("../../../utils/activity-log");
 
 module.exports = {
+
   async impersonate(ctx) {
     try {
       console.log("🚀 IMPERSONATE API CALLED");
@@ -65,25 +67,35 @@ module.exports = {
           impersonatedByEmail: authUser.email,
         });
 
-return ctx.send({
-  jwt: impersonationToken,
+      await createActivityLog({
+        user: authUser,
+        action: "User Impersonated",
+        module: "User",
+        entityId: targetUser.id,
+        entityName:
+          targetUser.email,
+        description: `${authUser.email} impersonated ${targetUser.email}`,
+      });
 
-  user: {
-    id: targetUser.id,
-    email: targetUser.email,
-    username: targetUser.username,
-    role: targetUser.role,
-  },
+      return ctx.send({
+        jwt: impersonationToken,
 
-  impersonation: {
-    actorId: authUser.id,
-    actorEmail: authUser.email,
-    targetId: targetUser.id,
-    targetEmail: targetUser.email,
-    startedAt: new Date().toISOString(),
-    expiresInSeconds: 2592000,
-  },
-});
+        user: {
+          id: targetUser.id,
+          email: targetUser.email,
+          username: targetUser.username,
+          role: targetUser.role,
+        },
+
+        impersonation: {
+          actorId: authUser.id,
+          actorEmail: authUser.email,
+          targetId: targetUser.id,
+          targetEmail: targetUser.email,
+          startedAt: new Date().toISOString(),
+          expiresInSeconds: 2592000,
+        },
+      });
     } catch (err) {
       console.error("========== IMPERSONATION ERROR ==========");
       console.error(err);
@@ -95,4 +107,5 @@ return ctx.send({
       });
     }
   },
+
 };
