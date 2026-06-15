@@ -887,7 +887,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       const reportYear = reportMonthDate.getFullYear();
 
       /* ACTIVE SUBSCRIPTION */
-      const activeSubscription = await strapi.db
+      let activeSubscription = await strapi.db
         .query("api::user-subscription.user-subscription")
         .findOne({
           where: {
@@ -897,19 +897,48 @@ async function generateInvoices(reportStartDate, reportEndDate) {
           populate: {
             plan: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
 
-      if (!activeSubscription?.plan?.isActive) {
+      /* IF NO ACTIVE SUBSCRIPTION, USE LATEST OLD SUBSCRIPTION */
+      if (!activeSubscription) {
+
         console.log(
-          `⏭️ User ${user.id} skipped - no active plan`
+          `⚠️ No active subscription for user ${user.id}. Using latest subscription.`
         );
+
+        activeSubscription = await strapi.db
+          .query("api::user-subscription.user-subscription")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+            },
+            populate: {
+              plan: true,
+            },
+            orderBy: {
+              endDate: "desc",
+            },
+          });
+      }
+
+      if (!activeSubscription) {
+
+        console.log(
+          `⏭️ User ${user.id} skipped - no subscription found`
+        );
+
         continue;
       }
 
       if (!activeSubscription?.plan?.isActive) {
+
         console.log(
-          `⏭️ User ${user.id} skipped - no active plan`
+          `⏭️ User ${user.id} skipped - plan inactive`
         );
+
         continue;
       }
 
