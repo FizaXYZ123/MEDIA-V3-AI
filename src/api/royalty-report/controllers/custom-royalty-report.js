@@ -400,125 +400,209 @@ module.exports = {
     }
   },
 
-  async userCountryStreams(ctx) {
-    try {
+async userCountryEarnings(ctx) {
+  try {
+    const user = ctx.state.user;
 
-      /* 1️⃣ GET USER */
-      const user = ctx.state.user;
+    if (!user) {
+      return ctx.unauthorized("Unauthorized");
+    }
 
-      if (!user) {
-        return ctx.unauthorized("Unauthorized");
+    const range = ctx.query.range || "1M";
+
+    let limit = 1;
+
+    if (range === "3M") {
+      limit = 3;
+    } else if (range === "6M") {
+      limit = 6;
+    }
+
+    /* ================= USER INVOICES ================= */
+
+    const invoices = await strapi.entityService.findMany(
+      "api::invoice.invoice",
+      {
+        filters: {
+          users_permissions_user: user.id,
+        },
+        fields: [
+          "month",
+          "year",
+          "invoiceDate",
+          "finalAmountPayable",
+        ],
+        sort: ["invoiceDate:desc"],
+        limit,
+      }
+    );
+
+    if (!invoices.length) {
+      return ctx.send({
+        range,
+        latestMonth: null,
+        latestYear: null,
+        totalTop5Earnings: 0,
+        countries: [],
+      });
+    }
+
+    const latestMonth = invoices[0].month;
+    const latestYear = invoices[0].year;
+
+    const countryMap = {};
+
+    /* ================= PROCESS EACH INVOICE MONTH ================= */
+
+    for (const invoice of invoices) {
+
+      const finalAmountPayable = Number(
+        invoice.finalAmountPayable || 0
+      );
+
+      if (!finalAmountPayable) {
+        continue;
       }
 
-      /* 2️⃣ GET YEAR */
-      const selectedYear =
-        parseInt(ctx.query.year) || new Date().getFullYear();
+      const monthStart = new Date(
+        invoice.year,
+        invoice.month - 1,
+        1
+      );
 
-      /* 3️⃣ GET USER TRACKS */
-      const tracks = await strapi.db
-        .query("api::distribute-track.distribute-track")
-        .findMany({
-          where: {
-            PublishedRelease: {
-              UserDetail: user.id
-            }
-          },
-          select: ["ISRC"]
-        });
+      const monthEnd = new Date(
+        invoice.year,
+        invoice.month,
+        0,
+        23,
+        59,
+        59
+      );
 
-      if (!tracks.length) {
-        return ctx.send({
-          totalUnits: 0,
-          countries: []
-        });
-      }
+      /* ================= USER ROYALTIES FOR MONTH ================= */
 
-      const isrcList = tracks.map(t => t.ISRC).filter(Boolean);
-
-      /* 4️⃣ FETCH ROYALTY DATA */
-      const data = await strapi.db
+      const royalties = await strapi.db
         .query("api::royalty-report.royalty-report")
         .findMany({
           where: {
-            ISRC: {
-              $in: isrcList
+            EndDate: {
+              $gte: monthStart,
+              $lte: monthEnd,
             },
-            $or: [
-              {
-                start_date: {
-                  $gte: `${selectedYear}-01-01`,
-                  $lte: `${selectedYear}-12-31`
-                }
+
+            distribute_track: {
+              PublishedRelease: {
+                UserDetail: user.id,
               },
-              {
-                end_date: {
-                  $gte: `${selectedYear}-01-01`,
-                  $lte: `${selectedYear}-12-31`
-                }
-              }
-            ]
+            },
           },
-          select: ["Country", "Units"]
+
+          select: [
+            "Country",
+            "NetTotal",
+            "StartDate",
+            "EndDate",
+          ],
         });
 
-      if (!data.length) {
-        return ctx.send({
-          totalUnits: 0,
-          countries: []
-        });
+      if (!royalties.length) {
+        continue;
       }
 
-      /* 5️⃣ GROUP BY COUNTRY */
-      let totalUnits = 0;
+      /* ================= COUNTRY NET TOTALS ================= */
 
-      const countryMap = {};
+      let monthNetTotal = 0;
 
-      data.forEach(item => {
+      const monthCountryTotals = {};
 
-        const country = item.Country || "Unknown";
+      for (const royalty of royalties) {
 
-        const units = Number(item.Units || 0);
+        const country =
+          royalty.Country || "Unknown";
 
-        totalUnits += units;
+        const netTotal = Number(
+          royalty.NetTotal || 0
+        );
+
+        monthNetTotal += netTotal;
+
+        if (!monthCountryTotals[country]) {
+          monthCountryTotals[country] = 0;
+        }
+
+        monthCountryTotals[country] += netTotal;
+      }
+
+      if (!monthNetTotal) {
+        continue;
+      }
+
+      /* ================= REDISTRIBUTE INVOICE EARNINGS ================= */
+
+      for (const country in monthCountryTotals) {
+
+        const countryNetTotal =
+          monthCountryTotals[country];
+
+        const countryPercentage =
+          countryNetTotal / monthNetTotal;
+
+        const redistributedAmount =
+          Number(
+            (
+              finalAmountPayable *
+              countryPercentage
+            ).toFixed(2)
+          );
 
         if (!countryMap[country]) {
           countryMap[country] = {
             country,
-            totalUnits: 0,
-            percentage: 0
+            earnings: 0,
           };
         }
 
-        countryMap[country].totalUnits += units;
-      });
-
-      /* 6️⃣ CALCULATE % */
-      const result = Object.values(countryMap).map(c => ({
-        country: c.country,
-
-        totalUnits: c.totalUnits,
-
-        percentage: totalUnits
-          ? (
-            (c.totalUnits / totalUnits) * 100
-          ).toFixed(2)
-          : 0
-      }));
-
-      /* 7️⃣ SORT + TOP 4 */
-      const topCountries = result
-        .sort((a, b) => b.totalUnits - a.totalUnits)
-        .slice(0, 4);
-
-      return ctx.send({
-        totalUnits,
-        countries: topCountries
-      });
-
-    } catch (err) {
-      ctx.throw(500, err);
+        countryMap[country].earnings +=
+          redistributedAmount;
+      }
     }
-  },
+
+    /* ================= TOP 5 COUNTRIES ================= */
+
+    const countries = Object.values(countryMap)
+      .map((item) => ({
+        country: item.country,
+        earnings: Number(
+          item.earnings.toFixed(2)
+        ),
+      }))
+      .sort(
+        (a, b) => b.earnings - a.earnings
+      )
+      .slice(0, 5);
+
+    const totalTop5Earnings = countries.reduce(
+      (sum, item) =>
+        sum + Number(item.earnings || 0),
+      0
+    );
+
+    return ctx.send({
+      range,
+      latestMonth,
+      latestYear,
+
+      totalTop5Earnings: Number(
+        totalTop5Earnings.toFixed(2)
+      ),
+
+      countries,
+    });
+
+  } catch (err) {
+    ctx.throw(500, err);
+  }
+},
 
   async getUserEarningsPerMonth(ctx) {
   const userId = ctx.state.user.id;
