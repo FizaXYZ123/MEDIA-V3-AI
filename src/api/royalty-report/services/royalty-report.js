@@ -879,7 +879,14 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         continue;
       }
 
-      /* ================= FETCH ACTIVE SUBSCRIPTION ================= */
+      /* ================= DETERMINE PLAN FOR ROYALTY MONTH ================= */
+
+      const reportMonthDate = new Date(reportEndDate);
+
+      const reportMonth = reportMonthDate.getMonth();
+      const reportYear = reportMonthDate.getFullYear();
+
+      /* ACTIVE SUBSCRIPTION */
       const activeSubscription = await strapi.db
         .query("api::user-subscription.user-subscription")
         .findOne({
@@ -892,15 +899,155 @@ async function generateInvoices(reportStartDate, reportEndDate) {
           },
         });
 
-      // ✅ SKIP IF PLAN NOT ACTIVE
       if (!activeSubscription?.plan?.isActive) {
+        console.log(
+          `⏭️ User ${user.id} skipped - no active plan`
+        );
         continue;
       }
 
-      const activePlan = activeSubscription.plan;
+      if (!activeSubscription?.plan?.isActive) {
+        console.log(
+          `⏭️ User ${user.id} skipped - no active plan`
+        );
+        continue;
+      }
+
+      let subscriptionToUse = activeSubscription;
+
+      console.log("=================================");
+      console.log("USER:", user.id);
+      console.log("REPORT MONTH:", reportMonth + 1);
+      console.log("REPORT YEAR:", reportYear);
+      console.log(
+        "ACTIVE PLAN:",
+        activeSubscription.plan?.name
+      );
+      console.log(
+        "SUBSCRIPTION TYPE:",
+        activeSubscription.subscriptionType
+      );
+      console.log(
+        "UPGRADED AT:",
+        activeSubscription.upgradedAt || "N/A"
+      );
+
+      /* HANDLE UPGRADE LOGIC */
+      if (
+        activeSubscription.subscriptionType === "upgrade" &&
+        activeSubscription.upgradedAt
+      ) {
+
+        const upgradedAt = new Date(
+          activeSubscription.upgradedAt
+        );
+
+        const upgradeMonth = upgradedAt.getMonth();
+        const upgradeYear = upgradedAt.getFullYear();
+        const upgradeDay = upgradedAt.getDate();
+
+        console.log(
+          "UPGRADE DATE:",
+          upgradedAt.toISOString()
+        );
+
+        /* FETCH PREVIOUS SUBSCRIPTION */
+        const previousSubscription = await strapi.db
+          .query("api::user-subscription.user-subscription")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+              createdAt: {
+                $lt: activeSubscription.createdAt,
+              },
+            },
+            populate: {
+              plan: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          });
+
+        /* REPORT BEFORE UPGRADE MONTH */
+        if (
+          reportYear < upgradeYear ||
+          (
+            reportYear === upgradeYear &&
+            reportMonth < upgradeMonth
+          )
+        ) {
+
+          console.log(
+            "📅 Report month before upgrade month."
+          );
+
+          if (previousSubscription?.plan) {
+            subscriptionToUse = previousSubscription;
+
+            console.log(
+              "USING PREVIOUS PLAN:",
+              previousSubscription.plan.name
+            );
+          }
+        }
+
+        /* REPORT IS UPGRADE MONTH */
+        else if (
+          reportYear === upgradeYear &&
+          reportMonth === upgradeMonth
+        ) {
+
+          console.log(
+            "📅 Report month is upgrade month."
+          );
+
+          if (upgradeDay <= 15) {
+
+            console.log(
+              "✅ Upgrade before/on 15th."
+            );
+
+            subscriptionToUse = activeSubscription;
+
+          } else {
+
+            console.log(
+              "⚠️ Upgrade after 15th."
+            );
+
+            if (previousSubscription?.plan) {
+              subscriptionToUse = previousSubscription;
+
+              console.log(
+                "USING PREVIOUS PLAN:",
+                previousSubscription.plan.name
+              );
+            }
+          }
+        }
+
+        /* REPORT AFTER UPGRADE MONTH */
+        else {
+
+          console.log(
+            "✅ Report month after upgrade month."
+          );
+
+          subscriptionToUse = activeSubscription;
+        }
+      }
+
+      const activePlan = subscriptionToUse.plan;
 
       const planName =
-        activePlan.name?.toLowerCase()?.trim();
+        activePlan?.name?.toLowerCase()?.trim();
+
+      console.log(
+        "FINAL PLAN USED:",
+        activePlan?.name
+      );
+      console.log("=================================");
 
       /* ================= FETCH FEES ================= */
       const labelFeeData = await strapi.db
