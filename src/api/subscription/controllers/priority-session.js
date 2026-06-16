@@ -9,7 +9,7 @@ module.exports = {
   async createPrioritySession(ctx) {
     try {
       const userId = ctx.state.user?.id;
-      const { draftId, amount, currency } = ctx.request.body;
+      const { draftId, amount, currency , platform = "web"} = ctx.request.body;
 
       if (!draftId) return ctx.badRequest("draftId is required");
       if (!amount || amount <= 0)
@@ -40,6 +40,7 @@ module.exports = {
         draft,
         amount,
         currency,
+        platform
       });
 
       return ctx.send({

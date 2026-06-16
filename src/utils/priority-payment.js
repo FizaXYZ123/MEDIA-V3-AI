@@ -1,7 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const createPriorityStripeSession = async ({ userId, draft, amount,
-  currency, }) => {
+  currency,   platform = "web"}) => {
   if (!draft) throw new Error("Draft not found");
 
   if (draft.Priority !== "Priority") {
@@ -20,6 +20,17 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
     "plugin::users-permissions.user",
     userId
   );
+
+  const isApp = platform === "app";
+
+const successUrl = isApp
+  ? `exp://192.168.1.13:8081/--/catalogue/my-release`
+  : `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`;
+
+const cancelUrl = isApp
+  ? `exp://192.168.1.13:8081/--/catalogue/draft`
+  : `${process.env.FRONTEND_BASE_URL}/catalogue/draft`;
+
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
@@ -43,10 +54,11 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
       type: "priority-upload",
       userId: userId.toString(),
       draftId: draft.id.toString(),
+        platform,
     },
 
-    success_url: `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_BASE_URL}/catalogue/draft`,
+    success_url: successUrl,
+    cancel_url: cancelUrl,
   });
 
   return session;

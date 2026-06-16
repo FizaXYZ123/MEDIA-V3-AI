@@ -13,8 +13,18 @@ module.exports = {
     const userId =
       ctx.state.user.id;
 
-    const { planName } =
+    const { planName , platform = "web"} =
       ctx.request.body;
+
+      const isApp = platform === "app";
+
+      const successUrl = isApp
+  ? `exp://192.168.1.13:8081/--/profile`
+  :  `${process.env.FRONTEND_BASE_URL}/profile`;
+
+const cancelUrl = isApp
+  ? `exp://192.168.1.13:8081/--/upgrade-plan`
+  :  `${process.env.FRONTEND_BASE_URL}/upgrade-plan`;
 
     // =========================
     // ✅ TARGET PLAN
@@ -261,13 +271,14 @@ module.exports = {
               plan.id.toString(),
 
             type: "upgrade",
+            platform
           },
 
           success_url:
-            `${process.env.FRONTEND_BASE_URL}/profile`,
+           successUrl,
 
           cancel_url:
-            `${process.env.FRONTEND_BASE_URL}/upgrade-plan`,
+            cancelUrl,
         }
       );
 

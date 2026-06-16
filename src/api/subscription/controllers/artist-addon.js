@@ -35,7 +35,18 @@ module.exports = {
         artists,
         amount,
         currency,
+        platform = "web",
       } = ctx.request.body;
+
+      const isApp = platform === "app";
+
+      const successUrl = isApp
+        ? `exp://192.168.1.13:8081/--/profile`
+        : `${process.env.FRONTEND_BASE_URL}/profile`;
+
+      const cancelUrl = isApp
+        ? `exp://192.168.1.13:8081/--/upgrade-plan`
+        : `${process.env.FRONTEND_BASE_URL}/upgrade-plan`;
 
       // =========================
       // VALIDATE ARTIST COUNT
@@ -57,7 +68,7 @@ module.exports = {
 
       const expectedAmount =
         VALID_AMOUNTS[currency]?.[
-          Number(artists)
+        Number(artists)
         ];
 
       if (!expectedAmount) {
@@ -151,13 +162,17 @@ module.exports = {
 
             artists:
               artists.toString(),
+
+            platform,
           },
 
+
+
           success_url:
-            `${process.env.FRONTEND_BASE_URL}/profile`,
+            successUrl,
 
           cancel_url:
-            `${process.env.FRONTEND_BASE_URL}/upgrade-plan`,
+            cancelUrl,
         });
 
       return ctx.send({
