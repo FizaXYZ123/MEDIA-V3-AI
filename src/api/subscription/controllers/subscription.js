@@ -18,10 +18,24 @@ const getCountryFromIP = async (ip) => {
 module.exports = {
 
   async createSession(ctx) {
-    // console.log("🔥 Creating Stripe session NOW");
 
+    // console.log("🔥 Creating Stripe session NOW");
     const userId = ctx.state.user.id;
-    const { planName } = ctx.request.body;
+
+    const {
+      planName,
+      platform = "web",
+    } = ctx.request.body;
+
+    const isApp = platform === "app";
+
+    const successUrl = isApp
+      ? `mozart://payment-success`
+      : `${process.env.FRONTEND_BASE_URL}/payment-success`;
+
+    const cancelUrl = isApp
+      ? `mozart://payment-cancel`
+      : `${process.env.FRONTEND_BASE_URL}/payment-cancel`;
 
     const plan = await strapi.db.query("api::plan.plan").findOne({
       where: { name: planName, isActive: true },
@@ -274,10 +288,12 @@ module.exports = {
         userId: userId.toString(),
         planId: plan.id.toString(),
         country,
+        platform
       },
 
-      success_url: `${process.env.FRONTEND_BASE_URL}/payment-success`,
-      cancel_url: `${process.env.FRONTEND_BASE_URL}/payment-cancel`,
+      success_url: successUrl,
+      cancel_url: cancelUrl
+
     });
 
     // console.log("✅ STRIPE SESSION CREATED:", {
