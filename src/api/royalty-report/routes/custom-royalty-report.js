@@ -64,8 +64,8 @@ module.exports = {
     },
       {
       method: "GET",
-      path: "/user/streams-per-platform-per-month",
-      handler: "custom-royalty-report.getUserStreamsPerPlatform",
+      path: "/user/earnings-per-platform",
+      handler: "custom-royalty-report.userPlatformEarnings",
       config: {
         auth: {}
       }
