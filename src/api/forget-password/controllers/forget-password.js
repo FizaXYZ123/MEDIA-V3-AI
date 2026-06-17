@@ -58,7 +58,7 @@ module.exports = {
         "https://api.brevo.com/v3/smtp/email",
         {
           sender: {
-            name: "AMozart",
+            name: "Amozart",
             email: process.env.BREVO_FROM_EMAIL,
           },
           to: [{ email: normalizedEmail }],
@@ -146,7 +146,7 @@ module.exports = {
   <!-- FOOTER -->
   <tr>
     <td align="center" style="padding:15px; font-size:11px; color:#999; background:#fafafa;">
-      © ${new Date().getFullYear()} AMozart. All rights reserved.
+      © ${new Date().getFullYear()} Amozart. All rights reserved.
     </td>
   </tr>
 
@@ -275,7 +275,7 @@ module.exports = {
         "https://api.brevo.com/v3/smtp/email",
         {
           sender: {
-            name: "XYZ MEDIA",
+            name: "Amozart",
             email: process.env.BREVO_FROM_EMAIL,
           },
           to: [{ email: normalizedEmail }],
@@ -363,7 +363,7 @@ module.exports = {
   <!-- FOOTER -->
   <tr>
     <td align="center" style="padding:15px; font-size:11px; color:#999; background:#fafafa;">
-      © ${new Date().getFullYear()} XYZ MEDIA. All rights reserved.
+      © ${new Date().getFullYear()} Amozart. All rights reserved.
     </td>
   </tr>
 

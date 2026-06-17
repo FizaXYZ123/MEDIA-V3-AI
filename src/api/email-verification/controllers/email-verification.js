@@ -53,7 +53,7 @@ body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f7f7f7;te
 <body>
 <div class="container">
 <div class="header">
-<img src="https://admin.amozart.com/assets/updateLogo-DoU658F0.png" alt="XYZ Media Logo">
+<img src="https://admin.amozart.com/assets/updateLogo-DoU658F0.png" alt="Amozart Logo">
 <div class="title">OTP Verification</div>
 </div>
 <div class="content">
@@ -64,7 +64,7 @@ body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f7f7f7;te
 </div>
 <div class="footer">
 <p>If you did not request this, please ignore this email.</p>
-<p>Thank you,<br>AMozart Team</p>
+<p>Thank you,<br>Amozart Team</p>
 </div>
 </div>
 </body>
@@ -77,7 +77,7 @@ body{font-family:Arial,sans-serif;margin:0;padding:0;background-color:#f7f7f7;te
         "https://api.brevo.com/v3/smtp/email",
         {
           sender: {
-            name: "AMozart",
+            name: "Amozart",
             email: msg.from,
           },
           to: [

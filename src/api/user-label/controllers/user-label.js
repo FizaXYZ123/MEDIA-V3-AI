@@ -29,7 +29,7 @@ module.exports = createCoreController('api::user-label.user-label', ({ strapi })
     ctx.body = { data };
   },
 
-  // POST /me/labels/ensure  { label: "XYZ Media" }
+  // POST /me/labels/ensure  
   async ensure(ctx) {
     const user = ctx.state.user;
     if (!user) return ctx.unauthorized('Authentication required');
