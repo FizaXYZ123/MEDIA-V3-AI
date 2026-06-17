@@ -24,7 +24,7 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
   const isApp = platform === "app";
 
 const successUrl = isApp
-  ? `exp://192.168.1.13:8081/--/catalogue/my-release`
+  ? `exp://192.168.1.13:8081/--/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`
   : `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`;
 
 const cancelUrl = isApp
