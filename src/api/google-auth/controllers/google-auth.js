@@ -185,7 +185,7 @@ module.exports = {
               username,
               email,
               phoneNumber,
-              provider: "google",
+              provider: "local",
               confirmed: true,
               confirmationToken,
               role: userRole.id,

@@ -171,7 +171,7 @@ module.exports = {
 
               phoneNumber,
 
-              provider: "facebook",
+              provider: "local",
 
               confirmed: true,
 
