@@ -33,13 +33,25 @@ module.exports = {
         return ctx.badRequest("Invalid platformCommissions JSON");
       }
 
+     const loggedInUser = await strapi.db
+  .query("plugin::users-permissions.user")
+  .findOne({
+    where: {
+      id: ctx.state.user.id,
+    },
+    populate: {
+      role: true,
+    },
+  });
+
       const result = await strapi
         .service("api::royalty-report.royalty-report")
         .importCSV(
           file.path,
           file.name,
           commissionValue,
-          platformCommissions
+          platformCommissions,
+          loggedInUser
         );
 
       return ctx.send({

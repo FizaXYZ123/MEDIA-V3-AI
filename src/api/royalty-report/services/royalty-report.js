@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const csv = require("csv-parser");
+const createActivityLog = require("../../../utils/activity-log");
 
 /* FORMAT DATE */
 function formatDate(dateStr) {
@@ -230,7 +231,7 @@ function normalizeHeader(header) {
 
 module.exports = () => ({
 
-  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {}) {
+  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {},  user = null) {
 
     const rows = [];
 
@@ -738,7 +739,7 @@ module.exports = () => ({
 
     originalTotal = toDecimal(originalTotal);
 
-    await strapi.db
+   const importedReport = await strapi.db
       .query("api::imported-report.imported-report")
       .create({
         data: {
@@ -766,6 +767,17 @@ module.exports = () => ({
       skippedTotal,
       originalTotal
     });
+
+    if (user) {
+  await createActivityLog({
+    user,
+    action: "Import",
+    module: "Royalty Report",
+    entityId: importedReport.id,
+    entityName: filename,
+    description: `Imported royalty report ${filename}. Inserted: ${inserted}, Skipped: ${skipped}`,
+  });
+}
 
     /* 🔥 GENERATE INVOICES */
     await generateInvoices(reportStartDate, reportEndDate);
