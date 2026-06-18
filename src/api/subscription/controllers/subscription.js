@@ -30,11 +30,11 @@ module.exports = {
     const isApp = platform === "app";
 
     const successUrl = isApp
-      ? `exp://192.168.1.13:8081/--/payment-success`
+      ? `exp://192.168.1.3:8081/--/payment-success`
       : `${process.env.FRONTEND_BASE_URL}/payment-success`;
 
     const cancelUrl = isApp
-      ? `exp://192.168.1.13:8081/--/payment-cancel`
+      ? `exp://192.168.1.3:8081/--/payment-cancel`
       : `${process.env.FRONTEND_BASE_URL}/payment-cancel`;
 
     const plan = await strapi.db.query("api::plan.plan").findOne({
