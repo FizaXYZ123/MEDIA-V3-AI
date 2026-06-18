@@ -31,6 +31,8 @@ module.exports = createCoreController(
               ],
             },
             plan: true,
+            payment_log:true,
+            
           },
           sort: { createdAt: "desc" },
 

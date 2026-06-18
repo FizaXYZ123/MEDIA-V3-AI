@@ -51,6 +51,12 @@
     "artistsAllowed": {
       "type": "string",
       "default": "1"
+    },
+    "payment_log": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::payment-log.payment-log",
+      "inversedBy": "user_subscription"
     }
   }
 }

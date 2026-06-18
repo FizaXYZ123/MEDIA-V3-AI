@@ -3,6 +3,7 @@ const applyPlanFees = require("./apply-plan-fees");
 const { savePriorityPaymentLog } = require("./priority-payment");
 
 module.exports = async (session) => {
+  console.log("🔥 MY HANDLE SUCCESS FILE LOADED");
 
   const amountPaid = Number((session.amount_total / 100).toFixed(2));
   // console.log(session)
@@ -222,8 +223,8 @@ module.exports = async (session) => {
           startDate,
           endDate,
           artistsAllowed:
-          plan.maxPrimaryArtists || "1",
-          subscriptionType:"subscription",
+            plan.maxPrimaryArtists || "1",
+          subscriptionType: "subscription",
           publishedAt: new Date().toISOString(),
         },
       }
@@ -251,6 +252,8 @@ module.exports = async (session) => {
       }
     );
 
+    console.log("subscription",subscription.id)
+
     await strapi.entityService.update(
       "api::payment-log.payment-log",
       paymentLog.id,
@@ -258,7 +261,7 @@ module.exports = async (session) => {
         data: {
           users_permissions_user: userId,
           plan: planId,
-
+          user_subscription: subscription.id,
           amount: amountPaid,
           currency: currency,
           status: "success",

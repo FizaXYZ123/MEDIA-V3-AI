@@ -72,6 +72,12 @@
         "upgrade",
         "artist-addon"
       ]
+    },
+    "user_subscription": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-subscription.user-subscription",
+      "inversedBy": "payment_log"
     }
   }
 }

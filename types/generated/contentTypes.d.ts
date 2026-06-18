@@ -1654,6 +1654,11 @@ export interface ApiPaymentLogPaymentLog extends Schema.CollectionType {
     type: Attribute.Enumeration<
       ['subscription', 'priority-upload', 'upgrade', 'artist-addon']
     >;
+    user_subscription: Attribute.Relation<
+      'api::payment-log.payment-log',
+      'oneToOne',
+      'api::user-subscription.user-subscription'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -2218,6 +2223,11 @@ export interface ApiUserSubscriptionUserSubscription
       'api::plan.plan'
     >;
     artistsAllowed: Attribute.String & Attribute.DefaultTo<'1'>;
+    payment_log: Attribute.Relation<
+      'api::user-subscription.user-subscription',
+      'oneToOne',
+      'api::payment-log.payment-log'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
