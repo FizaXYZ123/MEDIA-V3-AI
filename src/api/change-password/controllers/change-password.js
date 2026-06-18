@@ -1,3 +1,5 @@
+const createUserActivityLog = require("../../../utils/user-activity-log");
+
 module.exports = {
     async changePassword(ctx) {
         try {
@@ -98,6 +100,15 @@ module.exports = {
                     },
                 }
             );
+
+              /* =========================================================
+               CREATE ACTIVITY LOG
+            ========================================================= */
+            await createUserActivityLog({
+                userId: user.id,
+                action: "Password Changed",
+                description: "User changed account password",
+            });
 
             /* =========================================================
                RESPONSE
