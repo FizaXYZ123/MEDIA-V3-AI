@@ -556,6 +556,8 @@ module.exports = {
 
                 processing:
                   false,
+
+                user_subscription: newSubscription.id,
               },
             });
 

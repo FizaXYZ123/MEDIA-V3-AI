@@ -3,7 +3,6 @@ const applyPlanFees = require("./apply-plan-fees");
 const { savePriorityPaymentLog } = require("./priority-payment");
 
 module.exports = async (session) => {
-  console.log("🔥 MY HANDLE SUCCESS FILE LOADED");
 
   const amountPaid = Number((session.amount_total / 100).toFixed(2));
   // console.log(session)
@@ -251,8 +250,6 @@ module.exports = async (session) => {
         },
       }
     );
-
-    console.log("subscription",subscription.id)
 
     await strapi.entityService.update(
       "api::payment-log.payment-log",
