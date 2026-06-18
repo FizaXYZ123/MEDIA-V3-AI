@@ -212,6 +212,12 @@
       "relation": "oneToMany",
       "target": "api::activity-log.activity-log",
       "mappedBy": "users_permissions_user"
+    },
+    "user_activity_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-activity-log.user-activity-log",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

@@ -862,6 +862,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::activity-log.activity-log'
     >;
+    user_activity_logs: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::user-activity-log.user-activity-log'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -2112,6 +2117,43 @@ export interface ApiTicketRaiseTicketRaise extends Schema.CollectionType {
   };
 }
 
+export interface ApiUserActivityLogUserActivityLog
+  extends Schema.CollectionType {
+  collectionName: 'user_activity_logs';
+  info: {
+    singularName: 'user-activity-log';
+    pluralName: 'user-activity-logs';
+    displayName: 'user-activity-log';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    action: Attribute.String;
+    description: Attribute.Text;
+    users_permissions_user: Attribute.Relation<
+      'api::user-activity-log.user-activity-log',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::user-activity-log.user-activity-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::user-activity-log.user-activity-log',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiUserLabelUserLabel extends Schema.CollectionType {
   collectionName: 'user_labels';
   info: {
@@ -2292,6 +2334,7 @@ declare module '@strapi/types' {
       'api::subscribe-email.subscribe-email': ApiSubscribeEmailSubscribeEmail;
       'api::ticket-message.ticket-message': ApiTicketMessageTicketMessage;
       'api::ticket-raise.ticket-raise': ApiTicketRaiseTicketRaise;
+      'api::user-activity-log.user-activity-log': ApiUserActivityLogUserActivityLog;
       'api::user-label.user-label': ApiUserLabelUserLabel;
       'api::user-payout-detail.user-payout-detail': ApiUserPayoutDetailUserPayoutDetail;
       'api::user-subscription.user-subscription': ApiUserSubscriptionUserSubscription;

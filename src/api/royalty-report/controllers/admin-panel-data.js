@@ -140,7 +140,7 @@ module.exports = createCoreController(
             },
           });
 
-        console.log("allRoyalties:", allRoyalties.length);
+        // console.log("allRoyalties:", allRoyalties.length);
 
         if (allRoyalties.length) {
           console.log(
@@ -250,16 +250,16 @@ module.exports = createCoreController(
           );
         }
 
-        console.log("=================================");
-        console.log(
-          "Tracks Found:",
-          Object.keys(trackMap).length
-        );
-        console.log(
-          "Sample Track:",
-          trackMap[Object.keys(trackMap)[0]]
-        );
-        console.log("=================================");
+        // console.log("=================================");
+        // console.log(
+        //   "Tracks Found:",
+        //   Object.keys(trackMap).length
+        // );
+        // console.log(
+        //   "Sample Track:",
+        //   trackMap[Object.keys(trackMap)[0]]
+        // );
+        // console.log("=================================");
 
         const results = [];
         const userCache = {};
@@ -360,10 +360,10 @@ module.exports = createCoreController(
           } = userCache[user.id];
 
 
-          console.log(
-            "Subscriptions Found:",
-            subscriptions.length
-          );
+          // console.log(
+          //   "Subscriptions Found:",
+          //   subscriptions.length
+          // );
 
           if (!subscriptions.length) {
             console.log(
@@ -387,28 +387,28 @@ module.exports = createCoreController(
           const latestSubscription =
             subscriptions[subscriptions.length - 1];
 
-          console.log("=================================");
-          console.log(
-            "Selected Subscription:",
-            latestSubscription.id
-          );
-          console.log(
-            "Status:",
-            latestSubscription.status
-          );
-          console.log(
-            "Plan:",
-            latestSubscription.plan?.name
-          );
-          console.log(
-            "Start Date:",
-            latestSubscription.startDate
-          );
-          console.log(
-            "End Date:",
-            latestSubscription.endDate
-          );
-          console.log("=================================");
+          // console.log("=================================");
+          // console.log(
+          //   "Selected Subscription:",
+          //   latestSubscription.id
+          // );
+          // console.log(
+          //   "Status:",
+          //   latestSubscription.status
+          // );
+          // console.log(
+          //   "Plan:",
+          //   latestSubscription.plan?.name
+          // );
+          // console.log(
+          //   "Start Date:",
+          //   latestSubscription.startDate
+          // );
+          // console.log(
+          //   "End Date:",
+          //   latestSubscription.endDate
+          // );
+          // console.log("=================================");
 
           const activePlan =
             latestSubscription.plan;
@@ -431,12 +431,12 @@ module.exports = createCoreController(
             enterpriseCommissionData[0]
               ?.commission_percentage ?? 0;
 
-          console.log("Label Fee:", labelFee);
-          console.log("Admin Fee:", adminFee);
-          console.log(
-            "Enterprise Commission:",
-            enterpriseCommission
-          );
+          // console.log("Label Fee:", labelFee);
+          // console.log("Admin Fee:", adminFee);
+          // console.log(
+          //   "Enterprise Commission:",
+          //   enterpriseCommission
+          // );
 
           const songTotal = Number(
             track.grossEarnings || 0

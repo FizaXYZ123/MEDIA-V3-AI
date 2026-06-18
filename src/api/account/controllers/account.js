@@ -1,5 +1,8 @@
 const { sort } = require("../../../../config/middlewares");
 const distributeDraft = require("../../distribute-draft/controllers/distribute-draft");
+const createUserActivityLog = require(
+  "../../../utils/user-activity-log"
+);
 
 const { ApplicationError } = require("@strapi/utils").errors;
 
@@ -493,7 +496,7 @@ module.exports = {
         publishedTrackCount,
         clientCount,
         publishedReleaseCount,
-        importedReports,
+        invoices,
       ] = await Promise.all([
         // ✅ Published tracks
         strapi.db.query("api::distribute-track.distribute-track").count({
@@ -518,16 +521,56 @@ module.exports = {
           publicationState: "live",
         }),
 
-        // ✅ Imported reports (use totalNet)
-        strapi.db.query("api::imported-report.imported-report").findMany({
-          select: ["totalNet"],
+        // ✅ Invoices
+        strapi.db.query("api::invoice.invoice").findMany({
+          select: [
+            "month",
+            "year",
+            "finalAmountPayable",
+          ],
+          orderBy: [
+            { year: "desc" },
+            { month: "desc" },
+          ],
         }),
       ]);
 
-      // ✅ Calculate total earnings
-      const totalEarnings = importedReports.reduce((sum, item) => {
-        return sum + (Number(item.totalNet) || 0);
-      }, 0);
+      let totalEarnings = 0;
+
+      if (invoices.length) {
+        const latestYear = invoices[0].year;
+        const latestMonth = invoices[0].month;
+
+        const latestDate = new Date(
+          latestYear,
+          latestMonth - 1,
+          1
+        );
+
+        const startDate = new Date(latestDate);
+
+        // Latest 3 months
+        startDate.setMonth(
+          startDate.getMonth() - 2
+        );
+
+        for (const invoice of invoices) {
+          const invoiceDate = new Date(
+            invoice.year,
+            invoice.month - 1,
+            1
+          );
+
+          if (
+            invoiceDate >= startDate &&
+            invoiceDate <= latestDate
+          ) {
+            totalEarnings += Number(
+              invoice.finalAmountPayable || 0
+            );
+          }
+        }
+      }
 
       ctx.send({
         publishedTrackCount,
@@ -608,6 +651,59 @@ module.exports = {
     try {
       const data = ctx.request.body;
 
+      
+      const existingUser = await strapi.entityService.findOne(
+        "plugin::users-permissions.user",
+        id,
+        {
+          populate: ["Profile_image"],
+        }
+      );
+
+      const updatedFields = [];
+
+      if (
+        data.currency !== undefined &&
+        data.currency !== existingUser.currency
+      ) {
+        updatedFields.push("currency");
+      }
+
+      if (
+        data.dob !== undefined &&
+        data.dob !== existingUser.dob
+      ) {
+        updatedFields.push("dob");
+      }
+
+      if (
+        data.firstName !== undefined &&
+        data.firstName !== existingUser.firstName
+      ) {
+        updatedFields.push("first name");
+      }
+
+      if (
+        data.lastName !== undefined &&
+        data.lastName !== existingUser.lastName
+      ) {
+        updatedFields.push("last name");
+      }
+
+      if (
+        data.phoneNumber !== undefined &&
+        data.phoneNumber !== existingUser.phoneNumber
+      ) {
+        updatedFields.push("phone number");
+      }
+
+      if (
+        data.Profile_image &&
+        data.Profile_image !== existingUser.Profile_image?.id
+      ) {
+        updatedFields.push("profile image");
+      }
+
       // Update with entityService (supports relations like Profile_image)
       await strapi.entityService.update("plugin::users-permissions.user", id, {
         data: {
@@ -628,6 +724,14 @@ module.exports = {
           populate: ["Profile_image"],
         }
       );
+
+      const activity = await createUserActivityLog({
+        userId: id,
+        action: "Update Profile",
+        description: `Updated profile fields: ${updatedFields.join(", ")}`,
+      });
+
+      console.log("activty", activity)
 
       return {
         message: "Profile updated successfully",
