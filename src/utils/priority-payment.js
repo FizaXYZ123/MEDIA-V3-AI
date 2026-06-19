@@ -1,7 +1,8 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const createUserActivityLog = require("./user-activity-log");
 
 const createPriorityStripeSession = async ({ userId, draft, amount,
-  currency,   platform = "web"}) => {
+  currency, platform = "web" }) => {
   if (!draft) throw new Error("Draft not found");
 
   if (draft.Priority !== "Priority") {
@@ -23,13 +24,13 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
 
   const isApp = platform === "app";
 
-const successUrl = isApp
-  ? `exp://192.168.1.3:8081/--/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`
-  : `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`;
+  const successUrl = isApp
+    ? `exp://192.168.1.3:8081/--/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`
+    : `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`;
 
-const cancelUrl = isApp
-  ? `exp://192.168.1.3:8081/--/catalogue/draft`
-  : `${process.env.FRONTEND_BASE_URL}/catalogue/draft`;
+  const cancelUrl = isApp
+    ? `exp://192.168.1.3:8081/--/catalogue/draft`
+    : `${process.env.FRONTEND_BASE_URL}/catalogue/draft`;
 
 
   const session = await stripe.checkout.sessions.create({
@@ -54,7 +55,7 @@ const cancelUrl = isApp
       type: "priority-upload",
       userId: userId.toString(),
       draftId: draft.id.toString(),
-        platform,
+      platform,
     },
 
     success_url: successUrl,
@@ -103,6 +104,20 @@ const savePriorityPaymentLog = async (session) => {
         },
       }
     );
+
+    const draft = await strapi.entityService.findOne(
+      "api::distribute-draft.distribute-draft",
+      draftId,
+      {
+        fields: ["ReleaseTitle"],
+      }
+    );
+
+    await createUserActivityLog({
+      userId,
+      action: "priority_upload_purchased",
+      description: `Priority upload purchased for draft #${draftId}`,
+    });
 
     return createdLog;
   } catch (err) {

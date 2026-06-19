@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const handleSuccess = require("../../../utils/handle-success");
 const applyPlanFees = require("../../../utils/apply-plan-fees");
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 module.exports = {
   async webhook(ctx) {
@@ -261,6 +262,12 @@ module.exports = {
             console.log(
               "✅ ARTIST ADDON COMPLETED"
             );
+
+            await createUserActivityLog({
+              userId,
+              action: "artist_addon_purchased",
+              description: `Purchased ${artists} additional artists`,
+            });
 
             return ctx.send({
               received: true,
@@ -532,6 +539,12 @@ module.exports = {
               },
             }
           );
+
+          await createUserActivityLog({
+            userId,
+            action: "subscription_upgraded",
+            description: `Upgraded to ${plan.name} plan`,
+          });
 
           console.log(
             "👤 USER UPDATED"
