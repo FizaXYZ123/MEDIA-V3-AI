@@ -1,6 +1,7 @@
 const { fullDistribute } = require("./distribute-after-payment");
 const applyPlanFees = require("./apply-plan-fees");
 const { savePriorityPaymentLog } = require("./priority-payment");
+const createUserActivityLog = require("./user-activity-log");
 
 module.exports = async (session) => {
 
@@ -266,6 +267,12 @@ module.exports = async (session) => {
         },
       }
     );
+
+    await createUserActivityLog({
+      userId,
+      action: "subscription_purchased",
+      description: `${plan.name} subscription purchased for ${amountPaid} ${currency}`,
+    });
 
     console.log("🎉 Subscription + Fees + User Updated + Payment log created");
   } catch (err) {

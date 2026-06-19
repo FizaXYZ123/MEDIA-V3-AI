@@ -1,7 +1,7 @@
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const axios = require("axios");
-
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const getCountryFromIP = async (ip) => {
   try {
@@ -231,6 +231,12 @@ module.exports = {
           },
         }
       );
+
+      await createUserActivityLog({
+  userId,
+  action: "subscription_purchased",
+  description: `${plan.name} subscription activated`,
+});
 
       // ✅ ENTERPRISE COMMISSION ENTRY
       const enterpriseCommission =

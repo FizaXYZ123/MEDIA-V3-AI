@@ -1,5 +1,6 @@
 'use strict';
 const createActivityLog = require("../../../utils/activity-log");
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -131,8 +132,23 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
       ctx.params.id,
       {
         fields: ["Status", "TrackName"],
+        populate: {
+          artistDetails: {
+            fields: ["artistName"],
+          },
+          RoleCredits: true,
+        },
       }
     );
+
+    // console.log(
+    //   "EXISTING TRACK",
+    //   JSON.stringify(existingTrack, null, 2)
+    // );
+    // console.log(
+    //   "REQUEST BODY",
+    //   JSON.stringify(ctx.request.body, null, 2)
+    // );
 
     // 1) perform normal Strapi update (this updates other track fields as usual)
     const res = await super.update(ctx);
@@ -148,8 +164,6 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
     const track = await strapi.entityService.findOne('api::distribute-track.distribute-track', trackId, {
       populate: ['RoleCredits', 'artistDetails'],
     });
-
-
 
     const oldStatus = existingTrack?.Status;
     const newStatus = track?.Status;
@@ -260,6 +274,59 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
       strapi.log.error('Failed to sync artistDetails (track update): ' + (err?.message || err));
     }
 
+    const updatedTrack = await strapi.entityService.findOne(
+      "api::distribute-track.distribute-track",
+      trackId,
+      {
+        fields: ["TrackName"],
+        populate: {
+          artistDetails: {
+            fields: ["artistName"],
+          },
+
+          RoleCredits: true,
+        },
+      }
+    );
+    // console.log(
+    //   "UPDATED TRACK",
+    //   JSON.stringify(updatedTrack, null, 2)
+    // );
+
+    const userLogs = [];
+
+    if (existingTrack?.TrackName !== updatedTrack?.TrackName) {
+      userLogs.push(
+        `Track Name: ${existingTrack?.TrackName} → ${updatedTrack?.TrackName}`
+      );
+    }
+
+    const roleCredits =
+      ctx.request.body?.data?.RoleCredits || [];
+
+    roleCredits.forEach((credit) => {
+      if (
+        credit?.roleName &&
+        credit?.artistName
+      ) {
+        userLogs.push(
+          `${credit.roleName} changed to ${credit.artistName}`
+        );
+      }
+    });
+    // console.log("USER LOGS", userLogs);
+
+    if (userLogs.length > 0) {
+      await createUserActivityLog({
+        userId: ctx.state.user.id,
+        action: "Track Updated",
+        description: `${updatedTrack.TrackName} updated. Changed fields: ${userLogs.join(
+          ", "
+        )}`,
+      });
+    }
+
+
     // 🔥 Force Publish Release Status Refresh
     if (track.PublishedRelease?.id) {
       await strapi
@@ -274,7 +341,7 @@ module.exports = createCoreController('api::distribute-track.distribute-track', 
       state: ctx.state,
       request: ctx.request,
     });
-  }, 
+  },
 
   async delete(ctx) {
     const { id } = ctx.params;

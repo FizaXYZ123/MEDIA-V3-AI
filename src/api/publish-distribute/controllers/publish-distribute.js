@@ -1,6 +1,7 @@
 "use strict";
 
 const { createCoreController } = require("@strapi/strapi").factories;
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const POPULATE = {
   CoverArt: true,
@@ -622,7 +623,20 @@ module.exports = createCoreController(
               },
             }
           );
+
+          await createUserActivityLog({
+            userId,
+            action: "Release Updated",
+            description: `${existing.ReleaseTitle} updated. Changed fields: ${Object.keys(
+              changes
+            ).join(", ")}`,
+          });
+
         }
+
+
+
+
 
         // ================================
         // 5️⃣ FINAL DATA

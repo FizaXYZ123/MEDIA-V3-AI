@@ -1,5 +1,6 @@
 'use strict';
 const createActivityLog = require("../../../utils/activity-log");
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -112,14 +113,14 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
     };
 
     const entity = await strapi.entityService.create('api::artist-detail.artist-detail', {
-    data: {
-    ...newData,
-    publishedAt: new Date(),
-  },
+      data: {
+        ...newData,
+        publishedAt: new Date(),
+      },
       populate: ['owner'], // include owner in response
     });
 
-    console.log("Artist Created",entity )
+    console.log("Artist Created", entity)
 
     return entity;
   },
@@ -194,56 +195,91 @@ module.exports = createCoreController('api::artist-detail.artist-detail', ({ str
   },
 
   // Update by ID
-async update(ctx) {
-  try {
-    const { id } = ctx.params;
-    const { body } = ctx.request;
+  async update(ctx) {
+    try {
+      const { id } = ctx.params;
+      const { body } = ctx.request;
 
-    const existingArtist = await strapi.entityService.findOne(
-      "api::artist-detail.artist-detail",
-      id
-    );
+      const existingArtist = await strapi.entityService.findOne(
+        "api::artist-detail.artist-detail",
+        id
+      );
 
-    const entity = await strapi.service(
-      "api::artist-detail.artist-detail"
-    ).update(id, {
-      data: body,
-    });
-
-    const verificationApproved =
-      Object.prototype.hasOwnProperty.call(body, "itsVerified") &&
-      existingArtist?.itsVerified !== body.itsVerified &&
-      body.itsVerified === true;
-
-    const verificationRejected =
-      Object.prototype.hasOwnProperty.call(
-        body,
-        "requiredVerification"
-      ) &&
-      existingArtist?.requiredVerification === true &&
-      body.requiredVerification === false &&
-      existingArtist?.itsVerified === false;
-
-    if (verificationApproved || verificationRejected) {
-      await createActivityLog({
-        user: ctx.state.user,
-        action: verificationApproved
-          ? "Verification approved"
-          : "Verification Rejected",
-        module: "Artist",
-        entityId: entity.id,
-        entityName: entity.artistName,
-        description: verificationApproved
-          ? `${entity.artistName} was verified`
-          : `${entity.artistName}'s verification request was rejected`,
+      const entity = await strapi.service(
+        "api::artist-detail.artist-detail"
+      ).update(id, {
+        data: body,
       });
-    }
 
-    return entity;
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-},
+      const verificationApproved =
+        Object.prototype.hasOwnProperty.call(body, "itsVerified") &&
+        existingArtist?.itsVerified !== body.itsVerified &&
+        body.itsVerified === true;
+
+      const verificationRejected =
+        Object.prototype.hasOwnProperty.call(
+          body,
+          "requiredVerification"
+        ) &&
+        existingArtist?.requiredVerification === true &&
+        body.requiredVerification === false &&
+        existingArtist?.itsVerified === false;
+
+      const verificationRequested =
+        Object.prototype.hasOwnProperty.call(
+          body,
+          "requiredVerification"
+        ) &&
+        existingArtist?.requiredVerification !== true &&
+        body.requiredVerification === true;
+
+      const changedFields = Object.keys(body).filter(
+        (key) =>
+          existingArtist?.[key] !== body[key] &&
+          !["itsVerified", "requiredVerification", "fileName"].includes(key)
+      );
+
+      if (
+        !verificationApproved &&
+        !verificationRejected &&
+        !verificationRequested &&
+        changedFields.length > 0
+      ) {
+        await createUserActivityLog({
+          userId: ctx.state.user.id,
+          action: "Artist Profile Updated",
+          description: `${entity.artistName} is updated , changed fields: ${changedFields.join(", ")}`,
+        });
+      }
+
+      if (verificationRequested) {
+        await createUserActivityLog({
+          userId: ctx.state.user.id,
+          action: "Verification Request",
+          description: `${entity.artistName} verification request submitted`,
+        });
+      }
+
+      if (verificationApproved || verificationRejected) {
+        await createActivityLog({
+          user: ctx.state.user,
+          action: verificationApproved
+            ? "Verification approved"
+            : "Verification Rejected",
+          module: "Artist",
+          entityId: entity.id,
+          entityName: entity.artistName,
+          description: verificationApproved
+            ? `${entity.artistName} was verified`
+            : `${entity.artistName}'s verification request was rejected`,
+        });
+      }
+
+      return entity;
+    } catch (err) {
+      ctx.throw(400, err);
+    }
+  },
 
   // Delete by ID
   async delete(ctx) {
