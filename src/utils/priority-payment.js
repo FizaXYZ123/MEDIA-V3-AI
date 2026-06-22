@@ -116,7 +116,7 @@ const savePriorityPaymentLog = async (session) => {
     await createUserActivityLog({
       userId,
       action: "priority_upload_purchased",
-      description: `Priority upload purchased for draft ${draft?.ReleaseTitle}`,
+      description: `Priority upload purchased for ${draft?.ReleaseTitle}`,
     });
 
     return createdLog;

@@ -75,7 +75,17 @@ module.exports = {
         }
       );
 
-      if (!fullUser || fullUser.role?.name !== "Authenticated") {
+      const allowedRoles = [
+        "Authenticated",
+        "SubAdmin",
+      ];
+
+      if (
+        !fullUser ||
+        !allowedRoles.includes(
+          fullUser?.role?.name
+        )
+      ) {
         return ctx.forbidden("Access denied");
       }
       const { id } = ctx.params;
@@ -182,6 +192,21 @@ module.exports = {
           populate: ["role"],
         }
       );
+
+      const allowedRoles = [
+        "Authenticated",
+        "SubAdmin",
+      ];
+
+      if (
+        !allowedRoles.includes(
+          loggedInUser?.role?.name
+        )
+      ) {
+        return ctx.forbidden(
+          "Access denied"
+        );
+      }
 
       const targetUser = await strapi.entityService.findOne(
         "plugin::users-permissions.user",

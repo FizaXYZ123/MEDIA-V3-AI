@@ -409,12 +409,36 @@ module.exports = {
           });
       }
 
+      const activityLogs = await strapi.entityService.findMany(
+        "api::user-activity-log.user-activity-log",
+        {
+          filters: {
+            users_permissions_user: {
+              id: Number(id),
+            },
+          },
+          populate: {
+            users_permissions_user: {
+              fields: [
+                "id",
+                "username",
+                "email",
+              ],
+            },
+          },
+          sort: {
+            createdAt: "desc",
+          },
+        }
+      );
+
       return ctx.send({
         ...user,
         user_subscription: latestSubscription,
         admin_fee: latestAdminFee,
         label_fee: latestLabelFee,
         enterprise_commission: latestEnterpriseCommission,
+        activityLogs
       });
     } catch (err) {
       strapi.log.error("Error fetching user details:", err);
