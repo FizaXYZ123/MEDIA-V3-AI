@@ -1,10 +1,44 @@
 "use strict";
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController(
     "api::user-payout-detail.user-payout-detail",
     ({ strapi }) => ({
+
+        async create(ctx) {
+            try {
+                const user = ctx.state.user;
+
+                if (!user) {
+                    return ctx.unauthorized("You must be logged in");
+                }
+
+                const body = ctx.request.body.data;
+
+                const entry = await strapi.entityService.create(
+                    "api::user-payout-detail.user-payout-detail",
+                    {
+                        data: {
+                            ...body,
+                            userDetail: user.id,
+                        },
+                    }
+                );
+
+                await createUserActivityLog({
+                    userId: user.id,
+                    action: "Bank Account Added",
+                    description: `New bank added for payouts`,
+                });
+
+                return ctx.send(entry);
+            } catch (err) {
+                console.error(err);
+                return ctx.internalServerError(err.message);
+            }
+        },
 
         async find(ctx) {
             const user = ctx.state.user;
@@ -95,6 +129,7 @@ module.exports = createCoreController(
             return {
                 data: entry,
             };
-        }
+        },
+
     })
 );
