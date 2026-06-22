@@ -1,10 +1,9 @@
-// src/api/royalty-report/services/royalty-report.js
-
 const {
     createCoreService,
 } = require("@strapi/strapi").factories;
 
 const { Parser } = require("json2csv");
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 module.exports = createCoreService(
     "api::royalty-report.royalty-report",
@@ -54,6 +53,12 @@ module.exports = createCoreService(
 
                 console.log("👤 User ID:", userId);
 
+               const log = await createUserActivityLog({
+                    userId,
+                    action: "CSV Report Requested",
+                    description: `Requested royalty CSV report from ${startMonth} to ${endMonth}`,
+                });
+
                 /* ================= CHECK EXISTING REPORT ================= */
 
                 const existingReport =
@@ -85,7 +90,7 @@ module.exports = createCoreService(
                         reportId:
                             existingReport.id,
                     });
-                      return;
+                    return;
                 }
 
                 /* ================= FETCH ROYALTIES ================= */
@@ -761,6 +766,7 @@ module.exports = createCoreService(
                 console.log(
                     "📝 CSV Log Created"
                 );
+
 
                 /* ================= RESPONSE ================= */
 

@@ -1,3 +1,4 @@
+const createUserActivityLog = require("./user-activity-log");
 module.exports = {
 
   async fullDistribute(draftId) {
@@ -93,28 +94,28 @@ module.exports = {
     // 3. CREATE PUBLISH
     // =========================
     const publishData = {
-  ReleaseTitle: draft.ReleaseTitle,
-  ReleaseType: draft.ReleaseType,
-  Version: draft.Version,
-  LanguageOfTheTitles: draft.LanguageOfTheTitles,
-  PrimaryGenre: draft.PrimaryGenre,
-  SecondaryGenre: draft.SecondaryGenre,
-  AddLabel: draft.AddLabel,
-  ReferenceNumber: draft.ReferenceNumber,
-  Priority: draft.Priority,
-  TimeZoneOfReference: draft.TimeZoneOfReference,
-  Countries: draft.Countries,
-  MusicStores: draft.MusicStores,
-  ReleaseTime: draft.ReleaseTime,
-  OriginalReleaseDate: draft.OriginalReleaseDate,
-  DigitalReleaseDate: draft.DigitalReleaseDate,
-  CopyrightholderName: draft.CopyrightholderName,
-  CopyrightYear: draft.CopyrightYear,
-  PhonogramRightsHolderName: draft.PhonogramRightsHolderName,
-  PhonogramRightsHolderYear: draft.PhonogramRightsHolderYear,
-  PriceCategory: draft.PriceCategory,
-  CoverArt: draft.CoverArt?.id || null,
-};
+      ReleaseTitle: draft.ReleaseTitle,
+      ReleaseType: draft.ReleaseType,
+      Version: draft.Version,
+      LanguageOfTheTitles: draft.LanguageOfTheTitles,
+      PrimaryGenre: draft.PrimaryGenre,
+      SecondaryGenre: draft.SecondaryGenre,
+      AddLabel: draft.AddLabel,
+      ReferenceNumber: draft.ReferenceNumber,
+      Priority: draft.Priority,
+      TimeZoneOfReference: draft.TimeZoneOfReference,
+      Countries: draft.Countries,
+      MusicStores: draft.MusicStores,
+      ReleaseTime: draft.ReleaseTime,
+      OriginalReleaseDate: draft.OriginalReleaseDate,
+      DigitalReleaseDate: draft.DigitalReleaseDate,
+      CopyrightholderName: draft.CopyrightholderName,
+      CopyrightYear: draft.CopyrightYear,
+      PhonogramRightsHolderName: draft.PhonogramRightsHolderName,
+      PhonogramRightsHolderYear: draft.PhonogramRightsHolderYear,
+      PriceCategory: draft.PriceCategory,
+      CoverArt: draft.CoverArt?.id || null,
+    };
 
     const newPublish = await strapi.db
       .query('api::publish-distribute.publish-distribute')
@@ -166,6 +167,12 @@ module.exports = {
     });
 
     // console.log("🗑️ DRAFT DELETED");
+
+    await createUserActivityLog({
+      userId: draft.UserDetail?.id,
+      action: "Release Uploaded",
+      description: `Release "${newPublish.ReleaseTitle}" uploaded successfully (Release ID: ${newPublish.id})`,
+    });
 
     console.log("🎉 DISTRIBUTION DONE");
 
