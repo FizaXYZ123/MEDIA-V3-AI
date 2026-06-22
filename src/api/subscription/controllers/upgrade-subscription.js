@@ -19,11 +19,11 @@ module.exports = {
       const isApp = platform === "app";
 
       const successUrl = isApp
-  ? `exp://192.168.1.3:8081/--/profile`
+  ? `exp://192.168.1.8:8081/--/profile`
   :  `${process.env.FRONTEND_BASE_URL}/profile`;
 
 const cancelUrl = isApp
-  ? `exp://192.168.1.3:8081/--/upgrade-plan`
+  ? `exp://192.168.1.8:8081/--/upgrade-plan`
   :  `${process.env.FRONTEND_BASE_URL}/upgrade-plan`;
 
     // =========================

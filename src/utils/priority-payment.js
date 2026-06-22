@@ -25,11 +25,11 @@ const createPriorityStripeSession = async ({ userId, draft, amount,
   const isApp = platform === "app";
 
   const successUrl = isApp
-    ? `exp://192.168.1.3:8081/--/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`
+    ? `exp://192.168.1.8:8081/--/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`
     : `${process.env.FRONTEND_BASE_URL}/catalogue/my-release?session_id={CHECKOUT_SESSION_ID}`;
 
   const cancelUrl = isApp
-    ? `exp://192.168.1.3:8081/--/catalogue/draft`
+    ? `exp://192.168.1.8:8081/--/catalogue/draft`
     : `${process.env.FRONTEND_BASE_URL}/catalogue/draft`;
 
 
