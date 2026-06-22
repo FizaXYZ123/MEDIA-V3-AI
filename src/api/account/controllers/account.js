@@ -651,7 +651,7 @@ module.exports = {
     try {
       const data = ctx.request.body;
 
-      
+
       const existingUser = await strapi.entityService.findOne(
         "plugin::users-permissions.user",
         id,
@@ -812,6 +812,12 @@ module.exports = {
       // 4. Delete original draft after successful publish
       await strapi.db.query("api::distribute-draft.distribute-draft").delete({
         where: { id },
+      });
+
+      await createUserActivityLog({
+        userId: draft.UserDetail?.id,
+        action: "Release Uploaded",
+        description: `Release "${newPublish.ReleaseTitle}" uploaded successfully (Release ID: ${newPublish.id})`,
       });
 
       return ctx.send({
