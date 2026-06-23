@@ -43,63 +43,193 @@ async function loadGlobalSettings() {
 
 module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
 
-  /**
-   * Artist creates a payout request.
-   * Body: { amount }
-   * Validates:
-   *   - user authenticated
-   *   - amount > 0
-   *   - user.availableBalance >= globalSettings.minimumPayoutThreshold
-   *   - user.availableBalance >= amount
-   */
+
   async create(ctx) {
     const authUser = ctx.state.user;
-    if (!authUser) return ctx.unauthorized('Authentication required');
 
-    const amount = Number(ctx.request.body?.data?.amount ?? ctx.request.body?.amount);
+    if (!authUser) {
+      return ctx.unauthorized("Authentication required");
+    }
+
+    const amount = Number(
+      ctx.request.body?.data?.amount ?? ctx.request.body?.amount
+    );
+
+    const userPayoutDetailId =
+      ctx.request.body?.data?.userPayoutDetailId ??
+      ctx.request.body?.userPayoutDetailId;
+
     if (!amount || isNaN(amount) || amount <= 0) {
-      return ctx.badRequest('A positive amount is required');
+      return ctx.badRequest("A positive amount is required");
+    }
+
+    if (!userPayoutDetailId) {
+      return ctx.badRequest("Please select a payout account");
     }
 
     const fresh = await loadFullUser(authUser.id);
-    if (!fresh) return ctx.notFound('User not found');
 
-    const settings = await loadGlobalSettings();
-    const threshold = Number(settings.minimumPayoutThreshold || 0);
-    const balance = Number(fresh.availableBalance || 0);
+    if (!fresh) {
+      return ctx.notFound("User not found");
+    }
 
-    if (balance < threshold) {
-      return ctx.badRequest(
-        `Available balance ${balance} is below the minimum payout threshold ${threshold}`
+    const payoutDetail = await strapi.entityService.findOne(
+      "api::user-payout-detail.user-payout-detail",
+      userPayoutDetailId,
+      {
+        populate: {
+          userDetail: true,
+        },
+      }
+    );
+
+    if (!payoutDetail) {
+      return ctx.notFound("Selected payout account not found");
+    }
+
+    // Security check - ensure account belongs to logged in user
+    if (payoutDetail.userDetail?.id !== fresh.id) {
+      return ctx.forbidden(
+        "You are not authorized to use this payout account"
       );
     }
-    if (balance < amount) {
+
+
+
+    const settings = await loadGlobalSettings();
+
+    const threshold = Number(
+      settings.minimumPayoutThreshold || 50
+    );
+
+    const invoices = await strapi.entityService.findMany(
+      "api::invoice.invoice",
+      {
+        filters: {
+          users_permissions_user: {
+            id: authUser.id,
+          },
+        },
+        fields: ["finalAmountPayable"],
+      }
+    );
+
+    const payoutRequests = await strapi.entityService.findMany(
+      "api::payout-request.payout-request",
+      {
+        filters: {
+          user: {
+            id: authUser.id,
+          },
+          status: "completed",
+        },
+        fields: ["amount"],
+      }
+    );
+
+    const totalEarned = invoices.reduce(
+      (sum, invoice) =>
+        sum + Number(invoice.finalAmountPayable || 0),
+      0
+    );
+
+    const totalPaid = payoutRequests.reduce(
+      (sum, payout) =>
+        sum + Number(payout.amount || 0),
+      0
+    );
+
+    const balance = Math.max(
+      totalEarned - totalPaid,
+      0
+    );
+
+    // Requested amount must be at least minimum threshold
+    if (amount < threshold) {
+      return ctx.badRequest(
+        `Minimum withdrawal amount is ${threshold}`
+      );
+    }
+
+    // User cannot withdraw more than available balance
+    if (amount > balance) {
       return ctx.badRequest(
         `Requested amount ${amount} exceeds available balance ${balance}`
       );
     }
 
-    const created = await strapi.entityService.create(PAYOUT_API, {
-      data: {
-        user: fresh.id,
-        amount,
-        currency: 'USD',
-        status: 'pending',
-        paymentMethodSnapshot: fresh.paymentMethod || null,
-        publishedAt: new Date(),
-      },
-    });
+    const created = await strapi.entityService.create(
+      PAYOUT_API,
+      {
+        data: {
+          user: fresh.id,
+          amount,
+          currency: payoutDetail.currency,
+          status: "pending",
 
-    // Move funds from available -> pending so balance reflects the held amount.
-    const newAvailable = Number((balance - amount).toFixed(2));
-    const newPending = Number((Number(fresh.pendingBalance || 0) + amount).toFixed(2));
+          user_payout_detail: payoutDetail.id,
+
+          publishedAt: new Date(),
+        },
+      }
+    );
+
+    // Move funds from available -> pending
+    const newAvailable = Number(
+      (balance - amount).toFixed(2)
+    );
+
+    const newPending = Number(
+      (
+        Number(fresh.pendingBalance || 0) + amount
+      ).toFixed(2)
+    );
 
     await strapi.db.query(USER_API).update({
       where: { id: fresh.id },
-      data: { availableBalance: newAvailable, pendingBalance: newPending },
+      data: {
+        availableBalance: newAvailable,
+        pendingBalance: newPending,
+      },
     });
 
-    return ctx.send({ data: created });
+    return ctx.send({
+      success: true,
+      message: "Payout request submitted successfully",
+      data: created,
+    });
+  },
+
+  async find(ctx) {
+    try {
+      const { results, pagination } =
+        await strapi.service(
+          "api::payout-request.payout-request"
+        ).find({
+          ...ctx.query,
+
+          populate: {
+            user_payout_detail: true,
+            reviewedBy: true,
+            sort: {
+              createdAt: "desc",
+            },
+          }
+
+          });
+
+      return {
+        data: results,
+        meta: {
+          pagination,
+        },
+      };
+    } catch (error) {
+      strapi.log.error(error);
+      return ctx.internalServerError(
+        "Failed to fetch payout requests"
+      );
+    }
   },
 
   /**
@@ -135,7 +265,7 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
           publishedAt: new Date(),
         },
       });
-    } catch (_) {}
+    } catch (_) { }
 
     return ctx.send({ data: updated });
   },
@@ -191,7 +321,7 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
           publishedAt: new Date(),
         },
       });
-    } catch (_) {}
+    } catch (_) { }
 
     return ctx.send({ data: updated });
   },
@@ -251,7 +381,7 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
           publishedAt: new Date(),
         },
       });
-    } catch (_) {}
+    } catch (_) { }
 
     return ctx.send({ data: updated });
   },

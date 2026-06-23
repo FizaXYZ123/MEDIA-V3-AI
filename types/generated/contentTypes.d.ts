@@ -1701,7 +1701,7 @@ export interface ApiPayoutRequestPayoutRequest extends Schema.CollectionType {
     amount: Attribute.Decimal & Attribute.Required;
     currency: Attribute.String & Attribute.DefaultTo<'USD'>;
     status: Attribute.Enumeration<
-      ['pending', 'approved', 'processing', 'completed', 'rejected']
+      ['pending', 'processing', 'completed', 'rejected']
     > &
       Attribute.DefaultTo<'pending'>;
     reviewedBy: Attribute.Relation<
@@ -1714,6 +1714,11 @@ export interface ApiPayoutRequestPayoutRequest extends Schema.CollectionType {
     rejectionReason: Attribute.Text;
     paymentMethodSnapshot: Attribute.JSON;
     transactionReference: Attribute.String;
+    user_payout_detail: Attribute.Relation<
+      'api::payout-request.payout-request',
+      'manyToOne',
+      'api::user-payout-detail.user-payout-detail'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2217,6 +2222,11 @@ export interface ApiUserPayoutDetailUserPayoutDetail
       'api::user-payout-detail.user-payout-detail',
       'manyToOne',
       'plugin::users-permissions.user'
+    >;
+    payout_requests: Attribute.Relation<
+      'api::user-payout-detail.user-payout-detail',
+      'oneToMany',
+      'api::payout-request.payout-request'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

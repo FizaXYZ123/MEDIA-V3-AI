@@ -20,5 +20,13 @@ module.exports = {
       handler: 'payout-request.reject',
       config: { auth: {} },
     },
+    {
+      method: "GET",
+      path: "/payout-requests/my-balance",
+      handler: "custom-payout-request.getMyBalance",
+      config: {
+        auth: {},
+      },
+    },
   ],
 };

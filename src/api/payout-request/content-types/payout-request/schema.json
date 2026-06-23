@@ -30,7 +30,6 @@
       "type": "enumeration",
       "enum": [
         "pending",
-        "approved",
         "processing",
         "completed",
         "rejected"
@@ -56,6 +55,12 @@
     },
     "transactionReference": {
       "type": "string"
+    },
+    "user_payout_detail": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::user-payout-detail.user-payout-detail",
+      "inversedBy": "payout_requests"
     }
   }
 }

@@ -59,6 +59,12 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "user_payout_details"
+    },
+    "payout_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payout-request.payout-request",
+      "mappedBy": "user_payout_detail"
     }
   }
 }

@@ -23,6 +23,7 @@ module.exports = createCoreController(
                         data: {
                             ...body,
                             userDetail: user.id,
+                            publishedAt:new Date()
                         },
                     }
                 );

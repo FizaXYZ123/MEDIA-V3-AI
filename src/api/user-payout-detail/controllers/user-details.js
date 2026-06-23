@@ -7,7 +7,7 @@ async myAccounts(ctx) {
       return ctx.unauthorized("You must be logged in");
     }
 
-    console.log("user",user)
+    // console.log("user",user)
 
     const accounts = await strapi.entityService.findMany(
       "api::user-payout-detail.user-payout-detail",
