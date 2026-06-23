@@ -1,4 +1,5 @@
 'use strict';
+const createUserActivityLog = require("../../../utils/user-activity-log");
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
@@ -174,6 +175,12 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
       }
     );
 
+    await createUserActivityLog({
+      userId: fresh.id,
+      action: "withdraw_request",
+      description: `Withdrawal request submitted for ${amount} ${payoutDetail.currency}. Request ID: ${created.id}`,
+    });
+
     // Move funds from available -> pending
     const newAvailable = Number(
       (balance - amount).toFixed(2)
@@ -216,7 +223,7 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
             },
           }
 
-          });
+        });
 
       return {
         data: results,
