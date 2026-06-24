@@ -13,21 +13,11 @@
   "pluginOptions": {},
   "attributes": {
     "country": {
-      "type": "enumeration",
-      "enum": [
-        "India",
-        "Canada",
-        "United States"
-      ],
+      "type": "string",
       "required": true
     },
     "currency": {
-      "type": "enumeration",
-      "enum": [
-        "INR",
-        "CAD",
-        "USD"
-      ],
+      "type": "string",
       "required": true
     },
     "account_holder_name": {
@@ -42,17 +32,14 @@
       "type": "string",
       "required": true
     },
-    "ifsc_code": {
+    "iban": {
       "type": "string"
     },
-    "transit_number": {
+    "swift_code": {
       "type": "string"
     },
-    "institution_number": {
-      "type": "string"
-    },
-    "routing_number": {
-      "type": "string"
+    "additional_details": {
+      "type": "json"
     },
     "userDetail": {
       "type": "relation",

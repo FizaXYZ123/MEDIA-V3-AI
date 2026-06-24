@@ -144,7 +144,7 @@ plugin.controllers.user.findOne = async (ctx) => {
       },
       orderBy: { createdAt: "desc" },
       limit: 1,
-      populate: ["plan"],
+      populate: ["plan","payment_log"],
     });
 
 

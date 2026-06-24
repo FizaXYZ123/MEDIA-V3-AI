@@ -31,7 +31,9 @@ module.exports = {
             user: {
               id: userId,
             },
-            status: "completed",
+            status: {
+              $ne: "rejected",
+            },
           },
           fields: ["amount"],
         }

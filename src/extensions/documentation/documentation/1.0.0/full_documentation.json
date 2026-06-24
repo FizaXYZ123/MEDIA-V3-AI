@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-06-23T12:48:33.327Z"
+    "x-generation-date": "2026-06-24T12:34:29.506Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3467,20 +3467,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -3491,18 +3481,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -8226,20 +8211,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -8250,18 +8225,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -13050,20 +13020,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -13074,18 +13034,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -17921,20 +17876,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -17945,18 +17890,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -22725,20 +22665,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -22749,18 +22679,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -28281,20 +28206,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -28305,18 +28220,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -32827,20 +32737,10 @@
                                                                         "type": "object",
                                                                         "properties": {
                                                                           "country": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                              "India",
-                                                                              "Canada",
-                                                                              "United States"
-                                                                            ]
+                                                                            "type": "string"
                                                                           },
                                                                           "currency": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                              "INR",
-                                                                              "CAD",
-                                                                              "USD"
-                                                                            ]
+                                                                            "type": "string"
                                                                           },
                                                                           "account_holder_name": {
                                                                             "type": "string"
@@ -32851,18 +32751,13 @@
                                                                           "account_number": {
                                                                             "type": "string"
                                                                           },
-                                                                          "ifsc_code": {
+                                                                          "iban": {
                                                                             "type": "string"
                                                                           },
-                                                                          "transit_number": {
+                                                                          "swift_code": {
                                                                             "type": "string"
                                                                           },
-                                                                          "institution_number": {
-                                                                            "type": "string"
-                                                                          },
-                                                                          "routing_number": {
-                                                                            "type": "string"
-                                                                          },
+                                                                          "additional_details": {},
                                                                           "userDetail": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -37166,20 +37061,10 @@
                                                                                     "type": "object",
                                                                                     "properties": {
                                                                                       "country": {
-                                                                                        "type": "string",
-                                                                                        "enum": [
-                                                                                          "India",
-                                                                                          "Canada",
-                                                                                          "United States"
-                                                                                        ]
+                                                                                        "type": "string"
                                                                                       },
                                                                                       "currency": {
-                                                                                        "type": "string",
-                                                                                        "enum": [
-                                                                                          "INR",
-                                                                                          "CAD",
-                                                                                          "USD"
-                                                                                        ]
+                                                                                        "type": "string"
                                                                                       },
                                                                                       "account_holder_name": {
                                                                                         "type": "string"
@@ -37190,18 +37075,13 @@
                                                                                       "account_number": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "ifsc_code": {
+                                                                                      "iban": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "transit_number": {
+                                                                                      "swift_code": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "institution_number": {
-                                                                                        "type": "string"
-                                                                                      },
-                                                                                      "routing_number": {
-                                                                                        "type": "string"
-                                                                                      },
+                                                                                      "additional_details": {},
                                                                                       "userDetail": {
                                                                                         "type": "object",
                                                                                         "properties": {
@@ -43168,20 +43048,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -43192,18 +43062,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -50025,20 +49890,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -50049,18 +49904,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -54766,20 +54616,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -54790,18 +54630,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -59508,20 +59343,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -59532,18 +59357,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -64312,20 +64132,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -64336,18 +64146,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -69186,20 +68991,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -69210,18 +69005,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -74365,20 +74155,10 @@
                                                             "type": "object",
                                                             "properties": {
                                                               "country": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                  "India",
-                                                                  "Canada",
-                                                                  "United States"
-                                                                ]
+                                                                "type": "string"
                                                               },
                                                               "currency": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                  "INR",
-                                                                  "CAD",
-                                                                  "USD"
-                                                                ]
+                                                                "type": "string"
                                                               },
                                                               "account_holder_name": {
                                                                 "type": "string"
@@ -74389,18 +74169,13 @@
                                                               "account_number": {
                                                                 "type": "string"
                                                               },
-                                                              "ifsc_code": {
+                                                              "iban": {
                                                                 "type": "string"
                                                               },
-                                                              "transit_number": {
+                                                              "swift_code": {
                                                                 "type": "string"
                                                               },
-                                                              "institution_number": {
-                                                                "type": "string"
-                                                              },
-                                                              "routing_number": {
-                                                                "type": "string"
-                                                              },
+                                                              "additional_details": {},
                                                               "userDetail": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -79080,20 +78855,10 @@
                                                                         "type": "object",
                                                                         "properties": {
                                                                           "country": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                              "India",
-                                                                              "Canada",
-                                                                              "United States"
-                                                                            ]
+                                                                            "type": "string"
                                                                           },
                                                                           "currency": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                              "INR",
-                                                                              "CAD",
-                                                                              "USD"
-                                                                            ]
+                                                                            "type": "string"
                                                                           },
                                                                           "account_holder_name": {
                                                                             "type": "string"
@@ -79104,18 +78869,13 @@
                                                                           "account_number": {
                                                                             "type": "string"
                                                                           },
-                                                                          "ifsc_code": {
+                                                                          "iban": {
                                                                             "type": "string"
                                                                           },
-                                                                          "transit_number": {
+                                                                          "swift_code": {
                                                                             "type": "string"
                                                                           },
-                                                                          "institution_number": {
-                                                                            "type": "string"
-                                                                          },
-                                                                          "routing_number": {
-                                                                            "type": "string"
-                                                                          },
+                                                                          "additional_details": {},
                                                                           "userDetail": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -83361,20 +83121,10 @@
                                                                                     "type": "object",
                                                                                     "properties": {
                                                                                       "country": {
-                                                                                        "type": "string",
-                                                                                        "enum": [
-                                                                                          "India",
-                                                                                          "Canada",
-                                                                                          "United States"
-                                                                                        ]
+                                                                                        "type": "string"
                                                                                       },
                                                                                       "currency": {
-                                                                                        "type": "string",
-                                                                                        "enum": [
-                                                                                          "INR",
-                                                                                          "CAD",
-                                                                                          "USD"
-                                                                                        ]
+                                                                                        "type": "string"
                                                                                       },
                                                                                       "account_holder_name": {
                                                                                         "type": "string"
@@ -83385,18 +83135,13 @@
                                                                                       "account_number": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "ifsc_code": {
+                                                                                      "iban": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "transit_number": {
+                                                                                      "swift_code": {
                                                                                         "type": "string"
                                                                                       },
-                                                                                      "institution_number": {
-                                                                                        "type": "string"
-                                                                                      },
-                                                                                      "routing_number": {
-                                                                                        "type": "string"
-                                                                                      },
+                                                                                      "additional_details": {},
                                                                                       "userDetail": {
                                                                                         "type": "object",
                                                                                         "properties": {
@@ -88828,20 +88573,10 @@
                                                                       "type": "object",
                                                                       "properties": {
                                                                         "country": {
-                                                                          "type": "string",
-                                                                          "enum": [
-                                                                            "India",
-                                                                            "Canada",
-                                                                            "United States"
-                                                                          ]
+                                                                          "type": "string"
                                                                         },
                                                                         "currency": {
-                                                                          "type": "string",
-                                                                          "enum": [
-                                                                            "INR",
-                                                                            "CAD",
-                                                                            "USD"
-                                                                          ]
+                                                                          "type": "string"
                                                                         },
                                                                         "account_holder_name": {
                                                                           "type": "string"
@@ -88852,18 +88587,13 @@
                                                                         "account_number": {
                                                                           "type": "string"
                                                                         },
-                                                                        "ifsc_code": {
+                                                                        "iban": {
                                                                           "type": "string"
                                                                         },
-                                                                        "transit_number": {
+                                                                        "swift_code": {
                                                                           "type": "string"
                                                                         },
-                                                                        "institution_number": {
-                                                                          "type": "string"
-                                                                        },
-                                                                        "routing_number": {
-                                                                          "type": "string"
-                                                                        },
+                                                                        "additional_details": {},
                                                                         "userDetail": {
                                                                           "type": "object",
                                                                           "properties": {
@@ -94657,20 +94387,10 @@
                                                           "type": "object",
                                                           "properties": {
                                                             "country": {
-                                                              "type": "string",
-                                                              "enum": [
-                                                                "India",
-                                                                "Canada",
-                                                                "United States"
-                                                              ]
+                                                              "type": "string"
                                                             },
                                                             "currency": {
-                                                              "type": "string",
-                                                              "enum": [
-                                                                "INR",
-                                                                "CAD",
-                                                                "USD"
-                                                              ]
+                                                              "type": "string"
                                                             },
                                                             "account_holder_name": {
                                                               "type": "string"
@@ -94681,18 +94401,13 @@
                                                             "account_number": {
                                                               "type": "string"
                                                             },
-                                                            "ifsc_code": {
+                                                            "iban": {
                                                               "type": "string"
                                                             },
-                                                            "transit_number": {
+                                                            "swift_code": {
                                                               "type": "string"
                                                             },
-                                                            "institution_number": {
-                                                              "type": "string"
-                                                            },
-                                                            "routing_number": {
-                                                              "type": "string"
-                                                            },
+                                                            "additional_details": {},
                                                             "userDetail": {
                                                               "type": "object",
                                                               "properties": {
@@ -99625,20 +99340,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -99649,18 +99354,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -104428,20 +104128,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -104452,18 +104142,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -109127,20 +108812,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -109151,18 +108826,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -110512,20 +110182,10 @@
             "type": "object",
             "properties": {
               "country": {
-                "type": "string",
-                "enum": [
-                  "India",
-                  "Canada",
-                  "United States"
-                ]
+                "type": "string"
               },
               "currency": {
-                "type": "string",
-                "enum": [
-                  "INR",
-                  "CAD",
-                  "USD"
-                ]
+                "type": "string"
               },
               "account_holder_name": {
                 "type": "string"
@@ -110536,18 +110196,13 @@
               "account_number": {
                 "type": "string"
               },
-              "ifsc_code": {
+              "iban": {
                 "type": "string"
               },
-              "transit_number": {
+              "swift_code": {
                 "type": "string"
               },
-              "institution_number": {
-                "type": "string"
-              },
-              "routing_number": {
-                "type": "string"
-              },
+              "additional_details": {},
               "userDetail": {
                 "oneOf": [
                   {
@@ -110634,20 +110289,10 @@
         ],
         "properties": {
           "country": {
-            "type": "string",
-            "enum": [
-              "India",
-              "Canada",
-              "United States"
-            ]
+            "type": "string"
           },
           "currency": {
-            "type": "string",
-            "enum": [
-              "INR",
-              "CAD",
-              "USD"
-            ]
+            "type": "string"
           },
           "account_holder_name": {
             "type": "string"
@@ -110658,18 +110303,13 @@
           "account_number": {
             "type": "string"
           },
-          "ifsc_code": {
+          "iban": {
             "type": "string"
           },
-          "transit_number": {
+          "swift_code": {
             "type": "string"
           },
-          "institution_number": {
-            "type": "string"
-          },
-          "routing_number": {
-            "type": "string"
-          },
+          "additional_details": {},
           "userDetail": {
             "type": "object",
             "properties": {
@@ -113952,20 +113592,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -113976,18 +113606,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {
@@ -118751,20 +118376,10 @@
                                               "type": "object",
                                               "properties": {
                                                 "country": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "India",
-                                                    "Canada",
-                                                    "United States"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "currency": {
-                                                  "type": "string",
-                                                  "enum": [
-                                                    "INR",
-                                                    "CAD",
-                                                    "USD"
-                                                  ]
+                                                  "type": "string"
                                                 },
                                                 "account_holder_name": {
                                                   "type": "string"
@@ -118775,18 +118390,13 @@
                                                 "account_number": {
                                                   "type": "string"
                                                 },
-                                                "ifsc_code": {
+                                                "iban": {
                                                   "type": "string"
                                                 },
-                                                "transit_number": {
+                                                "swift_code": {
                                                   "type": "string"
                                                 },
-                                                "institution_number": {
-                                                  "type": "string"
-                                                },
-                                                "routing_number": {
-                                                  "type": "string"
-                                                },
+                                                "additional_details": {},
                                                 "userDetail": {
                                                   "type": "object",
                                                   "properties": {

@@ -2208,16 +2208,14 @@ export interface ApiUserPayoutDetailUserPayoutDetail
     draftAndPublish: true;
   };
   attributes: {
-    country: Attribute.Enumeration<['India', 'Canada', 'United States']> &
-      Attribute.Required;
-    currency: Attribute.Enumeration<['INR', 'CAD', 'USD']> & Attribute.Required;
+    country: Attribute.String & Attribute.Required;
+    currency: Attribute.String & Attribute.Required;
     account_holder_name: Attribute.String & Attribute.Required;
     bank_name: Attribute.String & Attribute.Required;
     account_number: Attribute.String & Attribute.Required;
-    ifsc_code: Attribute.String;
-    transit_number: Attribute.String;
-    institution_number: Attribute.String;
-    routing_number: Attribute.String;
+    iban: Attribute.String;
+    swift_code: Attribute.String;
+    additional_details: Attribute.JSON;
     userDetail: Attribute.Relation<
       'api::user-payout-detail.user-payout-detail',
       'manyToOne',
