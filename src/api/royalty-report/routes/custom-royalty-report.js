@@ -32,16 +32,24 @@ module.exports = {
     },
     {
       method: "GET",
-      path: "/user/streams-per-platform",
-      handler: "custom-royalty-report.userStreamsPerPlatform",
+      path: "/user/best-streaming-platforms",
+      handler: "custom-royalty-report.userStreamsFromPlatform",
       config: {
         auth: {}
       }
     },
     {
       method: "GET",
-      path: "/user/country-earnings",
-      handler: "custom-royalty-report.userCountryEarnings",
+      path: "/user/best-streaming-countries",
+      handler: "custom-royalty-report.userStreamsFromCountries",
+      config: {
+        auth: {}
+      }
+    },
+     {
+      method: "GET",
+      path: "/user/total-streams",
+      handler: "custom-royalty-report.userTotalStreams",
       config: {
         auth: {}
       }
@@ -50,22 +58,6 @@ module.exports = {
       method: "GET",
       path: "/user/earnings-per-month",
       handler: "custom-royalty-report.getUserEarningsPerMonth",
-      config: {
-        auth: {}
-      }
-    },
-     {
-      method: "GET",
-      path: "/user/streams-per-month",
-      handler: "custom-royalty-report.getUserStreamsPerMonth",
-      config: {
-        auth: {}
-      }
-    },
-      {
-      method: "GET",
-      path: "/user/earnings-per-platform",
-      handler: "custom-royalty-report.userPlatformEarnings",
       config: {
         auth: {}
       }

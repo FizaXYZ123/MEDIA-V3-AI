@@ -33,16 +33,16 @@ module.exports = {
         return ctx.badRequest("Invalid platformCommissions JSON");
       }
 
-     const loggedInUser = await strapi.db
-  .query("plugin::users-permissions.user")
-  .findOne({
-    where: {
-      id: ctx.state.user.id,
-    },
-    populate: {
-      role: true,
-    },
-  });
+      const loggedInUser = await strapi.db
+        .query("plugin::users-permissions.user")
+        .findOne({
+          where: {
+            id: ctx.state.user.id,
+          },
+          populate: {
+            role: true,
+          },
+        });
 
       const result = await strapi
         .service("api::royalty-report.royalty-report")
@@ -307,120 +307,17 @@ module.exports = {
 
   },
 
-  async userStreamsPerPlatform(ctx) {
+  async userStreamsFromPlatform(ctx) {
     try {
-
-      /* 1️⃣ GET USER */
+      /* 1️⃣ AUTH USER */
       const user = ctx.state.user;
 
       if (!user) {
         return ctx.unauthorized("Unauthorized");
       }
 
-      /* 2️⃣ GET YEAR */
-      const selectedYear =
-        parseInt(ctx.query.year) || new Date().getFullYear();
-
-      /* 2️⃣ GET USER TRACKS */
-      const tracks = await strapi.db
-        .query("api::distribute-track.distribute-track")
-        .findMany({
-          where: {
-            PublishedRelease: {
-              UserDetail: user.id
-            }
-          },
-          select: ["ISRC"]
-        });
-
-      if (!tracks.length) {
-        return ctx.send({
-          totalUnits: 0,
-          platforms: []
-        });
-      }
-
-      const isrcList = tracks.map(t => t.ISRC).filter(Boolean);
-
-      /* 3️⃣ FETCH ROYALTY DATA */
-      const data = await strapi.db
-        .query("api::royalty-report.royalty-report")
-        .findMany({
-          where: {
-            ISRC: {
-              $in: isrcList
-            },
-            $or: [
-              {
-                start_date: {
-                  $gte: `${selectedYear}-01-01`,
-                  $lte: `${selectedYear}-12-31`
-                }
-              },
-              {
-                end_date: {
-                  $gte: `${selectedYear}-01-01`,
-                  $lte: `${selectedYear}-12-31`
-                }
-              }
-            ]
-          },
-          select: ["Platform", "Units"]
-        });
-
-      /* 4️⃣ GROUP BY PLATFORM */
-      let totalUnits = 0;
-      const platformMap = {};
-
-      data.forEach(item => {
-        const platform = item.Platform || "Unknown";
-        const units = Number(item.Units || 0);
-
-        totalUnits += units;
-
-        if (!platformMap[platform]) {
-          platformMap[platform] = {
-            platform,
-            totalUnits: 0,
-            percentage: 0
-          };
-        }
-
-        platformMap[platform].totalUnits += units;
-      });
-
-      /* 5️⃣ CALCULATE % */
-      const result = Object.values(platformMap).map(p => ({
-        ...p,
-        percentage: totalUnits
-          ? ((p.totalUnits / totalUnits) * 100).toFixed(2)
-          : 0
-      }));
-
-      /* 6️⃣ SORT + TOP 4 */
-      const topPlatforms = result
-        .sort((a, b) => b.totalUnits - a.totalUnits)
-        .slice(0, 4);
-
-      return ctx.send({
-        totalUnits,
-        platforms: topPlatforms
-      });
-
-    } catch (err) {
-      ctx.throw(500, err);
-    }
-  },
-
-  async userCountryEarnings(ctx) {
-    try {
-      const user = ctx.state.user;
-
-      if (!user) {
-        return ctx.unauthorized("Unauthorized");
-      }
-
-      const range = ctx.query.range || "1M";
+      /* 2️⃣ RANGE */
+      const range = (ctx.query.range || "1M").toUpperCase();
 
       let limit = 1;
 
@@ -430,185 +327,388 @@ module.exports = {
         limit = 6;
       }
 
-      /* ================= USER INVOICES ================= */
-
-      const invoices = await strapi.entityService.findMany(
-        "api::invoice.invoice",
-        {
-          filters: {
-            users_permissions_user: user.id,
+      /* 3️⃣ GET USER TRACKS */
+      const tracks = await strapi.db
+        .query("api::distribute-track.distribute-track")
+        .findMany({
+          where: {
+            PublishedRelease: {
+              UserDetail: user.id,
+            },
           },
-          fields: [
-            "month",
-            "year",
-            "invoiceDate",
-            "finalAmountPayable",
-          ],
-          sort: ["invoiceDate:desc"],
-          limit,
-        }
-      );
+          select: ["ISRC"],
+        });
 
-      if (!invoices.length) {
+      if (!tracks.length) {
         return ctx.send({
           range,
-          latestMonth: null,
-          latestYear: null,
-          totalTop5Earnings: 0,
+          totalUnits: 0,
+          platforms: [],
+        });
+      }
+
+      const isrcList = tracks
+        .map((track) => track.ISRC)
+        .filter(Boolean);
+
+      /* 4️⃣ FETCH USER ROYALTIES */
+      const royalties = await strapi.db
+        .query("api::royalty-report.royalty-report")
+        .findMany({
+          where: {
+            ISRC: {
+              $in: isrcList,
+            },
+            distribute_track: {
+              PublishedRelease: {
+                UserDetail: user.id,
+              },
+            },
+          },
+          select: [
+            "ISRC",
+            "Platform",
+            "Units",
+            "StartDate",
+            "EndDate",
+          ],
+          orderBy: {
+            EndDate: "desc",
+          },
+        });
+
+      if (!royalties.length) {
+        return ctx.send({
+          range,
+          totalUnits: 0,
+          platforms: [],
+        });
+      }
+
+      /* 5️⃣ GROUP BY AVAILABLE REPORT PERIODS */
+      const periodMap = new Map();
+
+      royalties.forEach((royalty) => {
+        const key = `${royalty.StartDate}_${royalty.EndDate}`;
+
+        if (!periodMap.has(key)) {
+          periodMap.set(key, []);
+        }
+
+        periodMap.get(key).push(royalty);
+      });
+
+      /* 6️⃣ TAKE LATEST AVAILABLE REPORTS */
+      const selectedRoyalties = [...periodMap.values()]
+        .slice(0, limit)
+        .flat();
+
+      /* 7️⃣ GROUP BY PLATFORM */
+      let totalUnits = 0;
+
+      const platformMap = {};
+
+      selectedRoyalties.forEach((item) => {
+        const platform = item.Platform || "Unknown";
+        const units = Number(item.Units || 0);
+
+        totalUnits += units;
+
+        if (!platformMap[platform]) {
+          platformMap[platform] = {
+            platform,
+            totalUnits: 0,
+            percentage: 0,
+          };
+        }
+
+        platformMap[platform].totalUnits += units;
+      });
+
+      /* 8️⃣ CALCULATE PERCENTAGE */
+      const result = Object.values(platformMap).map((platform) => ({
+        ...platform,
+        percentage: totalUnits
+          ? ((platform.totalUnits / totalUnits) * 100).toFixed(2)
+          : 0,
+      }));
+
+      /* 9️⃣ TOP 4 */
+      const topPlatforms = result
+        .sort((a, b) => b.totalUnits - a.totalUnits)
+        .slice(0, 4);
+
+      return ctx.send({
+        range,
+        totalUnits,
+        platforms: topPlatforms,
+      });
+    } catch (err) {
+      ctx.throw(500, err);
+    }
+  },
+
+  async userStreamsFromCountries(ctx) {
+    try {
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized("Unauthorized");
+      }
+
+      const range = (ctx.query.range || "1M").toUpperCase();
+
+      let limit = 1;
+
+      if (range === "3M") {
+        limit = 3;
+      } else if (range === "6M") {
+        limit = 6;
+      }
+
+      /* ================= USER TRACKS ================= */
+
+      const tracks = await strapi.db
+        .query("api::distribute-track.distribute-track")
+        .findMany({
+          where: {
+            PublishedRelease: {
+              UserDetail: user.id,
+            },
+          },
+          select: ["ISRC"],
+        });
+
+      if (!tracks.length) {
+        return ctx.send({
+          range,
+          totalUnits: 0,
           countries: [],
         });
       }
 
-      const latestMonth = invoices[0].month;
-      const latestYear = invoices[0].year;
+      const isrcList = tracks
+        .map((track) => track.ISRC)
+        .filter(Boolean);
+
+      /* ================= USER ROYALTIES ================= */
+
+      const royalties = await strapi.db
+        .query("api::royalty-report.royalty-report")
+        .findMany({
+          where: {
+            ISRC: {
+              $in: isrcList,
+            },
+            distribute_track: {
+              PublishedRelease: {
+                UserDetail: user.id,
+              },
+            },
+          },
+          select: [
+            "Country",
+            "Units",
+            "StartDate",
+            "EndDate",
+          ],
+          orderBy: {
+            EndDate: "desc",
+          },
+        });
+
+      if (!royalties.length) {
+        return ctx.send({
+          range,
+          totalUnits: 0,
+          countries: [],
+        });
+      }
+
+      /* ================= AVAILABLE REPORT PERIODS ================= */
+
+      const periodMap = new Map();
+
+      royalties.forEach((royalty) => {
+        const key = `${royalty.StartDate}_${royalty.EndDate}`;
+
+        if (!periodMap.has(key)) {
+          periodMap.set(key, []);
+        }
+
+        periodMap.get(key).push(royalty);
+      });
+
+      const selectedRoyalties = [...periodMap.values()]
+        .slice(0, limit)
+        .flat();
+
+      /* ================= COUNTRY UNITS ================= */
+
+      let totalUnits = 0;
 
       const countryMap = {};
 
-      /* ================= PROCESS EACH INVOICE MONTH ================= */
+      selectedRoyalties.forEach((royalty) => {
+        const country = royalty.Country || "Unknown";
+        const units = Number(royalty.Units || 0);
 
-      for (const invoice of invoices) {
+        totalUnits += units;
 
-        const finalAmountPayable = Number(
-          invoice.finalAmountPayable || 0
-        );
-
-        if (!finalAmountPayable) {
-          continue;
+        if (!countryMap[country]) {
+          countryMap[country] = {
+            country,
+            units: 0,
+          };
         }
 
-        const monthStart = new Date(
-          invoice.year,
-          invoice.month - 1,
-          1
-        );
-
-        const monthEnd = new Date(
-          invoice.year,
-          invoice.month,
-          0,
-          23,
-          59,
-          59
-        );
-
-        /* ================= USER ROYALTIES FOR MONTH ================= */
-
-        const royalties = await strapi.db
-          .query("api::royalty-report.royalty-report")
-          .findMany({
-            where: {
-              EndDate: {
-                $gte: monthStart,
-                $lte: monthEnd,
-              },
-
-              distribute_track: {
-                PublishedRelease: {
-                  UserDetail: user.id,
-                },
-              },
-            },
-
-            select: [
-              "Country",
-              "NetTotal",
-              "StartDate",
-              "EndDate",
-            ],
-          });
-
-        if (!royalties.length) {
-          continue;
-        }
-
-        /* ================= COUNTRY NET TOTALS ================= */
-
-        let monthNetTotal = 0;
-
-        const monthCountryTotals = {};
-
-        for (const royalty of royalties) {
-
-          const country =
-            royalty.Country || "Unknown";
-
-          const netTotal = Number(
-            royalty.NetTotal || 0
-          );
-
-          monthNetTotal += netTotal;
-
-          if (!monthCountryTotals[country]) {
-            monthCountryTotals[country] = 0;
-          }
-
-          monthCountryTotals[country] += netTotal;
-        }
-
-        if (!monthNetTotal) {
-          continue;
-        }
-
-        /* ================= REDISTRIBUTE INVOICE EARNINGS ================= */
-
-        for (const country in monthCountryTotals) {
-
-          const countryNetTotal =
-            monthCountryTotals[country];
-
-          const countryPercentage =
-            countryNetTotal / monthNetTotal;
-
-          const redistributedAmount =
-            Number(
-              (
-                finalAmountPayable *
-                countryPercentage
-              ).toFixed(2)
-            );
-
-          if (!countryMap[country]) {
-            countryMap[country] = {
-              country,
-              earnings: 0,
-            };
-          }
-
-          countryMap[country].earnings +=
-            redistributedAmount;
-        }
-      }
+        countryMap[country].units += units;
+      });
 
       /* ================= TOP 5 COUNTRIES ================= */
 
       const countries = Object.values(countryMap)
-        .map((item) => ({
-          country: item.country,
-          earnings: Number(
-            item.earnings.toFixed(2)
-          ),
+        .map((country) => ({
+          country: country.country,
+          units: country.units,
         }))
-        .sort(
-          (a, b) => b.earnings - a.earnings
-        )
+        .sort((a, b) => b.units - a.units)
         .slice(0, 5);
 
-      const totalTop5Earnings = countries.reduce(
-        (sum, item) =>
-          sum + Number(item.earnings || 0),
+      return ctx.send({
+        range,
+        totalUnits,
+        countries,
+      });
+    } catch (err) {
+      ctx.throw(500, err);
+    }
+  },
+
+  async userTotalStreams(ctx) {
+    try {
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized("Unauthorized");
+      }
+
+      /* ================= RANGE ================= */
+
+      const range = (ctx.query.range || "1M").toUpperCase();
+
+      let limit = 1;
+
+      if (range === "3M") {
+        limit = 3;
+      } else if (range === "6M") {
+        limit = 6;
+      }
+
+      /* ================= USER TRACKS ================= */
+
+      const tracks = await strapi.db
+        .query("api::distribute-track.distribute-track")
+        .findMany({
+          where: {
+            PublishedRelease: {
+              UserDetail: user.id,
+            },
+          },
+          select: ["ISRC"],
+        });
+
+      if (!tracks.length) {
+        return ctx.send({
+          range,
+          totalStreams: 0,
+        });
+      }
+
+      const isrcList = tracks
+        .map((track) => track.ISRC)
+        .filter(Boolean);
+
+      /* ================= USER ROYALTIES ================= */
+
+      const royalties = await strapi.db
+        .query("api::royalty-report.royalty-report")
+        .findMany({
+          where: {
+            ISRC: {
+              $in: isrcList,
+            },
+            distribute_track: {
+              PublishedRelease: {
+                UserDetail: user.id,
+              },
+            },
+          },
+          select: [
+            "Units",
+            "StartDate",
+            "EndDate",
+          ],
+          orderBy: {
+            EndDate: "desc",
+          },
+        });
+
+      if (!royalties.length) {
+        return ctx.send({
+          range,
+          totalStreams: 0,
+        });
+      }
+
+      /* ================= GROUP BY AVAILABLE REPORT PERIODS ================= */
+
+      const periodMap = new Map();
+
+      royalties.forEach((royalty) => {
+        const key = `${royalty.StartDate}_${royalty.EndDate}`;
+
+        if (!periodMap.has(key)) {
+          periodMap.set(key, []);
+        }
+
+        periodMap.get(key).push(royalty);
+      });
+
+      /* ================= LATEST AVAILABLE REPORTS ================= */
+
+      const selectedReports = [...periodMap.entries()].slice(0, limit);
+
+      /* ================= CHART DATA ================= */
+
+      const chart = selectedReports.map(([key, royalties]) => {
+        const totalStreams = royalties.reduce(
+          (sum, royalty) => sum + Number(royalty.Units || 0),
+          0
+        );
+
+        const endDate = new Date(royalties[0].EndDate);
+
+        return {
+          month: endDate.toLocaleDateString("en-US", {
+            month: "short",
+            year: "numeric",
+          }),
+          totalStreams,
+        };
+      });
+
+      /* ================= GRAND TOTAL ================= */
+
+      const totalStreams = chart.reduce(
+        (sum, item) => sum + item.totalStreams,
         0
       );
 
       return ctx.send({
         range,
-        latestMonth,
-        latestYear,
-
-        totalTop5Earnings: Number(
-          totalTop5Earnings.toFixed(2)
-        ),
-
-        countries,
+        totalStreams,
+        chart,
       });
 
     } catch (err) {
@@ -670,344 +770,6 @@ module.exports = {
       totalEarnings,
       monthly,
     };
-  },
-
-  async getUserStreamsPerMonth(ctx) {
-    const userId = ctx.state.user.id;
-
-    // ✅ Year from query (required or fallback)
-    const year = parseInt(ctx.query.year) || new Date().getFullYear();
-
-    const start = `${year}-01-01`;
-    const end = `${year}-12-31`;
-
-    const royalties = await strapi.entityService.findMany(
-      "api::royalty-report.royalty-report",
-      {
-        filters: {
-          EndDate: {
-            $gte: start,
-            $lte: end,
-          },
-          distribute_track: {
-            PublishedRelease: {
-              UserDetail: {
-                id: userId,
-              },
-            },
-          },
-        },
-        fields: ["Units", "EndDate"],
-        populate: {
-          distribute_track: {
-            populate: {
-              PublishedRelease: {
-                populate: {
-                  UserDetail: true,
-                },
-              },
-            },
-          },
-        },
-        limit: -1,
-      }
-    );
-
-    const months = Array(12).fill(0);
-    let yearlyTotalUnits = 0;
-
-    royalties.forEach(r => {
-      if (!r.EndDate) return;
-
-      const monthIndex = new Date(r.EndDate).getMonth();
-      const units = Number(r.Units || 0);
-
-      months[monthIndex] += units;
-      yearlyTotalUnits += units;
-    });
-
-    const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-
-    return {
-      year,
-
-      // ✅ Total units for the selected year
-      totalUnits: yearlyTotalUnits,
-
-      // ✅ Month-wise units
-      monthly: months.map((total, i) => ({
-        month: monthNames[i],
-        units: total,
-      })),
-    };
-  },
-
-  async userPlatformEarnings(ctx) {
-    try {
-      const user = ctx.state.user;
-
-      if (!user) {
-        return ctx.unauthorized("Unauthorized");
-      }
-
-      const range = ctx.query.range || "1M";
-
-      let limit = 1;
-
-      if (range === "3M") {
-        limit = 3;
-      } else if (range === "6M") {
-        limit = 6;
-      }
-
-      /* PLATFORM NORMALIZER */
-      function normalizePlatform(platform) {
-        if (!platform) return null;
-
-        const p = platform.toLowerCase().trim();
-
-        if (p.includes("spotify")) return "Spotify";
-        if (p.includes("apple")) return "Apple Music";
-        if (p.includes("youtube")) return "YouTube Music";
-        if (p.includes("amazon")) return "Amazon Music";
-        if (p.includes("deezer")) return "Deezer";
-        if (p.includes("tidal")) return "Tidal";
-        if (p.includes("yango")) return "Yango Play";
-        if (p.includes("meta")) return "Meta";
-        if (p.includes("peloton")) return "Peloton";
-        if (p.includes("awa")) return "AWA";
-        if (p.includes("itunes")) return "iTunes";
-        if (p.includes("kdigital")) return "KDigital Media";
-        if (p.includes("supernatural")) return "Supernatural";
-        if (p.includes("tiktok")) return "TikTok";
-        if (p.includes("mixcloud")) return "MixCloud";
-        if (p.includes("qobuz")) return "Qobuz";
-        if (p.includes("anghami")) return "Anghami";
-        if (p.includes("beatport")) return "Beatport";
-        if (p.includes("douyin")) return "DouYin";
-        if (p.includes("jio saavn") || p.includes("saavn"))
-          return "JioSaavn";
-        if (p.includes("kkbox")) return "KKBox";
-        if (p.includes("taobao")) return "Taobao";
-        if (p.includes("tuned global")) return "Tuned Global";
-        if (p.includes("soda")) return "Soda Music";
-        if (p.includes("netease")) return "NetEase Cloud Music";
-        if (p.includes("soundcloud")) return "SoundCloud";
-        if (p.includes("boomplay")) return "Boomplay Music";
-        if (p.includes("flo")) return "Flo";
-        if (p.includes("joox")) return "JOOX";
-        if (p.includes("lickd")) return "Lickd";
-        if (p.includes("tencent")) return "Tencent";
-        if (p.includes("udio")) return "Udio";
-        if (p.includes("massive music")) return "Massive Music";
-        if (p.includes("pandora")) return "Pandora";
-        if (p.includes("soundexchange")) return "SoundExchange";
-        if (p.includes("audible magic")) return "Audible Magic";
-        if (p.includes("claro")) return "Claro Musica";
-        if (p.includes("iheart")) return "iHeart";
-        if (p.includes("kanjian")) return "Kanjian";
-        if (p.includes("lissen")) return "Lissen";
-
-        return platform.trim();
-      }
-
-      /* ================= USER INVOICES ================= */
-
-      const invoices = await strapi.entityService.findMany(
-        "api::invoice.invoice",
-        {
-          filters: {
-            users_permissions_user: user.id,
-          },
-          fields: [
-            "month",
-            "year",
-            "invoiceDate",
-            "finalAmountPayable",
-          ],
-          sort: ["invoiceDate:desc"],
-          limit,
-        }
-      );
-
-      if (!invoices.length) {
-        return ctx.send({
-          range,
-          latestMonth: null,
-          latestYear: null,
-          totalTop3Earnings: 0,
-          platforms: [],
-        });
-      }
-
-      const latestMonth = invoices[0].month;
-      const latestYear = invoices[0].year;
-
-      const platformMap = {};
-
-      /* ================= PROCESS EACH INVOICE ================= */
-
-      for (const invoice of invoices) {
-
-        const finalAmountPayable = Number(
-          invoice.finalAmountPayable || 0
-        );
-
-        if (!finalAmountPayable) {
-          continue;
-        }
-
-        const monthStart = new Date(
-          invoice.year,
-          invoice.month - 1,
-          1
-        );
-
-        const monthEnd = new Date(
-          invoice.year,
-          invoice.month,
-          0,
-          23,
-          59,
-          59
-        );
-
-        const royalties = await strapi.db
-          .query("api::royalty-report.royalty-report")
-          .findMany({
-            where: {
-              EndDate: {
-                $gte: monthStart,
-                $lte: monthEnd,
-              },
-
-              distribute_track: {
-                PublishedRelease: {
-                  UserDetail: user.id,
-                },
-              },
-            },
-
-            select: [
-              "Platform",
-              "NetTotal",
-              "StartDate",
-              "EndDate",
-            ],
-          });
-
-        if (!royalties.length) {
-          continue;
-        }
-
-        let monthNetTotal = 0;
-
-        const monthPlatformTotals = {};
-
-        for (const royalty of royalties) {
-
-          const platform =
-            normalizePlatform(
-              royalty.Platform
-            ) || "Unknown";
-
-          const netTotal = Number(
-            royalty.NetTotal || 0
-          );
-
-          monthNetTotal += netTotal;
-
-          if (!monthPlatformTotals[platform]) {
-            monthPlatformTotals[platform] = 0;
-          }
-
-          monthPlatformTotals[platform] += netTotal;
-        }
-
-        if (!monthNetTotal) {
-          continue;
-        }
-
-        for (const platform in monthPlatformTotals) {
-
-          const platformNetTotal =
-            monthPlatformTotals[platform];
-
-          const percentage =
-            platformNetTotal / monthNetTotal;
-
-          const redistributedAmount =
-            Number(
-              (
-                finalAmountPayable *
-                percentage
-              ).toFixed(2)
-            );
-
-          if (!platformMap[platform]) {
-            platformMap[platform] = {
-              platform,
-              earnings: 0,
-            };
-          }
-
-          platformMap[platform].earnings +=
-            redistributedAmount;
-        }
-      }
-
-      /* ================= OVERALL TOTAL ================= */
-
-      const totalEarnings = invoices.reduce(
-        (sum, invoice) =>
-          sum +
-          Number(
-            Number(
-              invoice.finalAmountPayable || 0
-            ).toFixed(2)
-          ),
-        0
-      );
-
-      /* ================= REQUIRED PLATFORMS ================= */
-
-      const requiredPlatforms = [
-        "Spotify",
-        "Apple Music",
-        "YouTube Music",
-        "Meta",
-        "TikTok",
-      ];
-
-      const platforms = requiredPlatforms.map(
-        (platform) => ({
-          platform,
-          earnings: Number(
-            (
-              platformMap[platform]?.earnings || 0
-            ).toFixed(2)
-          ),
-        })
-      );
-
-      return ctx.send({
-        range,
-        latestMonth,
-        latestYear,
-
-        totalEarnings: Number(
-          totalEarnings.toFixed(2)
-        ),
-
-        platforms,
-      });
-
-    } catch (err) {
-      ctx.throw(500, err);
-    }
   },
 
   // ─── V3 — Priority 12: enhanced analytics ─────────────────────────────────
