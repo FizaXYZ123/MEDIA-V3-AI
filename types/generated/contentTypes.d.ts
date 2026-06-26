@@ -867,6 +867,21 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::user-activity-log.user-activity-log'
     >;
+    ticket_raises: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::ticket-raise.ticket-raise'
+    >;
+    assigned_tickets: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::ticket-raise.ticket-raise'
+    >;
+    resolved_tickets: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::ticket-raise.ticket-raise'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -2030,11 +2045,6 @@ export interface ApiTicketMessageTicketMessage extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    ticket: Attribute.Relation<
-      'api::ticket-message.ticket-message',
-      'manyToOne',
-      'api::ticket-raise.ticket-raise'
-    >;
     sender: Attribute.Relation<
       'api::ticket-message.ticket-message',
       'manyToOne',
@@ -2042,7 +2052,15 @@ export interface ApiTicketMessageTicketMessage extends Schema.CollectionType {
     >;
     message: Attribute.Text & Attribute.Required;
     attachments: Attribute.Media;
-    is_read: Attribute.Boolean & Attribute.DefaultTo<false>;
+    senderType: Attribute.Enumeration<['user', 'admin']> &
+      Attribute.Required &
+      Attribute.DefaultTo<'user'>;
+    ticket: Attribute.Relation<
+      'api::ticket-message.ticket-message',
+      'manyToOne',
+      'api::ticket-raise.ticket-raise'
+    > &
+      Attribute.Required;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2073,32 +2091,43 @@ export interface ApiTicketRaiseTicketRaise extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    ticketNumber: Attribute.String & Attribute.Required & Attribute.Unique;
     title: Attribute.String & Attribute.Required;
-    description: Attribute.Text;
-    attachment: Attribute.Media;
-    status: Attribute.Enumeration<
-      ['open', 'in-progress', 'waiting_on_customer', 'resolved', 'closed']
-    > &
+    status: Attribute.Enumeration<['open', 'in_progress', 'resolved']> &
       Attribute.DefaultTo<'open'>;
-    is_read: Attribute.Boolean & Attribute.DefaultTo<false>;
+    category: Attribute.Enumeration<
+      [
+        'content_management',
+        'arrange_meeting_call',
+        'quality_control_process',
+        'copyright_claims',
+        'invoices_and_payments',
+        'technical_issue',
+        'terminate_my_contract',
+        'general_question',
+        'other'
+      ]
+    > &
+      Attribute.Required &
+      Attribute.DefaultTo<'general_question'>;
     user: Attribute.Relation<
       'api::ticket-raise.ticket-raise',
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    category: Attribute.Enumeration<
-      ['billing', 'release_issue', 'payout', 'general', 'account']
-    > &
-      Attribute.DefaultTo<'general'>;
-    priority: Attribute.Enumeration<['low', 'medium', 'high', 'urgent']> &
-      Attribute.DefaultTo<'medium'>;
     assignedTo: Attribute.Relation<
       'api::ticket-raise.ticket-raise',
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
-    slaDeadline: Attribute.DateTime;
-    closedAt: Attribute.DateTime;
+    assignedAt: Attribute.DateTime;
+    resolvedBy: Attribute.Relation<
+      'api::ticket-raise.ticket-raise',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    resolvedAt: Attribute.DateTime;
+    lastActivityAt: Attribute.DateTime;
     messages: Attribute.Relation<
       'api::ticket-raise.ticket-raise',
       'oneToMany',

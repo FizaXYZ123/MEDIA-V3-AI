@@ -1,46 +1,53 @@
-'use strict';
-
 module.exports = {
   routes: [
     {
-      method: 'GET',
-      path: '/ticket-raises',
-      handler: 'ticket-raise.find',
+      method: "POST",
+      path: "/tickets",
+      handler: "ticket-raise.createTicket",
       config: {
-        auth: { scope: [] }
-      }
+        auth: {},
+      },
     },
     {
-      method: 'GET',
-      path: '/ticket-raises/:id',
-      handler: 'ticket-raise.findOne',
+      method: "GET",
+      path: "/tickets/my",
+      handler: "ticket-raise.myTickets",
       config: {
-        auth: { scope: [] }
-      }
+        auth: {},
+      },
     },
     {
-      method: 'POST',
-      path: '/ticket-raises',
-      handler: 'ticket-raise.create',
+      method: "GET",
+      path: "/tickets/:id",
+      handler: "ticket-raise.findOne",
       config: {
-        auth: { scope: [] }
-      }
+        auth: {},
+      },
     },
     {
-      method: 'PUT',
-      path: '/ticket-raises/:id',
-      handler: 'ticket-raise.update',
+      method: "POST",
+      path: "/tickets/:id/reply",
+      handler: "ticket-raise.reply",
       config: {
-        auth: { scope: [] }
-      }
+        auth: {},
+      },
     },
     {
-      method: 'DELETE',
-      path: '/ticket-raises/:id',
-      handler: 'ticket-raise.delete',
+      method: "GET",
+      path: "/admin/tickets",
+      handler: "ticket-raise.adminTickets",
       config: {
-        auth: { scope: [] }
-      }
+        auth: {},
+      },
+    },
+    {
+      method: "POST",
+      path: "/tickets/:id/resolve",
+      handler: "ticket-raise.resolve",
+      config: {
+        auth: {},
+      },
     }
+
   ]
-};
+}

@@ -205,7 +205,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::ticket-message.ticket-message",
-      "mappedBy": "users_permissions_user"
+      "mappedBy": "sender"
     },
     "activity_logs": {
       "type": "relation",
@@ -218,6 +218,24 @@
       "relation": "oneToMany",
       "target": "api::user-activity-log.user-activity-log",
       "mappedBy": "users_permissions_user"
+    },
+    "ticket_raises": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-raise.ticket-raise",
+        "mappedBy": "user"
+    },
+    "assigned_tickets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-raise.ticket-raise",
+      "mappedBy": "assignedTo"
+    },
+    "resolved_tickets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-raise.ticket-raise",
+      "mappedBy": "resolvedBy"
     }
   }
 }

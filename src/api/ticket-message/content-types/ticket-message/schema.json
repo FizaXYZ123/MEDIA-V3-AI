@@ -12,12 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "ticket": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::ticket-raise.ticket-raise",
-      "inversedBy": "messages"
-    },
     "sender": {
       "type": "relation",
       "relation": "manyToOne",
@@ -39,9 +33,21 @@
         "audios"
       ]
     },
-    "is_read": {
-      "type": "boolean",
-      "default": false
+    "senderType": {
+      "type": "enumeration",
+      "enum": [
+        "user",
+        "admin"
+      ],
+      "required":true,
+       "default": "user"
+    },
+    "ticket": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ticket-raise.ticket-raise",
+      "inversedBy": "messages",
+       "required": true
     }
   }
 }

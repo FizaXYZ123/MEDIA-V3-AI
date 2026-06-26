@@ -12,74 +12,65 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "ticketNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
     "title": {
       "type": "string",
       "required": true
-    },
-    "description": {
-      "type": "text"
-    },
-    "attachment": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
     },
     "status": {
       "type": "enumeration",
       "enum": [
         "open",
-        "in-progress",
-        "waiting_on_customer",
-        "resolved",
-        "closed"
+        "in_progress",
+        "resolved"
       ],
       "default": "open"
-    },
-    "is_read": {
-      "type": "boolean",
-      "default": false
-    },
-    "user": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
     },
     "category": {
       "type": "enumeration",
       "enum": [
-        "billing",
-        "release_issue",
-        "payout",
-        "general",
-        "account"
+        "content_management",
+        "arrange_meeting_call",
+        "quality_control_process",
+        "copyright_claims",
+        "invoices_and_payments",
+        "technical_issue",
+        "terminate_my_contract",
+        "general_question",
+        "other"
       ],
-      "default": "general"
+      "default": "general_question",
+      "required":true
     },
-    "priority": {
-      "type": "enumeration",
-      "enum": [
-        "low",
-        "medium",
-        "high",
-        "urgent"
-      ],
-      "default": "medium"
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "ticket_raises"
     },
     "assignedTo": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "assigned_tickets"
     },
-    "slaDeadline": {
+    "assignedAt": {
       "type": "datetime"
     },
-    "closedAt": {
+    "resolvedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "resolved_tickets"
+    },
+    "resolvedAt": {
+      "type": "datetime"
+    },
+    "lastActivityAt": {
       "type": "datetime"
     },
     "messages": {
