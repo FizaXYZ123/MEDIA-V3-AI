@@ -66,6 +66,7 @@ module.exports = () => ({
                         status: "open",
                         user: authUser.id,
                         lastActivityAt: new Date(),
+                        publishedAt: new Date()
                     },
                 }
             );
@@ -84,6 +85,7 @@ module.exports = () => ({
                         senderType: "user",
                         message: message?.trim() || "",
                         attachments: attachmentIds,
+                        publishedAt: new Date()
                     },
                 }
             );
@@ -235,26 +237,18 @@ module.exports = () => ({
                         user: authUser.id,
                     },
 
-                    populate: {
-                        assignedTo: {
-                            fields: [
-                                "id",
-                                "firstName",
-                                "lastName",
-                            ],
-                        },
-
-                        resolvedBy: {
-                            fields: [
-                                "id",
-                                "firstName",
-                                "lastName",
-                            ],
-                        },
-                    },
+                    fields: [
+                        "ticketNumber",
+                        "title",
+                        "category",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "lastActivityAt",
+                    ],
 
                     sort: {
-                        createdAt: "desc",
+                        lastActivityAt: "desc",
                     },
                 }
             );
