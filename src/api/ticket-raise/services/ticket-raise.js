@@ -1,5 +1,5 @@
 "use strict";
-
+const axios = require("axios");
 const generateTicketNumber = require("../../../utils/generateTicketNumber");
 const createUserActivityLog = require("../../../utils/user-activity-log");
 const createActivityLog = require("../../../utils/activity-log")
@@ -16,7 +16,7 @@ module.exports = () => ({
         const {
             title,
             category,
-            message,
+            description,
             attachments,
         } = ctx.request.body;
 
@@ -36,13 +36,8 @@ module.exports = () => ({
             return ctx.badRequest("Category is required.");
         }
 
-        if (
-            (!message || !message.trim()) &&
-            attachmentIds.length === 0
-        ) {
-            return ctx.badRequest(
-                "Either a message or at least one attachment is required."
-            );
+        if (!description || !description.trim()) {
+            return ctx.badRequest("Description is required.");
         }
 
         // ------------------------
@@ -62,34 +57,16 @@ module.exports = () => ({
                     data: {
                         ticketNumber,
                         title: title.trim(),
+                        description: description.trim(),
+                        attachments: attachmentIds,
                         category,
                         status: "open",
                         user: authUser.id,
                         lastActivityAt: new Date(),
-                        publishedAt: new Date()
+                        publishedAt: new Date(),
                     },
                 }
             );
-
-            // ------------------------
-            // Create First Message
-            // ------------------------
-
-
-            await strapi.entityService.create(
-                "api::ticket-message.ticket-message",
-                {
-                    data: {
-                        ticket: ticket.id,
-                        sender: authUser.id,
-                        senderType: "user",
-                        message: message?.trim() || "",
-                        attachments: attachmentIds,
-                        publishedAt: new Date()
-                    },
-                }
-            );
-
 
             // create user activity log
             await createUserActivityLog({
@@ -98,57 +75,113 @@ module.exports = () => ({
                 description: `Support ticket ${ticket.ticketNumber} raised successfully.`,
             });
 
-            // send email to user
+            // ------------------------
+            // Send confirmation email
+            // ------------------------
 
-            void strapi
-                .plugin("email")
-                .service("email")
-                .send({
-                    to: authUser.email,
-                    subject: `Support Ticket Created - ${ticket.ticketNumber}`,
-                    html: `
-      <div style="font-family: Arial, sans-serif; line-height:1.6">
-        <h2>Support Ticket Created Successfully</h2>
+            try {
+                await axios.post(
+                    "https://api.brevo.com/v3/smtp/email",
+                    {
+                        sender: {
+                            name: "Amozart",
+                            email: process.env.BREVO_FROM_EMAIL,
+                        },
+                        to: [
+                            {
+                                email: authUser.email,
+                            },
+                        ],
+                        subject: `Support Ticket Created - ${ticket.ticketNumber}`,
+                        htmlContent: `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;">
 
-        <p>Hello <strong>${authUser.firstName || authUser.username}</strong>,</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:20px;">
+<tr>
+<td align="center">
 
-        <p>
-          Your support ticket has been created successfully.
-          Our support team will review your request and get back to you as soon as possible.
-        </p>
+<table width="100%" cellpadding="0" cellspacing="0"
+style="max-width:600px;background:#ffffff;border-radius:10px;overflow:hidden;">
 
-        <table style="border-collapse:collapse;margin:20px 0;">
-          <tr>
-            <td style="padding:8px;border:1px solid #ddd;"><strong>Ticket Number</strong></td>
-            <td style="padding:8px;border:1px solid #ddd;">${ticket.ticketNumber}</td>
-          </tr>
+<tr>
+<td align="center" style="background:#6e36be;padding:18px;">
+<img src="https://admin.amozart.com/assets/updateLogo-DoU658F0.png" style="max-width:120px;" />
+<div style="color:#fff;font-size:18px;font-weight:bold;margin-top:10px;">
+Support Ticket Created
+</div>
+</td>
+</tr>
 
-          <tr>
-            <td style="padding:8px;border:1px solid #ddd;"><strong>Title</strong></td>
-            <td style="padding:8px;border:1px solid #ddd;">${ticket.title}</td>
-          </tr>
+<tr>
+<td style="padding:25px;">
 
-          <tr>
-            <td style="padding:8px;border:1px solid #ddd;"><strong>Category</strong></td>
-            <td style="padding:8px;border:1px solid #ddd;">${ticket.category}</td>
-          </tr>
-        </table>
+<p>Hello <strong>${authUser.firstName || authUser.username}</strong>,</p>
 
-        <p>We'll notify you once one of our support team members replies.</p>
+<p>Your support ticket has been created successfully.</p>
 
-        <br>
+<table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid #ddd;">
 
-        <p>Regards,<br><strong>Support Team</strong></p>
-      </div>
-        `,
-                })
-                .catch((error) => {
-                    strapi.log.error(
-                        "Failed to send support ticket email:",
-                        error
-                    );
-                });
+<tr>
+<td><strong>Ticket Number</strong></td>
+<td>${ticket.ticketNumber}</td>
+</tr>
 
+<tr>
+<td><strong>Title</strong></td>
+<td>${ticket.title}</td>
+</tr>
+
+<tr>
+<td><strong>Category</strong></td>
+<td>${ticket.category}</td>
+</tr>
+
+<tr>
+<td><strong>Status</strong></td>
+<td>Open</td>
+</tr>
+
+</table>
+
+<p style="margin-top:20px;">
+Our support team will review your request and respond as soon as possible.
+</p>
+
+</td>
+</tr>
+
+<tr>
+<td align="center"
+style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
+© ${new Date().getFullYear()} Amozart
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+`,
+                    },
+                    {
+                        headers: {
+                            "api-key": process.env.BREVO_API_KEY,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+            } catch (emailError) {
+                strapi.log.error(
+                    `Failed to send ticket creation email for ticket ${ticket.ticketNumber}:`,
+                    emailError.response?.data || emailError.message
+                );
+            }
             // ------------------------
             // Return Ticket
             // ------------------------
@@ -230,12 +263,31 @@ module.exports = () => ({
                 return ctx.unauthorized("Unauthorized.");
             }
 
+            const { search = "" } = ctx.query;
+
+            const filters = {
+                user: authUser.id,
+            };
+
+            if (search.trim()) {
+                filters.$or = [
+                    {
+                        ticketNumber: {
+                            $containsi: search.trim(),
+                        },
+                    },
+                    {
+                        title: {
+                            $containsi: search.trim(),
+                        },
+                    },
+                ];
+            }
+
             const tickets = await strapi.entityService.findMany(
                 "api::ticket-raise.ticket-raise",
                 {
-                    filters: {
-                        user: authUser.id,
-                    },
+                    filters,
 
                     fields: [
                         "ticketNumber",
@@ -247,17 +299,36 @@ module.exports = () => ({
                         "lastActivityAt",
                     ],
 
+                    populate: {
+                        messages: {
+                            fields: [
+                                "senderType",
+                                "isRead",
+                            ],
+                        },
+                    },
+
                     sort: {
                         lastActivityAt: "desc",
                     },
                 }
             );
 
+            const formattedTickets = tickets.map((ticket) => ({
+                ...ticket,
+
+                unreadCount: ticket.messages.filter(
+                    (message) =>
+                        message.senderType === "admin" &&
+                        !message.isRead
+                ).length,
+            }));
+
             return ctx.send({
                 success: true,
                 message: "Tickets fetched successfully.",
-                count: tickets.length,
-                data: tickets,
+                count: formattedTickets.length,
+                data: formattedTickets,
             });
 
         } catch (err) {
@@ -289,7 +360,7 @@ module.exports = () => ({
                         "email",
                     ],
                 },
-
+                attachments: true,
                 assignedTo: {
                     fields: [
                         "id",
@@ -393,12 +464,11 @@ module.exports = () => ({
                     }
                 );
 
-                // Reload updated ticket
                 ticket = await strapi.entityService.findOne(
                     "api::ticket-raise.ticket-raise",
                     ticket.id,
                     {
-                        populate: ticketPopulate
+                        populate: ticketPopulate,
                     }
                 );
             }
@@ -512,6 +582,8 @@ module.exports = () => ({
                         senderType: isSupportUser ? "admin" : "user",
                         message: message?.trim() || "",
                         attachments: attachmentIds,
+                        isRead: !isSupportUser,
+                        publishedAt: new Date()
                     },
                     populate: {
                         sender: {
@@ -533,7 +605,7 @@ module.exports = () => ({
                 lastActivityAt: new Date(),
             };
 
-            if (ticket.status === "open") {
+            if (ticket.status !== "resolved") {
                 ticketUpdate.status = "in_progress";
             }
 

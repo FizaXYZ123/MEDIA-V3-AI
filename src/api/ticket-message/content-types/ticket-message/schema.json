@@ -19,8 +19,7 @@
       "inversedBy": "ticket_messages"
     },
     "message": {
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     "attachments": {
       "type": "media",
@@ -39,15 +38,19 @@
         "user",
         "admin"
       ],
-      "required":true,
-       "default": "user"
+      "required": true,
+      "default": "user"
+    },
+    "isRead": {
+      "type": "boolean",
+      "default": false
     },
     "ticket": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::ticket-raise.ticket-raise",
       "inversedBy": "messages",
-       "required": true
+      "required": true
     }
   }
 }

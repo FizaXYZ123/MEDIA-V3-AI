@@ -47,7 +47,23 @@ module.exports = {
       config: {
         auth: {},
       },
-    }
+    },
+    {
+      method: "POST",
+      path: "/ticket-raises/:id/mark-read",
+      handler: "ticket-raise.markMessagesRead",
+      config: {
+        auth: {},
+      },
+    },
+    {
+      method: "POST",
+      path: "/ticket-raises/:id/feedback",
+      handler: "ticket-raise.submitFeedback",
+      config: {
+        auth:{}
+      },
+    },
 
   ]
 }

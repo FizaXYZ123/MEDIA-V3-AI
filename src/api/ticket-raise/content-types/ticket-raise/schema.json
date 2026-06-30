@@ -21,6 +21,21 @@
       "type": "string",
       "required": true
     },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "attachments": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
     "status": {
       "type": "enumeration",
       "enum": [
@@ -44,7 +59,7 @@
         "other"
       ],
       "default": "general_question",
-      "required":true
+      "required": true
     },
     "user": {
       "type": "relation",
@@ -68,6 +83,21 @@
       "inversedBy": "resolved_tickets"
     },
     "resolvedAt": {
+      "type": "datetime"
+    },
+    "feedbackEmoji": {
+      "type": "enumeration",
+      "enum": [
+        "bad",
+        "okay",
+        "good",
+        "excellent"
+      ]
+    },
+    "feedbackComment": {
+      "type": "text"
+    },
+    "feedbackSubmittedAt": {
       "type": "datetime"
     },
     "lastActivityAt": {

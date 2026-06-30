@@ -2050,11 +2050,12 @@ export interface ApiTicketMessageTicketMessage extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    message: Attribute.Text & Attribute.Required;
+    message: Attribute.Text;
     attachments: Attribute.Media;
     senderType: Attribute.Enumeration<['user', 'admin']> &
       Attribute.Required &
       Attribute.DefaultTo<'user'>;
+    isRead: Attribute.Boolean & Attribute.DefaultTo<false>;
     ticket: Attribute.Relation<
       'api::ticket-message.ticket-message',
       'manyToOne',
@@ -2093,6 +2094,8 @@ export interface ApiTicketRaiseTicketRaise extends Schema.CollectionType {
   attributes: {
     ticketNumber: Attribute.String & Attribute.Required & Attribute.Unique;
     title: Attribute.String & Attribute.Required;
+    description: Attribute.Text & Attribute.Required;
+    attachments: Attribute.Media;
     status: Attribute.Enumeration<['open', 'in_progress', 'resolved']> &
       Attribute.DefaultTo<'open'>;
     category: Attribute.Enumeration<
@@ -2127,6 +2130,9 @@ export interface ApiTicketRaiseTicketRaise extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     resolvedAt: Attribute.DateTime;
+    feedbackEmoji: Attribute.Enumeration<['bad', 'okay', 'good', 'excellent']>;
+    feedbackComment: Attribute.Text;
+    feedbackSubmittedAt: Attribute.DateTime;
     lastActivityAt: Attribute.DateTime;
     messages: Attribute.Relation<
       'api::ticket-raise.ticket-raise',
