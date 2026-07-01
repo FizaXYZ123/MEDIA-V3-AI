@@ -61,7 +61,7 @@ module.exports = {
       path: "/ticket-raises/:id/feedback",
       handler: "ticket-raise.submitFeedback",
       config: {
-        auth:{}
+        auth: {}
       },
     },
 

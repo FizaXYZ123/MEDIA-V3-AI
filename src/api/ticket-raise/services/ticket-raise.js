@@ -411,7 +411,7 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                 }
             );
 
-            const SUPPORT_ROLES = ["Admin", "SubAdmin"];
+            const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
             const isSupportUser = SUPPORT_ROLES.includes(currentUser.role?.name);
 
             // Fetch ticket
@@ -521,7 +521,7 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                 }
             );
 
-            const SUPPORT_ROLES = ["Admin", "SubAdmin"];
+            const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
             const isSupportUser = SUPPORT_ROLES.includes(currentUser.role?.name);
 
             // Fetch ticket
@@ -670,7 +670,7 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                 }
             );
 
-            const SUPPORT_ROLES = ["Admin", "SubAdmin"];
+            const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
 
             if (!SUPPORT_ROLES.includes(currentUser.role?.name)) {
                 return ctx.forbidden(
@@ -793,6 +793,8 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                                 "email",
                             ],
                         },
+
+                        
                     },
                 }
             );
@@ -834,7 +836,7 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                 }
             );
 
-            const SUPPORT_ROLES = ["Admin", "SubAdmin"];
+            const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
 
             if (!SUPPORT_ROLES.includes(currentUser.role?.name)) {
                 return ctx.forbidden("You are not authorized to resolve tickets.");
