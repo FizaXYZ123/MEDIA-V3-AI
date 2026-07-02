@@ -135,7 +135,13 @@ Support Ticket Created
 
 <tr>
 <td><strong>Category</strong></td>
-<td>${ticket.category}</td>
+<td>${ticket.category
+    .split("_")
+    .map(
+        (word) =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+    )
+    .join(" ")}</td>
 </tr>
 
 <tr>
@@ -953,43 +959,115 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                 description: `Resolved support ticket ${ticket.ticketNumber}.`,
             });
 
-            void strapi
-                .plugin("email")
-                .service("email")
-                .send({
-                    to: updatedTicket.user.email,
-                    subject: `Support Ticket Resolved - ${updatedTicket.ticketNumber}`,
-                    html: `
-        <div style="font-family: Arial, sans-serif; line-height:1.6">
-            <h2>Your Support Ticket Has Been Resolved</h2>
+            try {
+                await axios.post(
+                    "https://api.brevo.com/v3/smtp/email",
+                    {
+                        sender: {
+                            name: "Amozart",
+                            email: process.env.BREVO_FROM_EMAIL,
+                        },
+                        to: [
+                            {
+                                email: updatedTicket.user.email,
+                            },
+                        ],
+                        subject: `Support Ticket Resolved - ${updatedTicket.ticketNumber}`,
+                        htmlContent: `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;">
 
-            <p>Hello <strong>${updatedTicket.user.firstName || updatedTicket.user.username}</strong>,</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:20px;">
+<tr>
+<td align="center">
 
-            <p>
-                Your support request has been marked as <strong>Resolved</strong>.
-            </p>
+<table width="100%" cellpadding="0" cellspacing="0"
+style="max-width:600px;background:#ffffff;border-radius:10px;overflow:hidden;">
 
-            <table style="border-collapse:collapse;margin:20px 0;">
-                <tr>
-                    <td style="padding:8px;border:1px solid #ddd;"><strong>Ticket Number</strong></td>
-                    <td style="padding:8px;border:1px solid #ddd;">${updatedTicket.ticketNumber}</td>
-                </tr>
+<tr>
+<td align="center" style="background:#6e36be;padding:18px;">
+<img src="https://admin.amozart.com/assets/updateLogo-DoU658F0.png" style="max-width:120px;" />
+<div style="color:#fff;font-size:18px;font-weight:bold;margin-top:10px;">
+Support Ticket Resolved
+</div>
+</td>
+</tr>
 
-                <tr>
-                    <td style="padding:8px;border:1px solid #ddd;"><strong>Title</strong></td>
-                    <td style="padding:8px;border:1px solid #ddd;">${updatedTicket.title}</td>
-                </tr>
-            </table>
+<tr>
+<td style="padding:25px;">
 
-            <p>If your issue is not fully resolved, you can contact our support team again by creating a new ticket.</p>
+<p>Hello <strong>${updatedTicket.user.firstName || updatedTicket.user.username}</strong>,</p>
 
-            <p>Regards,<br><strong>Support Team</strong></p>
-        </div>
-        `,
-                })
-                .catch((error) => {
-                    strapi.log.error("Failed to send ticket resolved email:", error);
-                });
+<p>Your support ticket has been marked as <strong>Resolved</strong>.</p>
+
+<table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid #ddd;">
+
+<tr>
+<td><strong>Ticket Number</strong></td>
+<td>${updatedTicket.ticketNumber}</td>
+</tr>
+
+<tr>
+<td><strong>Title</strong></td>
+<td>${updatedTicket.title}</td>
+</tr>
+
+<tr>
+<td><strong>Category</strong></td>
+<td>${updatedTicket.category
+    .split("_")
+    .map(
+        (word) =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+    )
+    .join(" ")}</td>
+</tr>
+
+<tr>
+<td><strong>Status</strong></td>
+<td>Resolved</td>
+</tr>
+
+</table>
+
+<p style="margin-top:20px;">
+We're glad we could assist you. If your issue isn't fully resolved or you need further help, you can create a new support ticket anytime.
+</p>
+
+</td>
+</tr>
+
+<tr>
+<td align="center"
+style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
+© ${new Date().getFullYear()} Amozart
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+`,
+                    },
+                    {
+                        headers: {
+                            "api-key": process.env.BREVO_API_KEY,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+            } catch (emailError) {
+                strapi.log.error(
+                    `Failed to send ticket resolved email for ticket ${updatedTicket.ticketNumber}:`,
+                    emailError.response?.data || emailError.message
+                );
+            }
 
             return ctx.send({
                 success: true,

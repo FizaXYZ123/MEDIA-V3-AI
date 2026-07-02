@@ -1,5 +1,7 @@
 "use strict";
 
+const createUserActivityLog = require("../../../utils/user-activity-log");
+
 module.exports = {
 
     async createTicket(ctx) {
@@ -38,98 +40,98 @@ module.exports = {
             .resolve(ctx);
     },
 
-   async markMessagesRead(ctx) {
-    try {
-        const authUser = ctx.state.user;
+    async markMessagesRead(ctx) {
+        try {
+            const authUser = ctx.state.user;
 
-        if (!authUser) {
-            return ctx.unauthorized("Unauthorized.");
-        }
-
-        const { id } = ctx.params;
-
-        const currentUser = await strapi.entityService.findOne(
-            "plugin::users-permissions.user",
-            authUser.id,
-            {
-                populate: {
-                    role: true,
-                },
+            if (!authUser) {
+                return ctx.unauthorized("Unauthorized.");
             }
-        );
 
-        const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
+            const { id } = ctx.params;
 
-        const ticket = await strapi.entityService.findOne(
-            "api::ticket-raise.ticket-raise",
-            id,
-            {
-                populate: {
-                    user: true,
-                    assignedTo: true,
-                    messages: true,
-                },
-            }
-        );
-
-        if (!ticket) {
-            return ctx.notFound("Ticket not found.");
-        }
-
-        let unreadMessages = [];
-
-        // Existing user logic
-        if (ticket.user.id === authUser.id) {
-            unreadMessages = ticket.messages.filter(
-                (message) =>
-                    message.senderType === "admin" &&
-                    !message.isRead
+            const currentUser = await strapi.entityService.findOne(
+                "plugin::users-permissions.user",
+                authUser.id,
+                {
+                    populate: {
+                        role: true,
+                    },
+                }
             );
-        }
-        // Admin logic
-        else if (SUPPORT_ROLES.includes(currentUser.role?.name)) {
-            // Ignore if this admin is not assigned to the ticket
-            if (
-                !ticket.assignedTo ||
-                ticket.assignedTo.id !== authUser.id
-            ) {
-                return ctx.send({
-                    success: true,
-                });
+
+            const SUPPORT_ROLES = ["Authenticated", "SubAdmin"];
+
+            const ticket = await strapi.entityService.findOne(
+                "api::ticket-raise.ticket-raise",
+                id,
+                {
+                    populate: {
+                        user: true,
+                        assignedTo: true,
+                        messages: true,
+                    },
+                }
+            );
+
+            if (!ticket) {
+                return ctx.notFound("Ticket not found.");
             }
 
-            unreadMessages = ticket.messages.filter(
-                (message) =>
-                    message.senderType === "user" &&
-                    !message.isRead
-            );
-        } else {
-            return ctx.forbidden();
-        }
+            let unreadMessages = [];
 
-        await Promise.all(
-            unreadMessages.map((message) =>
-                strapi.entityService.update(
-                    "api::ticket-message.ticket-message",
-                    message.id,
-                    {
-                        data: {
-                            isRead: true,
-                        },
-                    }
+            // Existing user logic
+            if (ticket.user.id === authUser.id) {
+                unreadMessages = ticket.messages.filter(
+                    (message) =>
+                        message.senderType === "admin" &&
+                        !message.isRead
+                );
+            }
+            // Admin logic
+            else if (SUPPORT_ROLES.includes(currentUser.role?.name)) {
+                // Ignore if this admin is not assigned to the ticket
+                if (
+                    !ticket.assignedTo ||
+                    ticket.assignedTo.id !== authUser.id
+                ) {
+                    return ctx.send({
+                        success: true,
+                    });
+                }
+
+                unreadMessages = ticket.messages.filter(
+                    (message) =>
+                        message.senderType === "user" &&
+                        !message.isRead
+                );
+            } else {
+                return ctx.forbidden();
+            }
+
+            await Promise.all(
+                unreadMessages.map((message) =>
+                    strapi.entityService.update(
+                        "api::ticket-message.ticket-message",
+                        message.id,
+                        {
+                            data: {
+                                isRead: true,
+                            },
+                        }
+                    )
                 )
-            )
-        );
+            );
 
-        return ctx.send({
-            success: true,
-        });
-    } catch (error) {
-        strapi.log.error(error);
+            return ctx.send({
+                success: true,
+            });
+        } catch (error) {
+            strapi.log.error(error);
 
-        return ctx.internalServerError();
-    }
-},
+            return ctx.internalServerError();
+        }
+    },
 
     async submitFeedback(ctx) {
         try {
@@ -190,11 +192,17 @@ module.exports = {
                 {
                     data: {
                         feedbackEmoji,
-                      feedbackComment: comment || null,
+                        feedbackComment: comment || null,
                         feedbackSubmittedAt: new Date(),
                     },
                 }
             );
+
+            await createUserActivityLog({
+                userId: authUser.id,
+                action: "ticket_feedback_submitted",
+                description: `Submitted feedback for support ticket ${ticket.ticketNumber}.`,
+            });
 
             return ctx.send({
                 message: "Feedback submitted successfully.",
