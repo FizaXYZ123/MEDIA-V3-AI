@@ -794,16 +794,30 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                             ],
                         },
 
-                        
+                        messages: {
+                            fields: ["id"],
+                            filters: {
+                                senderType: "user",
+                                isRead: false,
+                            },
+                        },
+
+
                     },
                 }
             );
 
+            const data = tickets.map((ticket) => ({
+                ...ticket,
+                unreadCount: ticket.messages?.length || 0,
+                messages: undefined,
+            }));
+
             return ctx.send({
                 success: true,
-                count: tickets.length,
+                count: data.length,
                 message: "Tickets fetched successfully.",
-                data: tickets,
+                data,
             });
 
         } catch (error) {
