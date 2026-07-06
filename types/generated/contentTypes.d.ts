@@ -2261,6 +2261,7 @@ export interface ApiUserPayoutDetailUserPayoutDetail
       'oneToMany',
       'api::payout-request.payout-request'
     >;
+    setDefault: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

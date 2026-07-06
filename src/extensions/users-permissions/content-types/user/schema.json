@@ -223,7 +223,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::ticket-raise.ticket-raise",
-        "mappedBy": "user"
+      "mappedBy": "user"
     },
     "assigned_tickets": {
       "type": "relation",

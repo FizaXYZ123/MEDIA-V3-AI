@@ -15,6 +15,14 @@ module.exports = {
       config: {
         auth: {},
       },
+    },
+    {
+      method: "POST",
+      path: "/user-payout-details/:id/set-default",
+      handler: "user-payout-detail.setDefaultBank",
+      config: {
+        auth: {},
+      },
     }
   ],
 };

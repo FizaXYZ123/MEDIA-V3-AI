@@ -17,13 +17,29 @@ module.exports = createCoreController(
 
                 const body = ctx.request.body.data;
 
+                // Check if the user already has any bank accounts
+                const existingBanks = await strapi.entityService.findMany(
+                    "api::user-payout-detail.user-payout-detail",
+                    {
+                        filters: {
+                            userDetail: user.id,
+                        },
+                        fields: ["id"],
+                        publicationState: "preview",
+                        limit: 1,
+                    }
+                );
+
+                const isFirstBank = existingBanks.length === 0;
+
                 const entry = await strapi.entityService.create(
                     "api::user-payout-detail.user-payout-detail",
                     {
                         data: {
                             ...body,
                             userDetail: user.id,
-                            publishedAt:new Date()
+                            setDefault: isFirstBank,
+                            publishedAt: new Date(),
                         },
                     }
                 );
@@ -131,6 +147,101 @@ module.exports = createCoreController(
                 data: entry,
             };
         },
+
+        async setDefaultBank(ctx) {
+            try {
+                const authUser = ctx.state.user;
+
+                if (!authUser) {
+                    return ctx.unauthorized("Unauthorized.");
+                }
+
+                const { id } = ctx.params;
+
+                const bankAccount = await strapi.entityService.findOne(
+                    "api::user-payout-detail.user-payout-detail",
+                    id,
+                    {
+                        populate: {
+                            userDetail: true,
+                        },
+                    }
+                );
+
+                if (!bankAccount) {
+                    return ctx.notFound("Bank account not found.");
+                }
+
+                if (bankAccount.userDetail?.id !== authUser.id) {
+                    return ctx.forbidden(
+                        "You are not allowed to modify this bank account."
+                    );
+                }
+
+                // Already default
+                if (bankAccount.setDefault) {
+                    return ctx.send({
+                        message: "This bank account is already the default.",
+                        data: bankAccount,
+                    });
+                }
+
+                // Get all bank accounts of the user
+                const userBanks = await strapi.entityService.findMany(
+                    "api::user-payout-detail.user-payout-detail",
+                    {
+                        filters: {
+                            userDetail: authUser.id,
+                        },
+                        fields: ["id"],
+                        publicationState: "preview",
+                        limit: -1,
+                    }
+                );
+
+                // Remove default from all bank accounts
+                await Promise.all(
+                    userBanks.map((bank) =>
+                        strapi.entityService.update(
+                            "api::user-payout-detail.user-payout-detail",
+                            bank.id,
+                            {
+                                data: {
+                                    setDefault: false,
+                                },
+                            }
+                        )
+                    )
+                );
+                // Set selected bank as default
+                const updatedBank = await strapi.entityService.update(
+                    "api::user-payout-detail.user-payout-detail",
+                    id,
+                    {
+                        data: {
+                            setDefault: true,
+                        },
+                        populate: {
+                            userDetail: true,
+                        },
+                    }
+                );
+
+                await createUserActivityLog({
+                    userId: authUser.id,
+                    action: "Default Bank Account Updated",
+                    description: `Changed default payout bank to ${updatedBank.bank_name}`,
+                });
+
+                return ctx.send({
+                    message: "Default bank account updated successfully.",
+                    data: updatedBank,
+                });
+            } catch (error) {
+                console.error(error);
+                return ctx.internalServerError("Something went wrong.");
+            }
+        }
 
     })
 );
