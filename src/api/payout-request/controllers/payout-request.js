@@ -207,37 +207,62 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
     });
   },
 
-  async find(ctx) {
-    try {
-      const { results, pagination } =
-        await strapi.service(
-          "api::payout-request.payout-request"
-        ).find({
-          ...ctx.query,
+ async find(ctx) {
+  try {
+    const authUser = ctx.state.user;
 
-          populate: {
-            user_payout_detail: true,
-            reviewedBy: true,
-            sort: {
-              createdAt: "desc",
-            },
-          }
-
-        });
-
-      return {
-        data: results,
-        meta: {
-          pagination,
-        },
-      };
-    } catch (error) {
-      strapi.log.error(error);
-      return ctx.internalServerError(
-        "Failed to fetch payout requests"
-      );
+    if (!authUser) {
+      return ctx.unauthorized("Unauthorized.");
     }
-  },
+
+    const currentUser = await strapi.entityService.findOne(
+      "plugin::users-permissions.user",
+      authUser.id,
+      {
+        populate: {
+          role: true,
+        },
+      }
+    );
+
+    const role = currentUser?.role?.name;
+
+    const filters = { ...(ctx.query.filters || {}) };
+
+    // Client can only see their own payout requests
+    if (role === "Client") {
+      filters.user = authUser.id;
+    }
+    // Authenticated & SubAdmin can see all requests
+    else if (!["Authenticated", "SubAdmin"].includes(role)) {
+      return ctx.forbidden("You are not authorized to access payout requests.");
+    }
+
+    const { results, pagination } = await strapi
+      .service("api::payout-request.payout-request")
+      .find({
+        ...ctx.query,
+        filters,
+        populate: {
+          user_payout_detail: true,
+          reviewedBy: true,
+        },
+        sort: {
+          createdAt: "desc",
+        },
+      });
+
+    return {
+      data: results,
+      meta: {
+        pagination,
+      },
+    };
+  } catch (error) {
+    strapi.log.error(error);
+    return ctx.internalServerError("Failed to fetch payout requests");
+  }
+},
 
   /**
    * Admin approves a pending request.
