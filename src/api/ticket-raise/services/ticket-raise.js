@@ -588,7 +588,7 @@ style="padding:15px;background:#fafafa;font-size:12px;color:#888;">
                         senderType: isSupportUser ? "admin" : "user",
                         message: message?.trim() || "",
                         attachments: attachmentIds,
-                        isRead: !isSupportUser,
+                       isRead: false,
                         publishedAt: new Date()
                     },
                     populate: {

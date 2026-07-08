@@ -14,14 +14,12 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-08T04:56:57.150Z"
+
+    "x-generation-date": "2026-07-06T09:15:38.312Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
-    "plugins": [
-      "upload",
-      "users-permissions"
-    ]
+    "plugins": ["upload", "users-permissions"]
   },
   "servers": [
     {
@@ -49,9 +47,7 @@
     "schemas": {
       "Error": {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "data": {
             "nullable": true,
@@ -88,15 +84,10 @@
       },
       "ActivityLogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "action",
-              "module"
-            ],
+            "required": ["action", "module"],
             "type": "object",
             "properties": {
               "users_permissions_user": {
@@ -180,10 +171,7 @@
       },
       "ActivityLog": {
         "type": "object",
-        "required": [
-          "action",
-          "module"
-        ],
+        "required": ["action", "module"],
         "properties": {
           "users_permissions_user": {
             "type": "object",
@@ -668,11 +656,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -1070,10 +1054,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -3022,11 +3003,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -4160,10 +4137,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -4947,9 +4921,7 @@
       },
       "AdminFeeHistoryRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -5515,11 +5487,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -5917,10 +5885,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -7869,11 +7834,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -9007,10 +8968,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -9776,14 +9734,10 @@
       },
       "ArtistDetailRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "artistName"
-            ],
+            "required": ["artistName"],
             "type": "object",
             "properties": {
               "artistName": {
@@ -9910,9 +9864,7 @@
       },
       "ArtistDetail": {
         "type": "object",
-        "required": [
-          "artistName"
-        ],
+        "required": ["artistName"],
         "properties": {
           "artistName": {
             "type": "string"
@@ -10427,11 +10379,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -10829,10 +10777,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -12781,11 +12726,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -13919,10 +13860,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -14899,9 +14837,7 @@
       },
       "AuditLog": {
         "type": "object",
-        "required": [
-          "action"
-        ],
+        "required": ["action"],
         "properties": {
           "actor": {
             "type": "object",
@@ -15386,11 +15322,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -15788,10 +15720,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -17740,11 +17669,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -18878,10 +18803,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -19674,9 +19596,7 @@
       },
       "BillingCardRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "required": [
@@ -20278,11 +20198,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -20680,10 +20596,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -22632,11 +22545,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -23770,10 +23679,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -24539,9 +24445,7 @@
       },
       "BlogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -25344,9 +25248,7 @@
       },
       "CsvReportLogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -25922,11 +25824,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -26324,10 +26222,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -28276,11 +28171,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -29414,10 +29305,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -30183,36 +30071,22 @@
       },
       "DistributeDraftRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "ReleaseType",
-              "ReleaseTitle"
-            ],
+            "required": ["ReleaseType", "ReleaseTitle"],
             "type": "object",
             "properties": {
               "ReleaseType": {
                 "type": "string",
-                "enum": [
-                  "Single",
-                  "EP",
-                  "Album"
-                ]
+                "enum": ["Single", "EP", "Album"]
               },
               "ReleaseTitle": {
                 "type": "string"
               },
               "Version": {
                 "type": "string",
-                "enum": [
-                  "Remaster",
-                  "Live",
-                  "Remix",
-                  "Other"
-                ]
+                "enum": ["Remaster", "Live", "Remix", "Other"]
               },
               "LanguageOfTheTitles": {
                 "type": "string"
@@ -30239,10 +30113,7 @@
               },
               "Priority": {
                 "type": "string",
-                "enum": [
-                  "Standard",
-                  "Priority"
-                ]
+                "enum": ["Standard", "Priority"]
               },
               "TimeZoneOfReference": {
                 "type": "string"
@@ -30264,12 +30135,7 @@
               },
               "PriceCategory": {
                 "type": "string",
-                "enum": [
-                  "Budget",
-                  "Mid",
-                  "Full",
-                  "Premium"
-                ]
+                "enum": ["Budget", "Mid", "Full", "Premium"]
               },
               "TrackList": {
                 "type": "array",
@@ -30364,30 +30230,18 @@
       },
       "DistributeDraft": {
         "type": "object",
-        "required": [
-          "ReleaseType",
-          "ReleaseTitle"
-        ],
+        "required": ["ReleaseType", "ReleaseTitle"],
         "properties": {
           "ReleaseType": {
             "type": "string",
-            "enum": [
-              "Single",
-              "EP",
-              "Album"
-            ]
+            "enum": ["Single", "EP", "Album"]
           },
           "ReleaseTitle": {
             "type": "string"
           },
           "Version": {
             "type": "string",
-            "enum": [
-              "Remaster",
-              "Live",
-              "Remix",
-              "Other"
-            ]
+            "enum": ["Remaster", "Live", "Remix", "Other"]
           },
           "LanguageOfTheTitles": {
             "type": "string"
@@ -31025,10 +30879,7 @@
           },
           "Priority": {
             "type": "string",
-            "enum": [
-              "Standard",
-              "Priority"
-            ]
+            "enum": ["Standard", "Priority"]
           },
           "TimeZoneOfReference": {
             "type": "string"
@@ -31050,12 +30901,7 @@
           },
           "PriceCategory": {
             "type": "string",
-            "enum": [
-              "Budget",
-              "Mid",
-              "Full",
-              "Premium"
-            ]
+            "enum": ["Budget", "Mid", "Full", "Premium"]
           },
           "TrackList": {
             "type": "object",
@@ -31085,11 +30931,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -31256,10 +31098,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -35354,15 +35193,10 @@
       },
       "DistributeTrackRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "TrackName",
-              "TrackUpload"
-            ],
+            "required": ["TrackName", "TrackUpload"],
             "type": "object",
             "properties": {
               "DraftRelease": {
@@ -35519,10 +35353,7 @@
       },
       "DistributeTrack": {
         "type": "object",
-        "required": [
-          "TrackName",
-          "TrackUpload"
-        ],
+        "required": ["TrackName", "TrackUpload"],
         "properties": {
           "DraftRelease": {
             "type": "object",
@@ -35538,23 +35369,14 @@
                     "properties": {
                       "ReleaseType": {
                         "type": "string",
-                        "enum": [
-                          "Single",
-                          "EP",
-                          "Album"
-                        ]
+                        "enum": ["Single", "EP", "Album"]
                       },
                       "ReleaseTitle": {
                         "type": "string"
                       },
                       "Version": {
                         "type": "string",
-                        "enum": [
-                          "Remaster",
-                          "Live",
-                          "Remix",
-                          "Other"
-                        ]
+                        "enum": ["Remaster", "Live", "Remix", "Other"]
                       },
                       "LanguageOfTheTitles": {
                         "type": "string"
@@ -36192,10 +36014,7 @@
                       },
                       "Priority": {
                         "type": "string",
-                        "enum": [
-                          "Standard",
-                          "Priority"
-                        ]
+                        "enum": ["Standard", "Priority"]
                       },
                       "TimeZoneOfReference": {
                         "type": "string"
@@ -36217,12 +36036,7 @@
                       },
                       "PriceCategory": {
                         "type": "string",
-                        "enum": [
-                          "Budget",
-                          "Mid",
-                          "Full",
-                          "Premium"
-                        ]
+                        "enum": ["Budget", "Mid", "Full", "Premium"]
                       },
                       "TrackList": {
                         "type": "object",
@@ -40505,9 +40319,7 @@
       },
       "EnterpriseCommissionRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -41073,11 +40885,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -41475,10 +41283,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -43427,11 +43232,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -44565,10 +44366,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -45334,9 +45132,7 @@
       },
       "FaqRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -45730,9 +45526,7 @@
       },
       "ForgetPasswordRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -46094,9 +45888,7 @@
       },
       "FormSubmissionRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -46516,9 +46308,7 @@
       },
       "GlobalSettingRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -46928,9 +46718,7 @@
       },
       "ImportedReportRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -47364,9 +47152,7 @@
       },
       "InvoiceRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "required": [
@@ -47484,12 +47270,7 @@
       },
       "Invoice": {
         "type": "object",
-        "required": [
-          "month",
-          "year",
-          "totalEarnings",
-          "finalAmountPayable"
-        ],
+        "required": ["month", "year", "totalEarnings", "finalAmountPayable"],
         "properties": {
           "month": {
             "type": "integer"
@@ -48018,11 +47799,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -48420,10 +48197,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -50372,11 +50146,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -51510,10 +51280,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -52279,9 +52046,7 @@
       },
       "LabelFeeHistoryRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -52847,11 +52612,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -53249,10 +53010,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -55201,11 +54959,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -56339,10 +56093,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -57108,9 +56859,7 @@
       },
       "NotificationRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -57677,11 +57426,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -58079,10 +57824,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -60031,11 +59773,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -61169,10 +60907,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -61941,9 +61676,7 @@
       },
       "PaymentLogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -61985,12 +61718,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "success",
-                  "failed",
-                  "processing",
-                  "locked"
-                ]
+                "enum": ["success", "failed", "processing", "locked"]
               },
               "processing": {
                 "type": "boolean"
@@ -62569,11 +62297,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -62971,10 +62695,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -64923,11 +64644,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -66061,10 +65778,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -66790,12 +66504,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "success",
-              "failed",
-              "processing",
-              "locked"
-            ]
+            "enum": ["success", "failed", "processing", "locked"]
           },
           "processing": {
             "type": "boolean"
@@ -66918,14 +66627,10 @@
       },
       "PayoutRequestRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "amount"
-            ],
+            "required": ["amount"],
             "type": "object",
             "properties": {
               "user": {
@@ -66948,12 +66653,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "processing",
-                  "completed",
-                  "rejected"
-                ]
+                "enum": ["pending", "processing", "completed", "rejected"]
               },
               "reviewedBy": {
                 "oneOf": [
@@ -67044,9 +66744,7 @@
       },
       "PayoutRequest": {
         "type": "object",
-        "required": [
-          "amount"
-        ],
+        "required": ["amount"],
         "properties": {
           "user": {
             "type": "object",
@@ -67531,11 +67229,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -67933,10 +67627,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -69885,11 +69576,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -71023,10 +70710,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -71729,12 +71413,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "processing",
-              "completed",
-              "rejected"
-            ]
+            "enum": ["pending", "processing", "completed", "rejected"]
           },
           "reviewedBy": {
             "type": "object",
@@ -71857,9 +71536,7 @@
       },
       "PhoneCounterRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -72255,14 +71932,10 @@
       },
       "PlanRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "name"
-            ],
+            "required": ["name"],
             "type": "object",
             "properties": {
               "name": {
@@ -72282,9 +71955,7 @@
               },
               "billingCycle": {
                 "type": "string",
-                "enum": [
-                  "yearly"
-                ]
+                "enum": ["yearly"]
               },
               "defaultCommission": {
                 "type": "number",
@@ -72385,9 +72056,7 @@
       },
       "Plan": {
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "properties": {
           "name": {
             "type": "string"
@@ -72406,9 +72075,7 @@
           },
           "billingCycle": {
             "type": "string",
-            "enum": [
-              "yearly"
-            ]
+            "enum": ["yearly"]
           },
           "defaultCommission": {
             "type": "number",
@@ -76290,10 +75957,7 @@
                                                   },
                                                   "senderType": {
                                                     "type": "string",
-                                                    "enum": [
-                                                      "user",
-                                                      "admin"
-                                                    ]
+                                                    "enum": ["user", "admin"]
                                                   },
                                                   "isRead": {
                                                     "type": "boolean"
@@ -76997,18 +76661,11 @@
                         },
                         "status": {
                           "type": "string",
-                          "enum": [
-                            "active",
-                            "expired",
-                            "canceled"
-                          ]
+                          "enum": ["active", "expired", "canceled"]
                         },
                         "subscriptionType": {
                           "type": "string",
-                          "enum": [
-                            "subscription",
-                            "upgrade"
-                          ]
+                          "enum": ["subscription", "upgrade"]
                         },
                         "upgradedAt": {
                           "type": "string",
@@ -77196,36 +76853,22 @@
       },
       "PublishDistributeRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "ReleaseType",
-              "ReleaseTitle"
-            ],
+            "required": ["ReleaseType", "ReleaseTitle"],
             "type": "object",
             "properties": {
               "ReleaseType": {
                 "type": "string",
-                "enum": [
-                  "Single",
-                  "EP",
-                  "Album"
-                ]
+                "enum": ["Single", "EP", "Album"]
               },
               "ReleaseTitle": {
                 "type": "string"
               },
               "Version": {
                 "type": "string",
-                "enum": [
-                  "Remaster",
-                  "Live",
-                  "Remix",
-                  "Other"
-                ]
+                "enum": ["Remaster", "Live", "Remix", "Other"]
               },
               "LanguageOfTheTitles": {
                 "type": "string"
@@ -77252,10 +76895,7 @@
               },
               "Priority": {
                 "type": "string",
-                "enum": [
-                  "Standard",
-                  "Priority"
-                ]
+                "enum": ["Standard", "Priority"]
               },
               "TimeZoneOfReference": {
                 "type": "string"
@@ -77277,12 +76917,7 @@
               },
               "PriceCategory": {
                 "type": "string",
-                "enum": [
-                  "Budget",
-                  "Mid",
-                  "Full",
-                  "Premium"
-                ]
+                "enum": ["Budget", "Mid", "Full", "Premium"]
               },
               "TrackList": {
                 "type": "array",
@@ -77323,11 +76958,7 @@
               },
               "Status": {
                 "type": "string",
-                "enum": [
-                  "In-Progress",
-                  "Completed",
-                  "Cancelled"
-                ]
+                "enum": ["In-Progress", "Completed", "Cancelled"]
               },
               "published_track_update_logs": {
                 "type": "array",
@@ -77409,30 +77040,18 @@
       },
       "PublishDistribute": {
         "type": "object",
-        "required": [
-          "ReleaseType",
-          "ReleaseTitle"
-        ],
+        "required": ["ReleaseType", "ReleaseTitle"],
         "properties": {
           "ReleaseType": {
             "type": "string",
-            "enum": [
-              "Single",
-              "EP",
-              "Album"
-            ]
+            "enum": ["Single", "EP", "Album"]
           },
           "ReleaseTitle": {
             "type": "string"
           },
           "Version": {
             "type": "string",
-            "enum": [
-              "Remaster",
-              "Live",
-              "Remix",
-              "Other"
-            ]
+            "enum": ["Remaster", "Live", "Remix", "Other"]
           },
           "LanguageOfTheTitles": {
             "type": "string"
@@ -78070,10 +77689,7 @@
           },
           "Priority": {
             "type": "string",
-            "enum": [
-              "Standard",
-              "Priority"
-            ]
+            "enum": ["Standard", "Priority"]
           },
           "TimeZoneOfReference": {
             "type": "string"
@@ -78095,12 +77711,7 @@
           },
           "PriceCategory": {
             "type": "string",
-            "enum": [
-              "Budget",
-              "Mid",
-              "Full",
-              "Premium"
-            ]
+            "enum": ["Budget", "Mid", "Full", "Premium"]
           },
           "TrackList": {
             "type": "object",
@@ -78130,11 +77741,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -78301,10 +77908,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -82325,11 +81929,7 @@
           },
           "Status": {
             "type": "string",
-            "enum": [
-              "In-Progress",
-              "Completed",
-              "Cancelled"
-            ]
+            "enum": ["In-Progress", "Completed", "Cancelled"]
           },
           "published_track_update_logs": {
             "type": "object",
@@ -82443,9 +82043,7 @@
       },
       "PublishedTrackUpdateLogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -82541,23 +82139,14 @@
                     "properties": {
                       "ReleaseType": {
                         "type": "string",
-                        "enum": [
-                          "Single",
-                          "EP",
-                          "Album"
-                        ]
+                        "enum": ["Single", "EP", "Album"]
                       },
                       "ReleaseTitle": {
                         "type": "string"
                       },
                       "Version": {
                         "type": "string",
-                        "enum": [
-                          "Remaster",
-                          "Live",
-                          "Remix",
-                          "Other"
-                        ]
+                        "enum": ["Remaster", "Live", "Remix", "Other"]
                       },
                       "LanguageOfTheTitles": {
                         "type": "string"
@@ -83195,10 +82784,7 @@
                       },
                       "Priority": {
                         "type": "string",
-                        "enum": [
-                          "Standard",
-                          "Priority"
-                        ]
+                        "enum": ["Standard", "Priority"]
                       },
                       "TimeZoneOfReference": {
                         "type": "string"
@@ -83220,12 +82806,7 @@
                       },
                       "PriceCategory": {
                         "type": "string",
-                        "enum": [
-                          "Budget",
-                          "Mid",
-                          "Full",
-                          "Premium"
-                        ]
+                        "enum": ["Budget", "Mid", "Full", "Premium"]
                       },
                       "TrackList": {
                         "type": "object",
@@ -87101,11 +86682,7 @@
                       },
                       "Status": {
                         "type": "string",
-                        "enum": [
-                          "In-Progress",
-                          "Completed",
-                          "Cancelled"
-                        ]
+                        "enum": ["In-Progress", "Completed", "Cancelled"]
                       },
                       "published_track_update_logs": {
                         "type": "object",
@@ -87284,9 +86861,7 @@
       },
       "RoyaltyReportRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -87571,11 +87146,7 @@
                                 "properties": {
                                   "ReleaseType": {
                                     "type": "string",
-                                    "enum": [
-                                      "Single",
-                                      "EP",
-                                      "Album"
-                                    ]
+                                    "enum": ["Single", "EP", "Album"]
                                   },
                                   "ReleaseTitle": {
                                     "type": "string"
@@ -88225,10 +87796,7 @@
                                   },
                                   "Priority": {
                                     "type": "string",
-                                    "enum": [
-                                      "Standard",
-                                      "Priority"
-                                    ]
+                                    "enum": ["Standard", "Priority"]
                                   },
                                   "TimeZoneOfReference": {
                                     "type": "string"
@@ -88250,12 +87818,7 @@
                                   },
                                   "PriceCategory": {
                                     "type": "string",
-                                    "enum": [
-                                      "Budget",
-                                      "Mid",
-                                      "Full",
-                                      "Premium"
-                                    ]
+                                    "enum": ["Budget", "Mid", "Full", "Premium"]
                                   },
                                   "TrackList": {
                                     "type": "object",
@@ -92289,9 +91852,7 @@
       },
       "SubscribeEmailRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -92681,15 +92242,10 @@
       },
       "TicketMessageRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "senderType",
-              "ticket"
-            ],
+            "required": ["senderType", "ticket"],
             "type": "object",
             "properties": {
               "sender": {
@@ -92722,10 +92278,7 @@
               },
               "senderType": {
                 "type": "string",
-                "enum": [
-                  "user",
-                  "admin"
-                ]
+                "enum": ["user", "admin"]
               },
               "isRead": {
                 "type": "boolean"
@@ -92793,10 +92346,7 @@
       },
       "TicketMessage": {
         "type": "object",
-        "required": [
-          "senderType",
-          "ticket"
-        ],
+        "required": ["senderType", "ticket"],
         "properties": {
           "sender": {
             "type": "object",
@@ -93281,11 +92831,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -93683,10 +93229,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -95635,11 +95178,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -96773,10 +96312,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -97617,10 +97153,7 @@
           },
           "senderType": {
             "type": "string",
-            "enum": [
-              "user",
-              "admin"
-            ]
+            "enum": ["user", "admin"]
           },
           "isRead": {
             "type": "boolean"
@@ -97714,17 +97247,10 @@
       },
       "TicketRaiseRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "ticketNumber",
-              "title",
-              "description",
-              "category"
-            ],
+            "required": ["ticketNumber", "title", "description", "category"],
             "type": "object",
             "properties": {
               "ticketNumber": {
@@ -97752,11 +97278,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "open",
-                  "in_progress",
-                  "resolved"
-                ]
+                "enum": ["open", "in_progress", "resolved"]
               },
               "category": {
                 "type": "string",
@@ -97815,12 +97337,7 @@
               },
               "feedbackEmoji": {
                 "type": "string",
-                "enum": [
-                  "bad",
-                  "okay",
-                  "good",
-                  "excellent"
-                ]
+                "enum": ["bad", "okay", "good", "excellent"]
               },
               "feedbackComment": {
                 "type": "string"
@@ -97853,12 +97370,7 @@
       },
       "TicketRaise": {
         "type": "object",
-        "required": [
-          "ticketNumber",
-          "title",
-          "description",
-          "category"
-        ],
+        "required": ["ticketNumber", "title", "description", "category"],
         "properties": {
           "ticketNumber": {
             "type": "string"
@@ -98496,11 +98008,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "open",
-              "in_progress",
-              "resolved"
-            ]
+            "enum": ["open", "in_progress", "resolved"]
           },
           "category": {
             "type": "string",
@@ -98747,11 +98255,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -98918,10 +98422,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -100870,11 +100371,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -102008,10 +101505,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -102749,12 +102243,7 @@
           },
           "feedbackEmoji": {
             "type": "string",
-            "enum": [
-              "bad",
-              "okay",
-              "good",
-              "excellent"
-            ]
+            "enum": ["bad", "okay", "good", "excellent"]
           },
           "feedbackComment": {
             "type": "string"
@@ -102859,9 +102348,7 @@
       },
       "UserActivityLogRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -103425,11 +102912,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -103827,10 +103310,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -105779,11 +105259,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -106917,10 +106393,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -107686,14 +107159,10 @@
       },
       "UserLabelRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
-            "required": [
-              "label"
-            ],
+            "required": ["label"],
             "type": "object",
             "properties": {
               "label": {
@@ -107719,9 +107188,7 @@
       },
       "UserLabel": {
         "type": "object",
-        "required": [
-          "label"
-        ],
+        "required": ["label"],
         "properties": {
           "label": {
             "type": "string"
@@ -108212,11 +107679,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -108614,10 +108077,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -110566,11 +110026,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -111704,10 +111160,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -112469,9 +111922,7 @@
       },
       "UserPayoutDetailRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "required": [
@@ -113098,11 +112549,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -113500,10 +112947,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -115452,11 +114896,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -116590,10 +116030,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -117382,9 +116819,7 @@
       },
       "UserSubscriptionRequest": {
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "properties": {
           "data": {
             "type": "object",
@@ -117410,18 +116845,11 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "active",
-                  "expired",
-                  "canceled"
-                ]
+                "enum": ["active", "expired", "canceled"]
               },
               "subscriptionType": {
                 "type": "string",
-                "enum": [
-                  "subscription",
-                  "upgrade"
-                ]
+                "enum": ["subscription", "upgrade"]
               },
               "upgradedAt": {
                 "type": "string",
@@ -117988,11 +117416,7 @@
                                   "properties": {
                                     "ReleaseType": {
                                       "type": "string",
-                                      "enum": [
-                                        "Single",
-                                        "EP",
-                                        "Album"
-                                      ]
+                                      "enum": ["Single", "EP", "Album"]
                                     },
                                     "ReleaseTitle": {
                                       "type": "string"
@@ -118390,10 +117814,7 @@
                                     },
                                     "Priority": {
                                       "type": "string",
-                                      "enum": [
-                                        "Standard",
-                                        "Priority"
-                                      ]
+                                      "enum": ["Standard", "Priority"]
                                     },
                                     "TimeZoneOfReference": {
                                       "type": "string"
@@ -120342,11 +119763,7 @@
                       },
                       "user_type": {
                         "type": "string",
-                        "enum": [
-                          "basic",
-                          "subscribed",
-                          "enterprise"
-                        ]
+                        "enum": ["basic", "subscribed", "enterprise"]
                       },
                       "label_fee_histories": {
                         "type": "object",
@@ -121480,10 +120897,7 @@
                                     },
                                     "senderType": {
                                       "type": "string",
-                                      "enum": [
-                                        "user",
-                                        "admin"
-                                      ]
+                                      "enum": ["user", "admin"]
                                     },
                                     "isRead": {
                                       "type": "boolean"
@@ -122187,18 +121601,11 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "expired",
-              "canceled"
-            ]
+            "enum": ["active", "expired", "canceled"]
           },
           "subscriptionType": {
             "type": "string",
-            "enum": [
-              "subscription",
-              "upgrade"
-            ]
+            "enum": ["subscription", "upgrade"]
           },
           "upgradedAt": {
             "type": "string",
@@ -122583,9 +121990,7 @@
             }
           }
         },
-        "tags": [
-          "Activity-log"
-        ],
+        "tags": ["Activity-log"],
         "parameters": [
           {
             "name": "sort",
@@ -122755,9 +122160,7 @@
             }
           }
         },
-        "tags": [
-          "Activity-log"
-        ],
+        "tags": ["Activity-log"],
         "parameters": [],
         "operationId": "post/activity-logs",
         "requestBody": {
@@ -122836,9 +122239,7 @@
             }
           }
         },
-        "tags": [
-          "Activity-log"
-        ],
+        "tags": ["Activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -122916,9 +122317,7 @@
             }
           }
         },
-        "tags": [
-          "Activity-log"
-        ],
+        "tags": ["Activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -123007,9 +122406,7 @@
             }
           }
         },
-        "tags": [
-          "Activity-log"
-        ],
+        "tags": ["Activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -123089,9 +122486,7 @@
             }
           }
         },
-        "tags": [
-          "Admin-fee-history"
-        ],
+        "tags": ["Admin-fee-history"],
         "parameters": [
           {
             "name": "sort",
@@ -123261,9 +122656,7 @@
             }
           }
         },
-        "tags": [
-          "Admin-fee-history"
-        ],
+        "tags": ["Admin-fee-history"],
         "parameters": [],
         "operationId": "post/admin-fee-histories",
         "requestBody": {
@@ -123342,9 +122735,7 @@
             }
           }
         },
-        "tags": [
-          "Admin-fee-history"
-        ],
+        "tags": ["Admin-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -123422,9 +122813,7 @@
             }
           }
         },
-        "tags": [
-          "Admin-fee-history"
-        ],
+        "tags": ["Admin-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -123513,9 +122902,7 @@
             }
           }
         },
-        "tags": [
-          "Admin-fee-history"
-        ],
+        "tags": ["Admin-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -123595,9 +122982,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [],
         "operationId": "get/artist-details/my"
       }
@@ -123666,9 +123051,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [],
         "operationId": "post/artist-details",
         "requestBody": {
@@ -123745,9 +123128,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [
           {
             "name": "sort",
@@ -123919,9 +123300,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [
           {
             "name": "id",
@@ -123999,9 +123378,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [
           {
             "name": "id",
@@ -124090,9 +123467,7 @@
             }
           }
         },
-        "tags": [
-          "Artist-detail"
-        ],
+        "tags": ["Artist-detail"],
         "parameters": [
           {
             "name": "id",
@@ -124172,9 +123547,7 @@
             }
           }
         },
-        "tags": [
-          "Audit-log"
-        ],
+        "tags": ["Audit-log"],
         "parameters": [
           {
             "name": "sort",
@@ -124346,9 +123719,7 @@
             }
           }
         },
-        "tags": [
-          "Billing-card"
-        ],
+        "tags": ["Billing-card"],
         "parameters": [
           {
             "name": "sort",
@@ -124518,9 +123889,7 @@
             }
           }
         },
-        "tags": [
-          "Billing-card"
-        ],
+        "tags": ["Billing-card"],
         "parameters": [],
         "operationId": "post/billing-cards",
         "requestBody": {
@@ -124599,9 +123968,7 @@
             }
           }
         },
-        "tags": [
-          "Billing-card"
-        ],
+        "tags": ["Billing-card"],
         "parameters": [
           {
             "name": "id",
@@ -124679,9 +124046,7 @@
             }
           }
         },
-        "tags": [
-          "Billing-card"
-        ],
+        "tags": ["Billing-card"],
         "parameters": [
           {
             "name": "id",
@@ -124770,9 +124135,7 @@
             }
           }
         },
-        "tags": [
-          "Billing-card"
-        ],
+        "tags": ["Billing-card"],
         "parameters": [
           {
             "name": "id",
@@ -124852,9 +124215,7 @@
             }
           }
         },
-        "tags": [
-          "Blog"
-        ],
+        "tags": ["Blog"],
         "parameters": [
           {
             "name": "sort",
@@ -125024,9 +124385,7 @@
             }
           }
         },
-        "tags": [
-          "Blog"
-        ],
+        "tags": ["Blog"],
         "parameters": [],
         "operationId": "post/blogs",
         "requestBody": {
@@ -125105,9 +124464,7 @@
             }
           }
         },
-        "tags": [
-          "Blog"
-        ],
+        "tags": ["Blog"],
         "parameters": [
           {
             "name": "id",
@@ -125185,9 +124542,7 @@
             }
           }
         },
-        "tags": [
-          "Blog"
-        ],
+        "tags": ["Blog"],
         "parameters": [
           {
             "name": "id",
@@ -125276,9 +124631,7 @@
             }
           }
         },
-        "tags": [
-          "Blog"
-        ],
+        "tags": ["Blog"],
         "parameters": [
           {
             "name": "id",
@@ -125358,9 +124711,7 @@
             }
           }
         },
-        "tags": [
-          "Csv-report-log"
-        ],
+        "tags": ["Csv-report-log"],
         "parameters": [
           {
             "name": "sort",
@@ -125530,9 +124881,7 @@
             }
           }
         },
-        "tags": [
-          "Csv-report-log"
-        ],
+        "tags": ["Csv-report-log"],
         "parameters": [],
         "operationId": "post/csv-report-logs",
         "requestBody": {
@@ -125611,9 +124960,7 @@
             }
           }
         },
-        "tags": [
-          "Csv-report-log"
-        ],
+        "tags": ["Csv-report-log"],
         "parameters": [
           {
             "name": "id",
@@ -125691,9 +125038,7 @@
             }
           }
         },
-        "tags": [
-          "Csv-report-log"
-        ],
+        "tags": ["Csv-report-log"],
         "parameters": [
           {
             "name": "id",
@@ -125782,9 +125127,7 @@
             }
           }
         },
-        "tags": [
-          "Csv-report-log"
-        ],
+        "tags": ["Csv-report-log"],
         "parameters": [
           {
             "name": "id",
@@ -125864,9 +125207,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "sort",
@@ -126036,9 +125377,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [],
         "operationId": "post/distribute-drafts",
         "requestBody": {
@@ -126117,9 +125456,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126197,9 +125534,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126288,9 +125623,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126370,9 +125703,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [],
         "operationId": "post/distribute-drafts/bulk-delete",
         "requestBody": {
@@ -126451,9 +125782,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [],
         "operationId": "post/distribute-drafts/step1",
         "requestBody": {
@@ -126532,9 +125861,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126624,9 +125951,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126716,9 +126041,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126808,9 +126131,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -126900,9 +126221,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [],
         "operationId": "post/distribute-drafts/create-from-tracks",
         "requestBody": {
@@ -126981,9 +126300,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [],
         "operationId": "get/distribute-drafts/state/drafts"
       }
@@ -127052,9 +126369,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "userId",
@@ -127134,9 +126449,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "userId",
@@ -127216,9 +126529,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-draft"
-        ],
+        "tags": ["Distribute-draft"],
         "parameters": [
           {
             "name": "id",
@@ -127308,9 +126619,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "sort",
@@ -127480,9 +126789,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [],
         "operationId": "post/distribute-tracks",
         "requestBody": {
@@ -127561,9 +126868,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "id",
@@ -127641,9 +126946,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "id",
@@ -127732,9 +127035,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "id",
@@ -127814,9 +127115,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "draftId",
@@ -127896,9 +127195,7 @@
             }
           }
         },
-        "tags": [
-          "Distribute-track"
-        ],
+        "tags": ["Distribute-track"],
         "parameters": [
           {
             "name": "pubId",
@@ -127978,9 +127275,7 @@
             }
           }
         },
-        "tags": [
-          "Enterprise-commission"
-        ],
+        "tags": ["Enterprise-commission"],
         "parameters": [
           {
             "name": "sort",
@@ -128150,9 +127445,7 @@
             }
           }
         },
-        "tags": [
-          "Enterprise-commission"
-        ],
+        "tags": ["Enterprise-commission"],
         "parameters": [],
         "operationId": "post/enterprise-commissions",
         "requestBody": {
@@ -128231,9 +127524,7 @@
             }
           }
         },
-        "tags": [
-          "Enterprise-commission"
-        ],
+        "tags": ["Enterprise-commission"],
         "parameters": [
           {
             "name": "id",
@@ -128311,9 +127602,7 @@
             }
           }
         },
-        "tags": [
-          "Enterprise-commission"
-        ],
+        "tags": ["Enterprise-commission"],
         "parameters": [
           {
             "name": "id",
@@ -128402,9 +127691,7 @@
             }
           }
         },
-        "tags": [
-          "Enterprise-commission"
-        ],
+        "tags": ["Enterprise-commission"],
         "parameters": [
           {
             "name": "id",
@@ -128484,9 +127771,7 @@
             }
           }
         },
-        "tags": [
-          "Faq"
-        ],
+        "tags": ["Faq"],
         "parameters": [
           {
             "name": "sort",
@@ -128656,9 +127941,7 @@
             }
           }
         },
-        "tags": [
-          "Faq"
-        ],
+        "tags": ["Faq"],
         "parameters": [],
         "operationId": "post/faqs",
         "requestBody": {
@@ -128737,9 +128020,7 @@
             }
           }
         },
-        "tags": [
-          "Faq"
-        ],
+        "tags": ["Faq"],
         "parameters": [
           {
             "name": "id",
@@ -128817,9 +128098,7 @@
             }
           }
         },
-        "tags": [
-          "Faq"
-        ],
+        "tags": ["Faq"],
         "parameters": [
           {
             "name": "id",
@@ -128908,9 +128187,7 @@
             }
           }
         },
-        "tags": [
-          "Faq"
-        ],
+        "tags": ["Faq"],
         "parameters": [
           {
             "name": "id",
@@ -128990,9 +128267,7 @@
             }
           }
         },
-        "tags": [
-          "Form-submission"
-        ],
+        "tags": ["Form-submission"],
         "parameters": [
           {
             "name": "sort",
@@ -129162,9 +128437,7 @@
             }
           }
         },
-        "tags": [
-          "Form-submission"
-        ],
+        "tags": ["Form-submission"],
         "parameters": [],
         "operationId": "post/form-submissions",
         "requestBody": {
@@ -129243,9 +128516,7 @@
             }
           }
         },
-        "tags": [
-          "Form-submission"
-        ],
+        "tags": ["Form-submission"],
         "parameters": [
           {
             "name": "id",
@@ -129323,9 +128594,7 @@
             }
           }
         },
-        "tags": [
-          "Form-submission"
-        ],
+        "tags": ["Form-submission"],
         "parameters": [
           {
             "name": "id",
@@ -129414,9 +128683,7 @@
             }
           }
         },
-        "tags": [
-          "Form-submission"
-        ],
+        "tags": ["Form-submission"],
         "parameters": [
           {
             "name": "id",
@@ -129496,9 +128763,7 @@
             }
           }
         },
-        "tags": [
-          "Global-setting"
-        ],
+        "tags": ["Global-setting"],
         "parameters": [
           {
             "name": "sort",
@@ -129668,9 +128933,7 @@
             }
           }
         },
-        "tags": [
-          "Global-setting"
-        ],
+        "tags": ["Global-setting"],
         "parameters": [],
         "operationId": "put/global-setting",
         "requestBody": {
@@ -129748,9 +129011,7 @@
             }
           }
         },
-        "tags": [
-          "Global-setting"
-        ],
+        "tags": ["Global-setting"],
         "parameters": [],
         "operationId": "delete/global-setting"
       }
@@ -129819,9 +129080,7 @@
             }
           }
         },
-        "tags": [
-          "Imported-report"
-        ],
+        "tags": ["Imported-report"],
         "parameters": [
           {
             "name": "sort",
@@ -129991,9 +129250,7 @@
             }
           }
         },
-        "tags": [
-          "Imported-report"
-        ],
+        "tags": ["Imported-report"],
         "parameters": [],
         "operationId": "post/imported-reports",
         "requestBody": {
@@ -130072,9 +129329,7 @@
             }
           }
         },
-        "tags": [
-          "Imported-report"
-        ],
+        "tags": ["Imported-report"],
         "parameters": [
           {
             "name": "id",
@@ -130152,9 +129407,7 @@
             }
           }
         },
-        "tags": [
-          "Imported-report"
-        ],
+        "tags": ["Imported-report"],
         "parameters": [
           {
             "name": "id",
@@ -130243,9 +129496,7 @@
             }
           }
         },
-        "tags": [
-          "Imported-report"
-        ],
+        "tags": ["Imported-report"],
         "parameters": [
           {
             "name": "id",
@@ -130325,9 +129576,7 @@
             }
           }
         },
-        "tags": [
-          "Invoice"
-        ],
+        "tags": ["Invoice"],
         "parameters": [
           {
             "name": "sort",
@@ -130497,9 +129746,7 @@
             }
           }
         },
-        "tags": [
-          "Invoice"
-        ],
+        "tags": ["Invoice"],
         "parameters": [],
         "operationId": "post/invoices",
         "requestBody": {
@@ -130578,9 +129825,7 @@
             }
           }
         },
-        "tags": [
-          "Invoice"
-        ],
+        "tags": ["Invoice"],
         "parameters": [
           {
             "name": "id",
@@ -130658,9 +129903,7 @@
             }
           }
         },
-        "tags": [
-          "Invoice"
-        ],
+        "tags": ["Invoice"],
         "parameters": [
           {
             "name": "id",
@@ -130749,9 +129992,7 @@
             }
           }
         },
-        "tags": [
-          "Invoice"
-        ],
+        "tags": ["Invoice"],
         "parameters": [
           {
             "name": "id",
@@ -130831,9 +130072,7 @@
             }
           }
         },
-        "tags": [
-          "Label-fee-history"
-        ],
+        "tags": ["Label-fee-history"],
         "parameters": [
           {
             "name": "sort",
@@ -131003,9 +130242,7 @@
             }
           }
         },
-        "tags": [
-          "Label-fee-history"
-        ],
+        "tags": ["Label-fee-history"],
         "parameters": [],
         "operationId": "post/label-fee-histories",
         "requestBody": {
@@ -131084,9 +130321,7 @@
             }
           }
         },
-        "tags": [
-          "Label-fee-history"
-        ],
+        "tags": ["Label-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -131164,9 +130399,7 @@
             }
           }
         },
-        "tags": [
-          "Label-fee-history"
-        ],
+        "tags": ["Label-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -131255,9 +130488,7 @@
             }
           }
         },
-        "tags": [
-          "Label-fee-history"
-        ],
+        "tags": ["Label-fee-history"],
         "parameters": [
           {
             "name": "id",
@@ -131337,9 +130568,7 @@
             }
           }
         },
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "sort",
@@ -131509,9 +130738,7 @@
             }
           }
         },
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [],
         "operationId": "post/notifications",
         "requestBody": {
@@ -131590,9 +130817,7 @@
             }
           }
         },
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "id",
@@ -131670,9 +130895,7 @@
             }
           }
         },
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "id",
@@ -131761,9 +130984,7 @@
             }
           }
         },
-        "tags": [
-          "Notification"
-        ],
+        "tags": ["Notification"],
         "parameters": [
           {
             "name": "id",
@@ -131843,9 +131064,7 @@
             }
           }
         },
-        "tags": [
-          "Payment-log"
-        ],
+        "tags": ["Payment-log"],
         "parameters": [
           {
             "name": "sort",
@@ -132015,9 +131234,7 @@
             }
           }
         },
-        "tags": [
-          "Payment-log"
-        ],
+        "tags": ["Payment-log"],
         "parameters": [],
         "operationId": "post/payment-logs",
         "requestBody": {
@@ -132096,9 +131313,7 @@
             }
           }
         },
-        "tags": [
-          "Payment-log"
-        ],
+        "tags": ["Payment-log"],
         "parameters": [
           {
             "name": "id",
@@ -132176,9 +131391,7 @@
             }
           }
         },
-        "tags": [
-          "Payment-log"
-        ],
+        "tags": ["Payment-log"],
         "parameters": [
           {
             "name": "id",
@@ -132267,9 +131480,7 @@
             }
           }
         },
-        "tags": [
-          "Payment-log"
-        ],
+        "tags": ["Payment-log"],
         "parameters": [
           {
             "name": "id",
@@ -132349,9 +131560,7 @@
             }
           }
         },
-        "tags": [
-          "Payout-request"
-        ],
+        "tags": ["Payout-request"],
         "parameters": [
           {
             "name": "sort",
@@ -132521,9 +131730,7 @@
             }
           }
         },
-        "tags": [
-          "Payout-request"
-        ],
+        "tags": ["Payout-request"],
         "parameters": [],
         "operationId": "post/payout-requests",
         "requestBody": {
@@ -132602,9 +131809,7 @@
             }
           }
         },
-        "tags": [
-          "Payout-request"
-        ],
+        "tags": ["Payout-request"],
         "parameters": [
           {
             "name": "id",
@@ -132682,9 +131887,7 @@
             }
           }
         },
-        "tags": [
-          "Payout-request"
-        ],
+        "tags": ["Payout-request"],
         "parameters": [
           {
             "name": "id",
@@ -132773,9 +131976,7 @@
             }
           }
         },
-        "tags": [
-          "Payout-request"
-        ],
+        "tags": ["Payout-request"],
         "parameters": [
           {
             "name": "id",
@@ -132855,9 +132056,7 @@
             }
           }
         },
-        "tags": [
-          "Phone-counter"
-        ],
+        "tags": ["Phone-counter"],
         "parameters": [
           {
             "name": "sort",
@@ -133027,9 +132226,7 @@
             }
           }
         },
-        "tags": [
-          "Phone-counter"
-        ],
+        "tags": ["Phone-counter"],
         "parameters": [],
         "operationId": "post/phone-counters",
         "requestBody": {
@@ -133108,9 +132305,7 @@
             }
           }
         },
-        "tags": [
-          "Phone-counter"
-        ],
+        "tags": ["Phone-counter"],
         "parameters": [
           {
             "name": "id",
@@ -133188,9 +132383,7 @@
             }
           }
         },
-        "tags": [
-          "Phone-counter"
-        ],
+        "tags": ["Phone-counter"],
         "parameters": [
           {
             "name": "id",
@@ -133279,9 +132472,7 @@
             }
           }
         },
-        "tags": [
-          "Phone-counter"
-        ],
+        "tags": ["Phone-counter"],
         "parameters": [
           {
             "name": "id",
@@ -133361,9 +132552,7 @@
             }
           }
         },
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "parameters": [
           {
             "name": "sort",
@@ -133533,9 +132722,7 @@
             }
           }
         },
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "parameters": [],
         "operationId": "post/plans",
         "requestBody": {
@@ -133614,9 +132801,7 @@
             }
           }
         },
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "parameters": [
           {
             "name": "id",
@@ -133694,9 +132879,7 @@
             }
           }
         },
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "parameters": [
           {
             "name": "id",
@@ -133785,9 +132968,7 @@
             }
           }
         },
-        "tags": [
-          "Plan"
-        ],
+        "tags": ["Plan"],
         "parameters": [
           {
             "name": "id",
@@ -133867,9 +133048,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "sort",
@@ -134039,9 +133218,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [],
         "operationId": "post/publish-distributes",
         "requestBody": {
@@ -134120,9 +133297,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "id",
@@ -134200,9 +133375,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "id",
@@ -134291,9 +133464,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "id",
@@ -134373,9 +133544,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [],
         "operationId": "get/publish-distributes/priorities"
       }
@@ -134444,9 +133613,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "id",
@@ -134536,9 +133703,7 @@
             }
           }
         },
-        "tags": [
-          "Publish-distribute"
-        ],
+        "tags": ["Publish-distribute"],
         "parameters": [
           {
             "name": "id",
@@ -134628,9 +133793,7 @@
             }
           }
         },
-        "tags": [
-          "Published-track-update-log"
-        ],
+        "tags": ["Published-track-update-log"],
         "parameters": [
           {
             "name": "sort",
@@ -134800,9 +133963,7 @@
             }
           }
         },
-        "tags": [
-          "Published-track-update-log"
-        ],
+        "tags": ["Published-track-update-log"],
         "parameters": [],
         "operationId": "post/published-track-update-logs",
         "requestBody": {
@@ -134881,9 +134042,7 @@
             }
           }
         },
-        "tags": [
-          "Published-track-update-log"
-        ],
+        "tags": ["Published-track-update-log"],
         "parameters": [
           {
             "name": "id",
@@ -134961,9 +134120,7 @@
             }
           }
         },
-        "tags": [
-          "Published-track-update-log"
-        ],
+        "tags": ["Published-track-update-log"],
         "parameters": [
           {
             "name": "id",
@@ -135052,9 +134209,7 @@
             }
           }
         },
-        "tags": [
-          "Published-track-update-log"
-        ],
+        "tags": ["Published-track-update-log"],
         "parameters": [
           {
             "name": "id",
@@ -135134,9 +134289,7 @@
             }
           }
         },
-        "tags": [
-          "Royalty-report"
-        ],
+        "tags": ["Royalty-report"],
         "parameters": [
           {
             "name": "sort",
@@ -135306,9 +134459,7 @@
             }
           }
         },
-        "tags": [
-          "Royalty-report"
-        ],
+        "tags": ["Royalty-report"],
         "parameters": [],
         "operationId": "post/royalty-reports",
         "requestBody": {
@@ -135387,9 +134538,7 @@
             }
           }
         },
-        "tags": [
-          "Royalty-report"
-        ],
+        "tags": ["Royalty-report"],
         "parameters": [
           {
             "name": "id",
@@ -135467,9 +134616,7 @@
             }
           }
         },
-        "tags": [
-          "Royalty-report"
-        ],
+        "tags": ["Royalty-report"],
         "parameters": [
           {
             "name": "id",
@@ -135558,9 +134705,7 @@
             }
           }
         },
-        "tags": [
-          "Royalty-report"
-        ],
+        "tags": ["Royalty-report"],
         "parameters": [
           {
             "name": "id",
@@ -135640,9 +134785,7 @@
             }
           }
         },
-        "tags": [
-          "Subscribe-email"
-        ],
+        "tags": ["Subscribe-email"],
         "parameters": [
           {
             "name": "sort",
@@ -135812,9 +134955,7 @@
             }
           }
         },
-        "tags": [
-          "Subscribe-email"
-        ],
+        "tags": ["Subscribe-email"],
         "parameters": [],
         "operationId": "post/subscribe-emails",
         "requestBody": {
@@ -135893,9 +135034,7 @@
             }
           }
         },
-        "tags": [
-          "Subscribe-email"
-        ],
+        "tags": ["Subscribe-email"],
         "parameters": [
           {
             "name": "id",
@@ -135973,9 +135112,7 @@
             }
           }
         },
-        "tags": [
-          "Subscribe-email"
-        ],
+        "tags": ["Subscribe-email"],
         "parameters": [
           {
             "name": "id",
@@ -136064,9 +135201,7 @@
             }
           }
         },
-        "tags": [
-          "Subscribe-email"
-        ],
+        "tags": ["Subscribe-email"],
         "parameters": [
           {
             "name": "id",
@@ -136146,9 +135281,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-message"
-        ],
+        "tags": ["Ticket-message"],
         "parameters": [
           {
             "name": "sort",
@@ -136318,9 +135451,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-message"
-        ],
+        "tags": ["Ticket-message"],
         "parameters": [],
         "operationId": "post/ticket-messages",
         "requestBody": {
@@ -136399,9 +135530,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-message"
-        ],
+        "tags": ["Ticket-message"],
         "parameters": [
           {
             "name": "id",
@@ -136479,9 +135608,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-message"
-        ],
+        "tags": ["Ticket-message"],
         "parameters": [
           {
             "name": "id",
@@ -136570,9 +135697,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-message"
-        ],
+        "tags": ["Ticket-message"],
         "parameters": [
           {
             "name": "id",
@@ -136652,9 +135777,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-raise"
-        ],
+        "tags": ["Ticket-raise"],
         "parameters": [
           {
             "name": "id",
@@ -136744,9 +135867,7 @@
             }
           }
         },
-        "tags": [
-          "Ticket-raise"
-        ],
+        "tags": ["Ticket-raise"],
         "parameters": [
           {
             "name": "id",
@@ -136836,9 +135957,7 @@
             }
           }
         },
-        "tags": [
-          "User-activity-log"
-        ],
+        "tags": ["User-activity-log"],
         "parameters": [
           {
             "name": "sort",
@@ -137008,9 +136127,7 @@
             }
           }
         },
-        "tags": [
-          "User-activity-log"
-        ],
+        "tags": ["User-activity-log"],
         "parameters": [],
         "operationId": "post/user-activity-logs",
         "requestBody": {
@@ -137089,9 +136206,7 @@
             }
           }
         },
-        "tags": [
-          "User-activity-log"
-        ],
+        "tags": ["User-activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -137169,9 +136284,7 @@
             }
           }
         },
-        "tags": [
-          "User-activity-log"
-        ],
+        "tags": ["User-activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -137260,9 +136373,7 @@
             }
           }
         },
-        "tags": [
-          "User-activity-log"
-        ],
+        "tags": ["User-activity-log"],
         "parameters": [
           {
             "name": "id",
@@ -137342,9 +136453,7 @@
             }
           }
         },
-        "tags": [
-          "User-payout-detail"
-        ],
+        "tags": ["User-payout-detail"],
         "parameters": [
           {
             "name": "sort",
@@ -137514,9 +136623,7 @@
             }
           }
         },
-        "tags": [
-          "User-payout-detail"
-        ],
+        "tags": ["User-payout-detail"],
         "parameters": [],
         "operationId": "post/user-payout-details",
         "requestBody": {
@@ -137595,9 +136702,7 @@
             }
           }
         },
-        "tags": [
-          "User-payout-detail"
-        ],
+        "tags": ["User-payout-detail"],
         "parameters": [
           {
             "name": "id",
@@ -137675,9 +136780,7 @@
             }
           }
         },
-        "tags": [
-          "User-payout-detail"
-        ],
+        "tags": ["User-payout-detail"],
         "parameters": [
           {
             "name": "id",
@@ -137766,9 +136869,7 @@
             }
           }
         },
-        "tags": [
-          "User-payout-detail"
-        ],
+        "tags": ["User-payout-detail"],
         "parameters": [
           {
             "name": "id",
@@ -137848,9 +136949,7 @@
             }
           }
         },
-        "tags": [
-          "User-subscription"
-        ],
+        "tags": ["User-subscription"],
         "parameters": [
           {
             "name": "sort",
@@ -138020,9 +137119,7 @@
             }
           }
         },
-        "tags": [
-          "User-subscription"
-        ],
+        "tags": ["User-subscription"],
         "parameters": [],
         "operationId": "post/user-subscriptions",
         "requestBody": {
@@ -138101,9 +137198,7 @@
             }
           }
         },
-        "tags": [
-          "User-subscription"
-        ],
+        "tags": ["User-subscription"],
         "parameters": [
           {
             "name": "id",
@@ -138181,9 +137276,7 @@
             }
           }
         },
-        "tags": [
-          "User-subscription"
-        ],
+        "tags": ["User-subscription"],
         "parameters": [
           {
             "name": "id",
@@ -138272,9 +137365,7 @@
             }
           }
         },
-        "tags": [
-          "User-subscription"
-        ],
+        "tags": ["User-subscription"],
         "parameters": [
           {
             "name": "id",
@@ -138309,18 +137400,14 @@
           }
         },
         "summary": "",
-        "tags": [
-          "Upload - File"
-        ],
+        "tags": ["Upload - File"],
         "requestBody": {
           "description": "Upload files",
           "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "files"
-                ],
+                "required": ["files"],
                 "type": "object",
                 "properties": {
                   "path": {
@@ -138383,9 +137470,7 @@
           }
         },
         "summary": "",
-        "tags": [
-          "Upload - File"
-        ],
+        "tags": ["Upload - File"],
         "requestBody": {
           "description": "Upload files",
           "required": true,
@@ -138421,9 +137506,7 @@
     },
     "/upload/files": {
       "get": {
-        "tags": [
-          "Upload - File"
-        ],
+        "tags": ["Upload - File"],
         "responses": {
           "200": {
             "description": "Get a list of files",
@@ -138455,9 +137538,7 @@
             }
           }
         ],
-        "tags": [
-          "Upload - File"
-        ],
+        "tags": ["Upload - File"],
         "responses": {
           "200": {
             "description": "Get a specific file",
@@ -138484,9 +137565,7 @@
             }
           }
         ],
-        "tags": [
-          "Upload - File"
-        ],
+        "tags": ["Upload - File"],
         "responses": {
           "200": {
             "description": "Delete a file",
@@ -138515,9 +137594,7 @@
             }
           }
         ],
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Login with a provider",
         "description": "Redirects to provider login before being redirect to /auth/{provider}/callback",
         "responses": {
@@ -138539,9 +137616,7 @@
     },
     "/auth/local": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Local login",
         "description": "Returns a jwt token and user info",
         "requestBody": {
@@ -138592,9 +137667,7 @@
     },
     "/auth/local/register": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Register a user",
         "description": "Returns a jwt token and user info",
         "requestBody": {
@@ -138649,9 +137722,7 @@
     },
     "/auth/{provider}/callback": {
       "get": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Default Callback from provider auth",
         "parameters": [
           {
@@ -138690,9 +137761,7 @@
     },
     "/auth/forgot-password": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Send rest password email",
         "requestBody": {
           "required": true,
@@ -138722,9 +137791,7 @@
                   "properties": {
                     "ok": {
                       "type": "string",
-                      "enum": [
-                        true
-                      ]
+                      "enum": [true]
                     }
                   }
                 }
@@ -138746,9 +137813,7 @@
     },
     "/auth/reset-password": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Rest user password",
         "requestBody": {
           "required": true,
@@ -138802,9 +137867,7 @@
     },
     "/auth/change-password": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Update user's own password",
         "requestBody": {
           "required": true,
@@ -138858,9 +137921,7 @@
     },
     "/auth/email-confirmation": {
       "get": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Confirm user email",
         "parameters": [
           {
@@ -138891,9 +137952,7 @@
     },
     "/auth/send-email-confirmation": {
       "post": {
-        "tags": [
-          "Users-Permissions - Auth"
-        ],
+        "tags": ["Users-Permissions - Auth"],
         "summary": "Send confirmation email",
         "requestBody": {
           "required": true,
@@ -138923,9 +137982,7 @@
                     },
                     "sent": {
                       "type": "string",
-                      "enum": [
-                        true
-                      ]
+                      "enum": [true]
                     }
                   }
                 }
@@ -138947,9 +138004,7 @@
     },
     "/users-permissions/permissions": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get default generated permissions",
         "responses": {
           "200": {
@@ -139018,9 +138073,7 @@
     },
     "/users-permissions/roles": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "List roles",
         "responses": {
           "200": {
@@ -139079,9 +138132,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Create a role",
         "requestBody": {
           "$ref": "#/components/requestBodies/Users-Permissions-RoleRequest"
@@ -139096,9 +138147,7 @@
                   "properties": {
                     "ok": {
                       "type": "string",
-                      "enum": [
-                        true
-                      ]
+                      "enum": [true]
                     }
                   }
                 }
@@ -139120,9 +138169,7 @@
     },
     "/users-permissions/roles/{id}": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get a role",
         "parameters": [
           {
@@ -139187,9 +138234,7 @@
     },
     "/users-permissions/roles/{role}": {
       "put": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Update a role",
         "parameters": [
           {
@@ -139215,9 +138260,7 @@
                   "properties": {
                     "ok": {
                       "type": "string",
-                      "enum": [
-                        true
-                      ]
+                      "enum": [true]
                     }
                   }
                 }
@@ -139237,9 +138280,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Delete a role",
         "parameters": [
           {
@@ -139262,9 +138303,7 @@
                   "properties": {
                     "ok": {
                       "type": "string",
-                      "enum": [
-                        true
-                      ]
+                      "enum": [true]
                     }
                   }
                 }
@@ -139286,9 +138325,7 @@
     },
     "/users": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get list of users",
         "responses": {
           "200": {
@@ -139329,9 +138366,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Create a user",
         "requestBody": {
           "required": true,
@@ -139339,11 +138374,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "username",
-                  "email",
-                  "password"
-                ],
+                "required": ["username", "email", "password"],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -139420,9 +138451,7 @@
     },
     "/users/{id}": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get a user",
         "parameters": [
           {
@@ -139469,9 +138498,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Update a user",
         "parameters": [
           {
@@ -139490,11 +138517,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "username",
-                  "email",
-                  "password"
-                ],
+                "required": ["username", "email", "password"],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -139569,9 +138592,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Delete a user",
         "parameters": [
           {
@@ -139624,9 +138645,7 @@
     },
     "/users/me": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get authenticated user info",
         "responses": {
           "200": {
@@ -139664,9 +138683,7 @@
     },
     "/users/count": {
       "get": {
-        "tags": [
-          "Users-Permissions - Users & Roles"
-        ],
+        "tags": ["Users-Permissions - Users & Roles"],
         "summary": "Get user count",
         "responses": {
           "200": {
