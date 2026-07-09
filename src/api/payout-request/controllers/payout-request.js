@@ -207,7 +207,7 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
     });
   },
 
- async find(ctx) {
+async find(ctx) {
   try {
     const authUser = ctx.state.user;
 
@@ -233,9 +233,21 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
     if (role === "Client") {
       filters.user = authUser.id;
     }
-    // Authenticated & SubAdmin can see all requests
+    // Only Authenticated & SubAdmin can see all requests
     else if (!["Authenticated", "SubAdmin"].includes(role)) {
-      return ctx.forbidden("You are not authorized to access payout requests.");
+      return ctx.forbidden(
+        "You are not authorized to access payout requests."
+      );
+    }
+
+    // Optional status filter
+    const { status } = ctx.query;
+
+    if (
+      status &&
+      ["pending", "processing", "completed", "rejected"].includes(status)
+    ) {
+      filters.status = status;
     }
 
     const { results, pagination } = await strapi
@@ -245,6 +257,14 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
         filters,
         populate: {
           user_payout_detail: true,
+          user: {
+            fields: [
+              "username",
+              "email",
+              "firstName",
+              "lastName",
+            ],
+          },
           reviewedBy: true,
         },
         sort: {
@@ -263,7 +283,6 @@ module.exports = createCoreController(PAYOUT_API, ({ strapi }) => ({
     return ctx.internalServerError("Failed to fetch payout requests");
   }
 },
-
   /**
    * Admin approves a pending request.
    * Funds were already moved to pending on creation; approval just transitions status.
