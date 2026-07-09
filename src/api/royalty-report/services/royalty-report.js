@@ -231,7 +231,7 @@ function normalizeHeader(header) {
 
 module.exports = () => ({
 
-  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {},  user = null) {
+  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {}, user = null) {
 
     const rows = [];
 
@@ -739,7 +739,7 @@ module.exports = () => ({
 
     originalTotal = toDecimal(originalTotal);
 
-   const importedReport = await strapi.db
+    const importedReport = await strapi.db
       .query("api::imported-report.imported-report")
       .create({
         data: {
@@ -769,15 +769,15 @@ module.exports = () => ({
     });
 
     if (user) {
-  await createActivityLog({
-    user,
-    action: "Import",
-    module: "Royalty Report",
-    entityId: importedReport.id,
-    entityName: filename,
-    description: `Imported royalty report ${filename}. Inserted: ${inserted}, Skipped: ${skipped}`,
-  });
-}
+      await createActivityLog({
+        user,
+        action: "Import",
+        module: "Royalty Report",
+        entityId: importedReport.id,
+        entityName: filename,
+        description: `Imported royalty report ${filename}. Inserted: ${inserted}, Skipped: ${skipped}`,
+      });
+    }
 
     /* 🔥 GENERATE INVOICES */
     await generateInvoices(reportStartDate, reportEndDate);
@@ -791,11 +791,13 @@ module.exports = () => ({
 
 /* ================= INVOICE GENERATION ================= */
 async function generateInvoices(reportStartDate, reportEndDate) {
+
   console.log("========== GENERATE INVOICES START ==========");
   console.log({
     reportStartDate,
     reportEndDate,
   });
+
   try {
 
     const end = new Date(reportEndDate);
@@ -805,31 +807,66 @@ async function generateInvoices(reportStartDate, reportEndDate) {
     const currentDate = new Date();
 
     /* ================= FETCH ROYALTIES ================= */
-    const royalties = await strapi.entityService.findMany(
-      "api::royalty-report.royalty-report",
-      {
-        filters: {
-          StartDate: reportStartDate,
-          EndDate: reportEndDate,
-        },
-        populate: {
-          distribute_track: {
-            populate: {
-              PublishedRelease: {
-                populate: {
-                  UserDetail: true,
+    // const royalties = await strapi.entityService.findMany(
+    //   "api::royalty-report.royalty-report",
+    //   {
+    //     filters: {
+    //       StartDate: reportStartDate,
+    //       EndDate: reportEndDate,
+    //     },
+    //     populate: {
+    //       distribute_track: {
+    //         populate: {
+    //           PublishedRelease: {
+    //             populate: {
+    //               UserDetail: true,
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   }
+    // );
+
+    // console.log("📦 Royalties fetched:", royalties.length);
+
+    let royalties;
+
+    try {
+      console.log("Fetching royalties...");
+
+      royalties = await strapi.entityService.findMany(
+        "api::royalty-report.royalty-report",
+        {
+          filters: {
+            StartDate: reportStartDate,
+            EndDate: reportEndDate,
+          },
+          populate: {
+            distribute_track: {
+              populate: {
+                PublishedRelease: {
+                  populate: {
+                    UserDetail: true,
+                  },
                 },
               },
             },
           },
-        },
-      }
-    );
+        }
+      );
 
-    // console.log("📦 Royalties fetched:", royalties.length);
+      console.log("Royalties fetched:", royalties.length);
+
+    } catch (err) {
+      console.error("FAILED TO FETCH ROYALTIES");
+      console.error(err);
+      console.error(err.stack);
+      throw err;
+    }
 
     if (!royalties.length) {
-      // console.log("⚠️ No royalties found");
+      console.log("⚠️ No royalties found");
       return;
     }
 
@@ -842,7 +879,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         r.distribute_track?.PublishedRelease?.UserDetail;
 
       if (!user) {
-        // console.log("❌ No user found for royalty:", r.id);
+        console.log("❌ No user found for royalty:", r.id);
         continue;
       }
 
@@ -863,15 +900,15 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       userMap[user.id].royalties.push(r);
     }
 
-    // console.log("👥 Total users grouped:", Object.keys(userMap).length);
+    console.log("👥 Total users grouped:", Object.keys(userMap).length);
 
     /* ================= PROCESS USERS ================= */
     for (const userId in userMap) {
 
       const { user, totalEarnings } = userMap[userId];
 
-      // console.log("➡️ Processing user:", user.id);
-      // console.log("💰 Total Earnings:", totalEarnings);
+      console.log("➡️ Processing user:", user.id);
+      console.log("💰 Total Earnings:", totalEarnings);
 
       if (!totalEarnings || totalEarnings <= 0) {
         // console.log("⚠️ Skipping (no earnings):", user.id);
@@ -891,7 +928,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       );
 
       if (existing.length > 0) {
-        // console.log("⚠️ Invoice already exists:", user.id);
+        console.log("⚠️ Invoice already exists:", user.id);
         continue;
       }
 
@@ -1148,11 +1185,11 @@ async function generateInvoices(reportStartDate, reportEndDate) {
       const enterpriseCommission =
         enterpriseCommissionData[0]?.commission_percentage ?? 0;
 
-      // console.log("💸 Fees:", {
-      //   userId: user.id,
-      //   labelFee,
-      //   adminFee,
-      // });
+      console.log("💸 Fees:", {
+        userId: user.id,
+        labelFee,
+        adminFee,
+      });
 
       /* ================= CALCULATION ================= */
 
@@ -1318,7 +1355,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         }
       );
 
-      // console.log("✅ Invoice created:", user.id);
+      console.log("✅ Invoice created:", user.id);
 
       /* ================= 🔔 SEND NOTIFICATION ================= */
       try {
@@ -1331,10 +1368,10 @@ async function generateInvoices(reportStartDate, reportEndDate) {
           },
         });
 
-        // console.log("🔔 Notification created for user:", user.id);
+        console.log("🔔 Notification created for user:", user.id);
 
       } catch (err) {
-        // console.error("❌ Notification error:", err);
+        console.error("❌ Notification error:", err);
       }
 
       console.log("✅ Invoice created:", user.id);
