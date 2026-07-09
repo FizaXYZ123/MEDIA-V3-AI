@@ -790,23 +790,23 @@ module.exports = () => ({
     console.log("Matching via db.query:", matching.length);
 
     const royalties = await strapi.entityService.findMany(
-  "api::royalty-report.royalty-report",
-  {
-    populate: {
-      distribute_track: {
+      "api::royalty-report.royalty-report",
+      {
         populate: {
-          PublishedRelease: {
+          distribute_track: {
             populate: {
-              UserDetail: true,
+              PublishedRelease: {
+                populate: {
+                  UserDetail: true,
+                },
+              },
             },
           },
         },
-      },
-    },
-  }
-);
+      }
+    );
 
-console.log("Royalties without filter:", royalties.length);
+    console.log("Royalties without filter:", royalties.length);
 
     if (user) {
       await createActivityLog({
@@ -840,47 +840,44 @@ async function generateInvoices(reportStartDate, reportEndDate) {
 
   try {
 
-    const end = new Date(reportEndDate);
+    const start = new Date(reportStartDate);
 
-    const month = end.getMonth() + 1;
-    const year = end.getFullYear();
+    const month = start.getMonth() + 1;
+    const year = start.getFullYear();
     const currentDate = new Date();
 
     /* ================= FETCH ROYALTIES ================= */
-    // const royalties = await strapi.entityService.findMany(
-    //   "api::royalty-report.royalty-report",
-    //   {
-    //     filters: {
-    //       StartDate: reportStartDate,
-    //       EndDate: reportEndDate,
-    //     },
-    //     populate: {
-    //       distribute_track: {
-    //         populate: {
-    //           PublishedRelease: {
-    //             populate: {
-    //               UserDetail: true,
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   }
-    // );
-
-    // console.log("📦 Royalties fetched:", royalties.length);
 
     let royalties;
 
     try {
       console.log("Fetching royalties...");
 
+      const start = new Date(reportStartDate);
+
+      const month = start.getMonth() + 1;
+      const year = start.getFullYear();
+
+      const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
+
+      const nextMonth =
+        month === 12
+          ? `${year + 1}-01-01`
+          : `${year}-${String(month + 1).padStart(2, "0")}-01`;
+
+      console.log({
+        monthStart,
+        nextMonth,
+      });
+
       royalties = await strapi.entityService.findMany(
         "api::royalty-report.royalty-report",
         {
           filters: {
-            StartDate: reportStartDate,
-            EndDate: reportEndDate,
+            StartDate: {
+              $gte: monthStart,
+              $lt: nextMonth,
+            },
           },
           populate: {
             distribute_track: {
@@ -974,7 +971,7 @@ async function generateInvoices(reportStartDate, reportEndDate) {
 
       /* ================= DETERMINE PLAN FOR ROYALTY MONTH ================= */
 
-      const reportMonthDate = new Date(reportEndDate);
+      const reportMonthDate = new Date(reportStartDate);
 
       const reportMonth = reportMonthDate.getMonth();
       const reportYear = reportMonthDate.getFullYear();
