@@ -9,9 +9,9 @@ module.exports = ({ env }) => ({
             secretAccessKey: env("AWS_ACCESS_SECRET"),
           },
           region: env("AWS_REGION"),
-        },
-        params: {
-          Bucket: env("AWS_BUCKET"),
+          params: {
+            Bucket: env("AWS_BUCKET"),
+          },
         },
       },
     },
@@ -30,4 +30,20 @@ module.exports = ({ env }) => ({
       },
     },
   },
+  "users-permissions": {
+    config: {
+      register: {
+        allowedFields: [
+          "firstName", "lastName", "phoneNumber", "distribute_drafts", "artist_details",
+          "Profile_image", "currency", "dob", "notifications", "user_type",
+          "label_fee_histories", "admin_fee_histories", "invoices", "published_track_update_logs",
+          "platformFeeOverride", "commissionOverride", "availableBalance", "pendingBalance",
+          "paymentMethod", "payout_requests", "user_subscriptions", "payment_logs",
+          "enterprise_commissions", "csv_report_logs", "billing_cards", "user_payout_details",
+          "ticket_messages", "activity_logs", "user_activity_logs", "ticket_raises",
+          "assigned_tickets", "resolved_tickets"
+        ]
+      }
+    }
+  }
 });

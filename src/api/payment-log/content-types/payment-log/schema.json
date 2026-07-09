@@ -77,7 +77,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::user-subscription.user-subscription",
-      "inversedBy": "payment_log"
+      "mappedBy": "payment_log"
     }
   }
 }

@@ -1,7 +1,6 @@
-'use strict';
+"use strict";
 
 module.exports = (plugin) => {
-
   // --- REGISTER OVERRIDE ---
   const originalRegister = plugin.controllers.auth.register;
 
@@ -13,19 +12,23 @@ module.exports = (plugin) => {
       body.FulllName = body.fullName;
     }
 
-    if (typeof body.FulllName === 'string') {
+    if (typeof body.FulllName === "string") {
       body.FulllName = body.FulllName.trim();
     }
 
     // Prevent "invalid input syntax for type bigint: ''" error
     // Delete empty string values for numeric or potentially bigint DB fields
     const fieldsToClean = [
-      'phoneNumber', 'phone_number',
-      'availableBalance', 'available_balance',
-      'pendingBalance', 'pending_balance',
-      'platformFeeOverride', 'commissionOverride'
+      "phoneNumber",
+      "phone_number",
+      "availableBalance",
+      "available_balance",
+      "pendingBalance",
+      "pending_balance",
+      "platformFeeOverride",
+      "commissionOverride",
     ];
-    fieldsToClean.forEach(field => {
+    fieldsToClean.forEach((field) => {
       if (body[field] === "") {
         delete body[field];
       }
@@ -50,17 +53,17 @@ module.exports = (plugin) => {
         ...userWithDetails,
         profileImage: userWithDetails.Profile_image
           ? {
-              id: userWithDetails.Profile_image.id,
-              url: userWithDetails.Profile_image.url,
-              name: userWithDetails.Profile_image.name,
-              mime: userWithDetails.Profile_image.mime,
-            }
+            id: userWithDetails.Profile_image.id,
+            url: userWithDetails.Profile_image.url,
+            name: userWithDetails.Profile_image.name,
+            mime: userWithDetails.Profile_image.mime,
+          }
           : null,
       };
     }
   };
 
-// --- LOGIN OVERRIDE ---
+  // --- LOGIN OVERRIDE ---
   const originalLogin = plugin.controllers.auth.callback;
 
   plugin.controllers.auth.callback = async (ctx) => {
@@ -97,63 +100,60 @@ module.exports = (plugin) => {
           ...userWithDetails,
           profileImage: userWithDetails.Profile_image
             ? {
-                id: userWithDetails.Profile_image.id,
-                url: userWithDetails.Profile_image.url,
-                name: userWithDetails.Profile_image.name,
-                mime: userWithDetails.Profile_image.mime,
-              }
+              id: userWithDetails.Profile_image.id,
+              url: userWithDetails.Profile_image.url,
+              name: userWithDetails.Profile_image.name,
+              mime: userWithDetails.Profile_image.mime,
+            }
             : null,
 
           // ✅ ONLY ADD THIS LINE
           latest_subscription,
         };
       }
-
     } catch (error) {
       console.error("LOGIN ERROR:", error.message);
       return ctx.badRequest("Invalid email or password");
     }
   };
 
-// /users/:id override to include latest subscription
-plugin.controllers.user.findOne = async (ctx) => {
+  // /users/:id override to include latest subscription
+  plugin.controllers.user.findOne = async (ctx) => {
+    const userId = ctx.params.id;
 
-  const userId = ctx.params.id;
+    if (!userId) {
+      return ctx.badRequest("User ID is required");
+    }
 
-  if (!userId) {
-    return ctx.badRequest("User ID is required");
-  }
+    const user = await strapi.db
+      .query("plugin::users-permissions.user")
+      .findOne({
+        where: { id: userId },
+        populate: ["role", "Profile_image"],
+      });
 
-  const user = await strapi.db
-    .query("plugin::users-permissions.user")
-    .findOne({
-      where: { id: userId },
-      populate: ["role", "Profile_image"],
+    if (!user) {
+      return ctx.notFound("User not found");
+    }
+
+    const subscription = await strapi.db
+      .query("api::user-subscription.user-subscription")
+      .findMany({
+        where: {
+          users_permissions_user: userId,
+        },
+        orderBy: { createdAt: "desc" },
+        limit: 1,
+        populate: ["plan", "payment_log"],
+      });
+
+    const latest_subscription = subscription[0] || null;
+
+    return ctx.send({
+      ...user,
+      latest_subscription,
     });
+  };
 
-
-  if (!user) {
-    return ctx.notFound("User not found");
-  }
-
-  const subscription = await strapi.db
-    .query("api::user-subscription.user-subscription")
-    .findMany({
-      where: {
-        users_permissions_user: userId,
-      },
-      orderBy: { createdAt: "desc" },
-      limit: 1,
-      populate: ["plan","payment_log"],
-    });
-
-
-  const latest_subscription = subscription[0] || null;
-
-  return ctx.send({
-    ...user,
-    latest_subscription,
-  });
-};
   return plugin;
 };
