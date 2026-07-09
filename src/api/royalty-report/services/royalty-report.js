@@ -791,7 +791,11 @@ module.exports = () => ({
 
 /* ================= INVOICE GENERATION ================= */
 async function generateInvoices(reportStartDate, reportEndDate) {
-
+  console.log("========== GENERATE INVOICES START ==========");
+  console.log({
+    reportStartDate,
+    reportEndDate,
+  });
   try {
 
     const end = new Date(reportEndDate);
@@ -1333,12 +1337,12 @@ async function generateInvoices(reportStartDate, reportEndDate) {
         // console.error("❌ Notification error:", err);
       }
 
-      // console.log("✅ Invoice created:", user.id);
+      console.log("✅ Invoice created:", user.id);
     }
 
-    // console.log("🎉 Invoice generation completed");
+    console.log("🎉 Invoice generation completed");
 
   } catch (error) {
-    // console.error("❌ Invoice generation error:", error);
+    console.error("❌ Invoice generation error:", error);
   }
 }
