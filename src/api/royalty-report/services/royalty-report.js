@@ -768,6 +768,46 @@ module.exports = () => ({
       originalTotal
     });
 
+    const sample = await strapi.db
+      .query("api::royalty-report.royalty-report")
+      .findMany({
+        limit: 3,
+        select: ["id", "StartDate", "EndDate", "ISRC"],
+      });
+
+    console.log("Sample royalties:", sample);
+
+    const matching = await strapi.db
+      .query("api::royalty-report.royalty-report")
+      .findMany({
+        where: {
+          StartDate: reportStartDate,
+          EndDate: reportEndDate,
+        },
+        select: ["id", "StartDate", "EndDate"],
+      });
+
+    console.log("Matching via db.query:", matching.length);
+
+    const royalties = await strapi.entityService.findMany(
+  "api::royalty-report.royalty-report",
+  {
+    populate: {
+      distribute_track: {
+        populate: {
+          PublishedRelease: {
+            populate: {
+              UserDetail: true,
+            },
+          },
+        },
+      },
+    },
+  }
+);
+
+console.log("Royalties without filter:", royalties.length);
+
     if (user) {
       await createActivityLog({
         user,
