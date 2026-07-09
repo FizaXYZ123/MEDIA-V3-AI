@@ -47,7 +47,7 @@
     "completedAt": {
       "type": "datetime"
     },
-    "rejectionReason": {
+    "adminRemark": {
       "type": "text"
     },
     "paymentMethodSnapshot": {

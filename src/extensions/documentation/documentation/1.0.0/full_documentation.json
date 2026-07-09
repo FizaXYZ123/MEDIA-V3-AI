@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-09T11:06:27.628Z"
+    "x-generation-date": "2026-07-09T11:48:02.152Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3447,7 +3447,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -8294,7 +8294,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -13206,7 +13206,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -18165,7 +18165,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -23057,7 +23057,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -28701,7 +28701,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -33335,7 +33335,7 @@
                                                                 "type": "string",
                                                                 "format": "date-time"
                                                               },
-                                                              "rejectionReason": {
+                                                              "adminRemark": {
                                                                 "type": "string"
                                                               },
                                                               "paymentMethodSnapshot": {},
@@ -37762,7 +37762,7 @@
                                                                             "type": "string",
                                                                             "format": "date-time"
                                                                           },
-                                                                          "rejectionReason": {
+                                                                          "adminRemark": {
                                                                             "type": "string"
                                                                           },
                                                                           "paymentMethodSnapshot": {},
@@ -43852,7 +43852,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -50797,7 +50797,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -55626,7 +55626,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -60456,7 +60456,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -65348,7 +65348,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -66974,7 +66974,7 @@
                 "type": "string",
                 "format": "date-time"
               },
-              "rejectionReason": {
+              "adminRemark": {
                 "type": "string"
               },
               "paymentMethodSnapshot": {},
@@ -70310,7 +70310,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -71761,7 +71761,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "rejectionReason": {
+          "adminRemark": {
             "type": "string"
           },
           "paymentMethodSnapshot": {},
@@ -75577,7 +75577,7 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
-                                                  "rejectionReason": {
+                                                  "adminRemark": {
                                                     "type": "string"
                                                   },
                                                   "paymentMethodSnapshot": {},
@@ -80380,7 +80380,7 @@
                                                                 "type": "string",
                                                                 "format": "date-time"
                                                               },
-                                                              "rejectionReason": {
+                                                              "adminRemark": {
                                                                 "type": "string"
                                                               },
                                                               "paymentMethodSnapshot": {},
@@ -84749,7 +84749,7 @@
                                                                             "type": "string",
                                                                             "format": "date-time"
                                                                           },
-                                                                          "rejectionReason": {
+                                                                          "adminRemark": {
                                                                             "type": "string"
                                                                           },
                                                                           "paymentMethodSnapshot": {},
@@ -90304,7 +90304,7 @@
                                                               "type": "string",
                                                               "format": "date-time"
                                                             },
-                                                            "rejectionReason": {
+                                                            "adminRemark": {
                                                               "type": "string"
                                                             },
                                                             "paymentMethodSnapshot": {},
@@ -96060,7 +96060,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -101295,7 +101295,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -106204,7 +106204,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -110991,7 +110991,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -115877,7 +115877,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},
@@ -120767,7 +120767,7 @@
                                       "type": "string",
                                       "format": "date-time"
                                     },
-                                    "rejectionReason": {
+                                    "adminRemark": {
                                       "type": "string"
                                     },
                                     "paymentMethodSnapshot": {},

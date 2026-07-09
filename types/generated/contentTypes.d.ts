@@ -1726,7 +1726,7 @@ export interface ApiPayoutRequestPayoutRequest extends Schema.CollectionType {
     >;
     reviewedAt: Attribute.DateTime;
     completedAt: Attribute.DateTime;
-    rejectionReason: Attribute.Text;
+    adminRemark: Attribute.Text;
     paymentMethodSnapshot: Attribute.JSON;
     transactionReference: Attribute.String;
     user_payout_detail: Attribute.Relation<
