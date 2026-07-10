@@ -886,108 +886,22 @@ function splitRoyaltyByMonths(startDate, endDate, amount) {
 
 /* ================= INVOICE GENERATION ================= */
 async function generateInvoices(importedRoyalties) {
-try{
-  console.log("========== GENERATE INVOICES START ==========");
+  try {
+    console.log("========== GENERATE INVOICES START ==========");
 
-  if (!importedRoyalties.length) {
-    console.log("No imported royalties.");
-    return;
-  }
-
-  /* ================= FETCH ROYALTIES ================= */
-
-  const royalties = await strapi.entityService.findMany(
-    "api::royalty-report.royalty-report",
-    {
-      filters: {
-        id: {
-          $in: importedRoyalties.map(r => r.id),
-        },
-      },
-      populate: {
-        distribute_track: {
-          populate: {
-            PublishedRelease: {
-              populate: {
-                UserDetail: true,
-              },
-            },
-          },
-        },
-      },
+    if (!importedRoyalties.length) {
+      console.log("No imported royalties.");
+      return;
     }
-  );
 
-  if (!royalties.length) {
-    console.log("No royalties found.");
-    return;
-  }
-  /* ================= GROUP BY USER ================= */
-  const affectedMonths = new Map();
+    /* ================= FETCH ROYALTIES ================= */
 
-  for (const royalty of royalties) {
-
-    const user =
-      royalty.distribute_track?.PublishedRelease?.UserDetail;
-
-    if (!user) continue;
-
-    const allocations = splitRoyaltyByMonths(
-      royalty.StartDate,
-      royalty.EndDate,
-      Number(royalty.NetTotal || 0)
-    );
-
-    for (const allocation of allocations) {
-
-      const key =
-        `${user.id}-${allocation.year}-${allocation.month}`;
-
-      affectedMonths.set(key, {
-        user,
-        userId: user.id,
-        month: allocation.month,
-        year: allocation.year,
-      });
-
-    }
-  }
-
-  /* ================= PROCESS USERS ================= */
-  for (const [, item] of affectedMonths) {
-
-    const {
-      user,
-      month,
-      year,
-    } = item;
-
-    const invoiceMonthStart = new Date(
-      year,
-      month - 1,
-      1
-    );
-
-    const invoiceMonthEnd = new Date(
-      year,
-      month,
-      0,
-      23,
-      59,
-      59,
-      999
-    );
-
-    const allRoyalties = await strapi.entityService.findMany(
+    const royalties = await strapi.entityService.findMany(
       "api::royalty-report.royalty-report",
       {
         filters: {
-          distribute_track: {
-            PublishedRelease: {
-              UserDetail: {
-                id: user.id,
-              },
-            },
+          id: {
+            $in: importedRoyalties.map(r => r.id),
           },
         },
         populate: {
@@ -1004,17 +918,19 @@ try{
       }
     );
 
-    let totalEarnings = 0;
-    const royalties = [];
+    if (!royalties.length) {
+      console.log("No royalties found.");
+      return;
+    }
+    /* ================= GROUP BY USER ================= */
+    const affectedMonths = new Map();
 
-    for (const royalty of allRoyalties) {
+    for (const royalty of royalties) {
 
-      const royaltyUser =
+      const user =
         royalty.distribute_track?.PublishedRelease?.UserDetail;
 
-      if (!royaltyUser || royaltyUser.id !== user.id) {
-        continue;
-      }
+      if (!user) continue;
 
       const allocations = splitRoyaltyByMonths(
         royalty.StartDate,
@@ -1024,63 +940,133 @@ try{
 
       for (const allocation of allocations) {
 
-        if (
-          allocation.month === month &&
-          allocation.year === year
-        ) {
-          totalEarnings += allocation.amount;
-          royalties.push(royalty);
-        }
+        const key =
+          `${user.id}-${allocation.year}-${allocation.month}`;
+
+        affectedMonths.set(key, {
+          user,
+          userId: user.id,
+          month: allocation.month,
+          year: allocation.year,
+        });
 
       }
     }
 
-    console.log(
-      `User ${user.id} Month ${month}/${year} Total ${totalEarnings}`
-    );
+    /* ================= PROCESS USERS ================= */
+    for (const [, item] of affectedMonths) {
 
-    if (totalEarnings <= 0) {
-      continue;
-    }
+      const {
+        user,
+        month,
+        year,
+      } = item;
 
-    /* ================= DETERMINE PLAN FOR ROYALTY MONTH ================= */
-
-    const reportMonth = month - 1;
-    const reportYear = year;
-
-    /* ACTIVE SUBSCRIPTION */
-    let activeSubscription = await strapi.db
-      .query("api::user-subscription.user-subscription")
-      .findOne({
-        where: {
-          users_permissions_user: user.id,
-
-          startDate: {
-            $lte: invoiceMonthEnd,
-          },
-
-          endDate: {
-            $gte: invoiceMonthStart,
-          },
-        },
-
-        populate: {
-          plan: true,
-        },
-
-        orderBy: {
-          startDate: "desc",
-        },
-      });
-
-    /* IF NO ACTIVE SUBSCRIPTION, USE LATEST OLD SUBSCRIPTION */
-    if (!activeSubscription) {
-
-      console.log(
-        `⚠️ No active subscription for user ${user.id}. Using latest subscription.`
+      const invoiceMonthStart = new Date(
+        year,
+        month - 1,
+        1
       );
 
-      activeSubscription = await strapi.db
+      const invoiceMonthEnd = new Date(
+        year,
+        month,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
+
+      const allRoyalties = await strapi.entityService.findMany(
+        "api::royalty-report.royalty-report",
+        {
+          filters: {
+            distribute_track: {
+              PublishedRelease: {
+                UserDetail: {
+                  id: user.id,
+                },
+              },
+            },
+          },
+          populate: {
+            distribute_track: {
+              populate: {
+                PublishedRelease: {
+                  populate: {
+                    UserDetail: true,
+                  },
+                },
+              },
+            },
+          },
+        }
+      );
+
+      let totalEarnings = 0;
+      const royalties = [];
+
+      for (const royalty of allRoyalties) {
+
+        const royaltyUser =
+          royalty.distribute_track?.PublishedRelease?.UserDetail;
+
+        if (!royaltyUser || royaltyUser.id !== user.id) {
+          continue;
+        }
+
+        const allocations = splitRoyaltyByMonths(
+          royalty.StartDate,
+          royalty.EndDate,
+          Number(royalty.NetTotal || 0)
+        );
+
+        for (const allocation of allocations) {
+
+          if (
+            allocation.month === month &&
+            allocation.year === year
+          ) {
+            totalEarnings += allocation.amount;
+            royalties.push(royalty);
+          }
+
+        }
+      }
+
+      console.log(
+        `User ${user.id} Month ${month}/${year} Total ${totalEarnings}`
+      );
+
+      if (totalEarnings <= 0) {
+        continue;
+      }
+
+      /* ================= EXISTING INVOICE ================= */
+
+      const existing = await strapi.entityService.findMany(
+        "api::invoice.invoice",
+        {
+          filters: {
+            users_permissions_user: user.id,
+            month,
+            year,
+          },
+        }
+      );
+
+      const invoice = existing[0];
+
+      const isUpdate = !!invoice;
+
+      /* ================= DETERMINE PLAN FOR ROYALTY MONTH ================= */
+
+      const reportMonth = month - 1;
+      const reportYear = year;
+
+      /* ACTIVE SUBSCRIPTION */
+      let activeSubscription = await strapi.db
         .query("api::user-subscription.user-subscription")
         .findOne({
           where: {
@@ -1089,83 +1075,9 @@ try{
             startDate: {
               $lte: invoiceMonthEnd,
             },
-          },
 
-          populate: {
-            plan: true,
-          },
-
-          orderBy: {
-            startDate: "desc",
-          },
-        });
-    }
-
-    if (!activeSubscription) {
-
-      console.log(
-        `⏭️ User ${user.id} skipped - no subscription found`
-      );
-
-      continue;
-    }
-
-    if (!activeSubscription?.plan?.isActive) {
-
-      console.log(
-        `⏭️ User ${user.id} skipped - plan inactive`
-      );
-
-      continue;
-    }
-
-    let subscriptionToUse = activeSubscription;
-
-    console.log("=================================");
-    console.log("USER:", user.id);
-    console.log("REPORT MONTH:", reportMonth + 1);
-    console.log("REPORT YEAR:", reportYear);
-    console.log(
-      "ACTIVE PLAN:",
-      activeSubscription.plan?.name
-    );
-    console.log(
-      "SUBSCRIPTION TYPE:",
-      activeSubscription.subscriptionType
-    );
-    console.log(
-      "UPGRADED AT:",
-      activeSubscription.upgradedAt || "N/A"
-    );
-
-    /* HANDLE UPGRADE LOGIC */
-    if (
-      activeSubscription.subscriptionType === "upgrade" &&
-      activeSubscription.upgradedAt
-    ) {
-
-      const upgradedAt = new Date(
-        activeSubscription.upgradedAt
-      );
-
-      const upgradeMonth = upgradedAt.getMonth();
-      const upgradeYear = upgradedAt.getFullYear();
-      const upgradeDay = upgradedAt.getDate();
-
-      console.log(
-        "UPGRADE DATE:",
-        upgradedAt.toISOString()
-      );
-
-      /* FETCH PREVIOUS SUBSCRIPTION */
-      const previousSubscription = await strapi.db
-        .query("api::user-subscription.user-subscription")
-        .findOne({
-          where: {
-            users_permissions_user: user.id,
-
-            startDate: {
-              $lt: activeSubscription.startDate,
+            endDate: {
+              $gte: invoiceMonthStart,
             },
           },
 
@@ -1178,51 +1090,122 @@ try{
           },
         });
 
-      /* REPORT BEFORE UPGRADE MONTH */
-      if (
-        reportYear < upgradeYear ||
-        (
-          reportYear === upgradeYear &&
-          reportMonth < upgradeMonth
-        )
-      ) {
+      /* IF NO ACTIVE SUBSCRIPTION, USE LATEST OLD SUBSCRIPTION */
+      if (!activeSubscription) {
 
         console.log(
-          "📅 Report month before upgrade month."
+          `⚠️ No active subscription for user ${user.id}. Using latest subscription.`
         );
 
-        if (previousSubscription?.plan) {
-          subscriptionToUse = previousSubscription;
+        activeSubscription = await strapi.db
+          .query("api::user-subscription.user-subscription")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
 
-          console.log(
-            "USING PREVIOUS PLAN:",
-            previousSubscription.plan.name
-          );
-        }
+              startDate: {
+                $lte: invoiceMonthEnd,
+              },
+            },
+
+            populate: {
+              plan: true,
+            },
+
+            orderBy: {
+              startDate: "desc",
+            },
+          });
       }
 
-      /* REPORT IS UPGRADE MONTH */
-      else if (
-        reportYear === upgradeYear &&
-        reportMonth === upgradeMonth
-      ) {
+      if (!activeSubscription) {
 
         console.log(
-          "📅 Report month is upgrade month."
+          `⏭️ User ${user.id} skipped - no subscription found`
         );
 
-        if (upgradeDay <= 15) {
+        continue;
+      }
+
+      if (!activeSubscription?.plan?.isActive) {
+
+        console.log(
+          `⏭️ User ${user.id} skipped - plan inactive`
+        );
+
+        continue;
+      }
+
+      let subscriptionToUse = activeSubscription;
+
+      console.log("=================================");
+      console.log("USER:", user.id);
+      console.log("REPORT MONTH:", reportMonth + 1);
+      console.log("REPORT YEAR:", reportYear);
+      console.log(
+        "ACTIVE PLAN:",
+        activeSubscription.plan?.name
+      );
+      console.log(
+        "SUBSCRIPTION TYPE:",
+        activeSubscription.subscriptionType
+      );
+      console.log(
+        "UPGRADED AT:",
+        activeSubscription.upgradedAt || "N/A"
+      );
+
+      /* HANDLE UPGRADE LOGIC */
+      if (
+        activeSubscription.subscriptionType === "upgrade" &&
+        activeSubscription.upgradedAt
+      ) {
+
+        const upgradedAt = new Date(
+          activeSubscription.upgradedAt
+        );
+
+        const upgradeMonth = upgradedAt.getMonth();
+        const upgradeYear = upgradedAt.getFullYear();
+        const upgradeDay = upgradedAt.getDate();
+
+        console.log(
+          "UPGRADE DATE:",
+          upgradedAt.toISOString()
+        );
+
+        /* FETCH PREVIOUS SUBSCRIPTION */
+        const previousSubscription = await strapi.db
+          .query("api::user-subscription.user-subscription")
+          .findOne({
+            where: {
+              users_permissions_user: user.id,
+
+              startDate: {
+                $lt: activeSubscription.startDate,
+              },
+            },
+
+            populate: {
+              plan: true,
+            },
+
+            orderBy: {
+              startDate: "desc",
+            },
+          });
+
+        /* REPORT BEFORE UPGRADE MONTH */
+        if (
+          reportYear < upgradeYear ||
+          (
+            reportYear === upgradeYear &&
+            reportMonth < upgradeMonth
+          )
+        ) {
 
           console.log(
-            "✅ Upgrade before/on 15th."
-          );
-
-          subscriptionToUse = activeSubscription;
-
-        } else {
-
-          console.log(
-            "⚠️ Upgrade after 15th."
+            "📅 Report month before upgrade month."
           );
 
           if (previousSubscription?.plan) {
@@ -1234,323 +1217,357 @@ try{
             );
           }
         }
-      }
 
-      /* REPORT AFTER UPGRADE MONTH */
-      else {
+        /* REPORT IS UPGRADE MONTH */
+        else if (
+          reportYear === upgradeYear &&
+          reportMonth === upgradeMonth
+        ) {
 
-        console.log(
-          "✅ Report month after upgrade month."
-        );
+          console.log(
+            "📅 Report month is upgrade month."
+          );
 
-        subscriptionToUse = activeSubscription;
-      }
-    }
+          if (upgradeDay <= 15) {
 
-    const activePlan = subscriptionToUse.plan;
+            console.log(
+              "✅ Upgrade before/on 15th."
+            );
 
-    const planName =
-      activePlan?.name?.toLowerCase()?.trim();
+            subscriptionToUse = activeSubscription;
 
-    console.log(
-      "FINAL PLAN USED:",
-      activePlan?.name
-    );
-    console.log("=================================");
+          } else {
 
-    /* ================= FETCH FEES ================= */
-    const labelFeeData = await strapi.db
-      .query("api::label-fee-history.label-fee-history")
-      .findMany({
-        where: {
-          users_permissions_user: user.id,
-          effective_from: {
-            $lte: invoiceMonthEnd,
-          },
-        },
-        orderBy: { effective_from: "desc" },
-        limit: 1,
-      });
+            console.log(
+              "⚠️ Upgrade after 15th."
+            );
 
-    const adminFeeData = await strapi.db
-      .query("api::admin-fee-history.admin-fee-history")
-      .findMany({
-        where: {
-          users_permissions_user: user.id,
-          effective_from: {
-            $lte: invoiceMonthEnd,
-          },
-        },
-        orderBy: { effective_from: "desc" },
-        limit: 1,
-      });
+            if (previousSubscription?.plan) {
+              subscriptionToUse = previousSubscription;
 
-
-    let labelFee =
-      labelFeeData[0]?.feePercentage ??
-      user.labelFee ??
-      0;
-
-    let adminFee =
-      adminFeeData[0]?.feePercentage ??
-      user.adminFee ??
-      0;
-
-    const enterpriseCommissionData = await strapi.db
-      .query("api::enterprise-commission.enterprise-commission")
-      .findMany({
-        where: {
-          users_permissions_user: user.id,
-          effective_from: {
-            $lte: invoiceMonthEnd
-          },
-        },
-        orderBy: { effective_from: "desc" },
-        limit: 1,
-      });
-
-    const enterpriseCommission =
-      enterpriseCommissionData[0]?.commission_percentage ?? 0;
-
-    console.log("💸 Fees:", {
-      userId: user.id,
-      labelFee,
-      adminFee,
-    });
-
-    /* ================= CALCULATION ================= */
-
-    let labelFeeAmount = 0;
-    let adminFeeAmount = 0;
-
-    let enterpriseCommissionPercentage = 0;
-    let enterpriseCommissionAmount = 0;
-
-    let afterLabel = totalEarnings;
-    let finalAmount = totalEarnings;
-
-    // ✅ ARTIST / ARTIST PLUS
-    if (
-      planName === "artist" ||
-      planName === "artist plus"
-    ) {
-
-      // 🔥 OLD LOGIC KEPT SAME
-
-      labelFeeAmount = Number(
-        (totalEarnings * labelFee / 100).toFixed(2)
-      );
-
-      afterLabel = Number(
-        (totalEarnings - labelFeeAmount).toFixed(2)
-      );
-
-      adminFeeAmount = Number(
-        (afterLabel * adminFee / 100).toFixed(2)
-      );
-
-      finalAmount = Number(
-        (afterLabel - adminFeeAmount).toFixed(2)
-      );
-    }
-
-    // ✅ PRO LABEL
-    else if (planName === "pro label") {
-
-      // ✅ Never apply admin/label fee
-      labelFeeAmount = 0;
-      adminFeeAmount = 0;
-
-      labelFee = 0;
-      adminFee = 0;
-
-      let totalCommissionAmount = 0;
-      let totalPayable = 0;
-
-      // ✅ If no commission entry exists -> use 0
-      enterpriseCommissionPercentage =
-        Number(enterpriseCommission || 0);
-
-      // ✅ GROUP ROYALTIES BY ISRC
-      const isrcTotals = {};
-
-      for (const royalty of royalties) {
-
-        const isrc =
-          royalty.ISRC ||
-          royalty.isrc ||
-          "NO_ISRC";
-
-        const amount = Number(
-          royalty.NetTotal || 0
-        );
-
-        if (!isrcTotals[isrc]) {
-          isrcTotals[isrc] = 0;
+              console.log(
+                "USING PREVIOUS PLAN:",
+                previousSubscription.plan.name
+              );
+            }
+          }
         }
 
-        isrcTotals[isrc] = Number(
-          (
-            isrcTotals[isrc] + amount
-          ).toFixed(2)
-        );
+        /* REPORT AFTER UPGRADE MONTH */
+        else {
+
+          console.log(
+            "✅ Report month after upgrade month."
+          );
+
+          subscriptionToUse = activeSubscription;
+        }
       }
 
-      // ✅ APPLY COMMISSION ON TOTAL OF EACH ISRC
-      for (const isrc in isrcTotals) {
+      const activePlan = subscriptionToUse.plan;
 
-        const songTotal = Number(
-          isrcTotals[isrc]
-        );
-
-        const commissionAmount = Number(
-          (
-            songTotal *
-            enterpriseCommissionPercentage /
-            100
-          ).toFixed(2)
-        );
-
-        const payableAmount = Number(
-          (
-            songTotal -
-            commissionAmount
-          ).toFixed(2)
-        );
-
-        totalCommissionAmount = Number(
-          (
-            totalCommissionAmount +
-            commissionAmount
-          ).toFixed(2)
-        );
-
-        totalPayable = Number(
-          (
-            totalPayable +
-            payableAmount
-          ).toFixed(2)
-        );
-      }
-
-      afterLabel = totalEarnings;
-
-      enterpriseCommissionAmount =
-        totalCommissionAmount;
-
-      finalAmount = totalPayable;
-    };
-
-    console.log("=================================");
-    console.log("USER ID:", user.id);
-    console.log("PLAN:", planName);
-    console.log("TOTAL EARNINGS:", totalEarnings);
-    console.log("FINAL AMOUNT PAYABLE:", finalAmount);
-    console.log("LABEL FEE:", labelFee);
-    console.log("ADMIN FEE:", adminFee);
-    console.log("ENTERPRISE COMMISSION:", enterpriseCommission);
-    console.log("=================================");
-
-    /* ================= CREATE INVOICE ================= */
-    if (isUpdate) {
-
-      await strapi.entityService.update(
-        "api::invoice.invoice",
-        invoice.id,
-        {
-          data: {
-            month,
-            year,
-            totalEarnings,
-
-            labelFeePercentage: labelFee,
-            labelFeeAmount,
-
-            amountPayableBeforeAdminFee: afterLabel,
-
-            adminFeePercentage: adminFee,
-            adminFeeAmount,
-
-            enterpriseCommissionPercentage,
-            enterpriseCommissionAmount,
-
-            finalAmountPayable: finalAmount,
-          },
-        }
-      );
-
-    } else {
-
-      await strapi.entityService.create(
-        "api::invoice.invoice",
-        {
-          data: {
-            month,
-            year,
-            totalEarnings,
-
-            labelFeePercentage: labelFee,
-            labelFeeAmount,
-
-            amountPayableBeforeAdminFee: afterLabel,
-
-            adminFeePercentage: adminFee,
-            adminFeeAmount,
-
-            enterpriseCommissionPercentage,
-            enterpriseCommissionAmount,
-
-            finalAmountPayable: finalAmount,
-
-            invoiceDate: new Date(),
-
-            users_permissions_user: user.id,
-
-            publishedAt: new Date(),
-          },
-        }
-      );
-
-    }
-    console.log("✅ Invoice created:", user.id);
-
-    /* ================= 🔔 SEND NOTIFICATION ================= */
-
-    const notificationTitle = isUpdate
-      ? "Invoice Updated"
-      : "Invoice Generated";
-
-    const notificationMessage = isUpdate
-      ? `Your invoice for ${month}/${year} has been updated. Amount: ₹${finalAmount}`
-      : `Your invoice for ${month}/${year} is ready. Amount: ₹${finalAmount}`;
-    try {
-
-      await strapi.entityService.create("api::notification.notification", {
-        data: {
-          title: notificationTitle,
-          message: notificationMessage,
-          users_permissions_user: user.id,
-          publishedAt: new Date(),
-        },
-      });
+      const planName =
+        activePlan?.name?.toLowerCase()?.trim();
 
       console.log(
-        isUpdate
-          ? "✅ Invoice updated:"
-          : "✅ Invoice created:",
-        user.id
+        "FINAL PLAN USED:",
+        activePlan?.name
       );
+      console.log("=================================");
 
-    } catch (err) {
-      console.error("❌ Notification error:", err);
+      /* ================= FETCH FEES ================= */
+      const labelFeeData = await strapi.db
+        .query("api::label-fee-history.label-fee-history")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+            effective_from: {
+              $lte: invoiceMonthEnd,
+            },
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
+
+      const adminFeeData = await strapi.db
+        .query("api::admin-fee-history.admin-fee-history")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+            effective_from: {
+              $lte: invoiceMonthEnd,
+            },
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
+
+
+      let labelFee =
+        labelFeeData[0]?.feePercentage ??
+        user.labelFee ??
+        0;
+
+      let adminFee =
+        adminFeeData[0]?.feePercentage ??
+        user.adminFee ??
+        0;
+
+      const enterpriseCommissionData = await strapi.db
+        .query("api::enterprise-commission.enterprise-commission")
+        .findMany({
+          where: {
+            users_permissions_user: user.id,
+            effective_from: {
+              $lte: invoiceMonthEnd
+            },
+          },
+          orderBy: { effective_from: "desc" },
+          limit: 1,
+        });
+
+      const enterpriseCommission =
+        enterpriseCommissionData[0]?.commission_percentage ?? 0;
+
+      console.log("💸 Fees:", {
+        userId: user.id,
+        labelFee,
+        adminFee,
+      });
+
+      /* ================= CALCULATION ================= */
+
+      let labelFeeAmount = 0;
+      let adminFeeAmount = 0;
+
+      let enterpriseCommissionPercentage = 0;
+      let enterpriseCommissionAmount = 0;
+
+      let afterLabel = totalEarnings;
+      let finalAmount = totalEarnings;
+
+      // ✅ ARTIST / ARTIST PLUS
+      if (
+        planName === "artist" ||
+        planName === "artist plus"
+      ) {
+
+        // 🔥 OLD LOGIC KEPT SAME
+
+        labelFeeAmount = Number(
+          (totalEarnings * labelFee / 100).toFixed(2)
+        );
+
+        afterLabel = Number(
+          (totalEarnings - labelFeeAmount).toFixed(2)
+        );
+
+        adminFeeAmount = Number(
+          (afterLabel * adminFee / 100).toFixed(2)
+        );
+
+        finalAmount = Number(
+          (afterLabel - adminFeeAmount).toFixed(2)
+        );
+      }
+
+      // ✅ PRO LABEL
+      else if (planName === "pro label") {
+
+        // ✅ Never apply admin/label fee
+        labelFeeAmount = 0;
+        adminFeeAmount = 0;
+
+        labelFee = 0;
+        adminFee = 0;
+
+        let totalCommissionAmount = 0;
+        let totalPayable = 0;
+
+        // ✅ If no commission entry exists -> use 0
+        enterpriseCommissionPercentage =
+          Number(enterpriseCommission || 0);
+
+        // ✅ GROUP ROYALTIES BY ISRC
+        const isrcTotals = {};
+
+        for (const royalty of royalties) {
+
+          const isrc =
+            royalty.ISRC ||
+            royalty.isrc ||
+            "NO_ISRC";
+
+          const amount = Number(
+            royalty.NetTotal || 0
+          );
+
+          if (!isrcTotals[isrc]) {
+            isrcTotals[isrc] = 0;
+          }
+
+          isrcTotals[isrc] = Number(
+            (
+              isrcTotals[isrc] + amount
+            ).toFixed(2)
+          );
+        }
+
+        // ✅ APPLY COMMISSION ON TOTAL OF EACH ISRC
+        for (const isrc in isrcTotals) {
+
+          const songTotal = Number(
+            isrcTotals[isrc]
+          );
+
+          const commissionAmount = Number(
+            (
+              songTotal *
+              enterpriseCommissionPercentage /
+              100
+            ).toFixed(2)
+          );
+
+          const payableAmount = Number(
+            (
+              songTotal -
+              commissionAmount
+            ).toFixed(2)
+          );
+
+          totalCommissionAmount = Number(
+            (
+              totalCommissionAmount +
+              commissionAmount
+            ).toFixed(2)
+          );
+
+          totalPayable = Number(
+            (
+              totalPayable +
+              payableAmount
+            ).toFixed(2)
+          );
+        }
+
+        afterLabel = totalEarnings;
+
+        enterpriseCommissionAmount =
+          totalCommissionAmount;
+
+        finalAmount = totalPayable;
+      };
+
+      console.log("=================================");
+      console.log("USER ID:", user.id);
+      console.log("PLAN:", planName);
+      console.log("TOTAL EARNINGS:", totalEarnings);
+      console.log("FINAL AMOUNT PAYABLE:", finalAmount);
+      console.log("LABEL FEE:", labelFee);
+      console.log("ADMIN FEE:", adminFee);
+      console.log("ENTERPRISE COMMISSION:", enterpriseCommission);
+      console.log("=================================");
+
+      /* ================= CREATE INVOICE ================= */
+      if (isUpdate) {
+
+        await strapi.entityService.update(
+          "api::invoice.invoice",
+          invoice.id,
+          {
+            data: {
+              month,
+              year,
+              totalEarnings,
+
+              labelFeePercentage: labelFee,
+              labelFeeAmount,
+
+              amountPayableBeforeAdminFee: afterLabel,
+
+              adminFeePercentage: adminFee,
+              adminFeeAmount,
+
+              enterpriseCommissionPercentage,
+              enterpriseCommissionAmount,
+
+              finalAmountPayable: finalAmount,
+            },
+          }
+        );
+
+      } else {
+
+        await strapi.entityService.create(
+          "api::invoice.invoice",
+          {
+            data: {
+              month,
+              year,
+              totalEarnings,
+
+              labelFeePercentage: labelFee,
+              labelFeeAmount,
+
+              amountPayableBeforeAdminFee: afterLabel,
+
+              adminFeePercentage: adminFee,
+              adminFeeAmount,
+
+              enterpriseCommissionPercentage,
+              enterpriseCommissionAmount,
+
+              finalAmountPayable: finalAmount,
+
+              invoiceDate: new Date(),
+
+              users_permissions_user: user.id,
+
+              publishedAt: new Date(),
+            },
+          }
+        );
+
+      }
+      console.log("✅ Invoice created:", user.id);
+
+      /* ================= 🔔 SEND NOTIFICATION ================= */
+
+      const notificationTitle = isUpdate
+        ? "Invoice Updated"
+        : "Invoice Generated";
+
+      const notificationMessage = isUpdate
+        ? `Your invoice for ${month}/${year} has been updated. Amount: ₹${finalAmount}`
+        : `Your invoice for ${month}/${year} is ready. Amount: ₹${finalAmount}`;
+      try {
+
+        await strapi.entityService.create("api::notification.notification", {
+          data: {
+            title: notificationTitle,
+            message: notificationMessage,
+            users_permissions_user: user.id,
+            publishedAt: new Date(),
+          },
+        });
+
+        console.log(
+          isUpdate
+            ? "✅ Invoice updated:"
+            : "✅ Invoice created:",
+          user.id
+        );
+
+      } catch (err) {
+        console.error("❌ Notification error:", err);
+      }
+
+      console.log("✅ Invoice created:", user.id);
     }
 
-    console.log("✅ Invoice created:", user.id);
+    console.log("🎉 Invoice generation completed");
+
+  } catch (error) {
+    console.error("❌ Invoice generation error:", error);
   }
-
-  console.log("🎉 Invoice generation completed");
-
-} catch (error) {
-  console.error("❌ Invoice generation error:", error);
-}
 }
