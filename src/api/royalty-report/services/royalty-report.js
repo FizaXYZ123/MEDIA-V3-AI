@@ -302,12 +302,12 @@ module.exports = () => ({
     for (const row of rows) {
 
       const key = [
-  normalizeISRC(row.isrc),
-  normalizePlatform(row.channel),
-  (row.country || "").trim().toUpperCase(),
-  formatDate(row.start_date),
-  formatDate(row.end_date),
-].join("|");
+        normalizeISRC(row.isrc),
+        normalizePlatform(row.channel),
+        (row.country || "").trim().toUpperCase(),
+        formatDate(row.start_date),
+        formatDate(row.end_date),
+      ].join("|");
 
       if (existingPeriodKeys.has(key)) {
 
@@ -686,49 +686,49 @@ module.exports = () => ({
         skipped++;
 
         const existingTrack = await strapi.entityService.findOne(
-  "api::royalty-report.royalty-report",
-  existingRoyalty.id,
-  {
-    populate: {
-      distribute_track: {
-        populate: {
-          PublishedRelease: {
+          "api::royalty-report.royalty-report",
+          existingRoyalty.id,
+          {
             populate: {
-              UserDetail: true,
+              distribute_track: {
+                populate: {
+                  PublishedRelease: {
+                    populate: {
+                      UserDetail: true,
+                    },
+                  },
+                },
+              },
             },
-          },
-        },
-      },
-    },
-  }
-);
+          }
+        );
 
-const existingUser =
-  existingTrack.distribute_track?.PublishedRelease?.UserDetail;
+        const existingUser =
+          existingTrack.distribute_track?.PublishedRelease?.UserDetail;
 
-if (existingUser) {
+        if (existingUser) {
 
-  const allocations = splitRoyaltyByMonths(
-    existingRoyalty.StartDate,
-    existingRoyalty.EndDate,
-    Number(existingRoyalty.NetTotal || 0)
-  );
+          const allocations = splitRoyaltyByMonths(
+            existingRoyalty.StartDate,
+            existingRoyalty.EndDate,
+            Number(existingRoyalty.NetTotal || 0)
+          );
 
-  for (const allocation of allocations) {
+          for (const allocation of allocations) {
 
-    affectedInvoiceKeys.set(
-      `${existingUser.id}-${allocation.year}-${allocation.month}`,
-      {
-        user: existingUser,
-        userId: existingUser.id,
-        month: allocation.month,
-        year: allocation.year,
-      }
-    );
+            affectedInvoiceKeys.set(
+              `${existingUser.id}-${allocation.year}-${allocation.month}`,
+              {
+                user: existingUser,
+                userId: existingUser.id,
+                month: allocation.month,
+                year: allocation.year,
+              }
+            );
 
-  }
+          }
 
-}
+        }
 
         continue;
       }
@@ -821,49 +821,49 @@ if (existingUser) {
       importedRoyalties.push(created);
 
       const createdTrack = await strapi.entityService.findOne(
-  "api::royalty-report.royalty-report",
-  created.id,
-  {
-    populate: {
-      distribute_track: {
-        populate: {
-          PublishedRelease: {
-            populate: {
-              UserDetail: true,
+        "api::royalty-report.royalty-report",
+        created.id,
+        {
+          populate: {
+            distribute_track: {
+              populate: {
+                PublishedRelease: {
+                  populate: {
+                    UserDetail: true,
+                  },
+                },
+              },
             },
           },
-        },
-      },
-    },
-  }
-);
+        }
+      );
 
-const createdUser =
-  createdTrack.distribute_track?.PublishedRelease?.UserDetail;
+      const createdUser =
+        createdTrack.distribute_track?.PublishedRelease?.UserDetail;
 
-if (createdUser) {
+      if (createdUser) {
 
-  const allocations = splitRoyaltyByMonths(
-    created.StartDate,
-    created.EndDate,
-    Number(created.NetTotal || 0)
-  );
+        const allocations = splitRoyaltyByMonths(
+          created.StartDate,
+          created.EndDate,
+          Number(created.NetTotal || 0)
+        );
 
-  for (const allocation of allocations) {
+        for (const allocation of allocations) {
 
-    affectedInvoiceKeys.set(
-      `${createdUser.id}-${allocation.year}-${allocation.month}`,
-      {
-        user: createdUser,
-        userId: createdUser.id,
-        month: allocation.month,
-        year: allocation.year,
+          affectedInvoiceKeys.set(
+            `${createdUser.id}-${allocation.year}-${allocation.month}`,
+            {
+              user: createdUser,
+              userId: createdUser.id,
+              month: allocation.month,
+              year: allocation.year,
+            }
+          );
+
+        }
+
       }
-    );
-
-  }
-
-}
     }
 
     let originalTotal = 0;
@@ -916,7 +916,7 @@ if (createdUser) {
     }
 
     /* 🔥 GENERATE INVOICES */
-await generateInvoices(affectedInvoiceKeys);
+    await generateInvoices(affectedInvoiceKeys);
     return {
       inserted,
       skipped: skipped + skippedImportedRows,
@@ -982,13 +982,16 @@ async function generateInvoices(affectedInvoiceKeys) {
   try {
     console.log("========== GENERATE INVOICES START ==========");
 
-   if (!affectedInvoiceKeys.size) {
-  console.log("No affected invoices.");
-  return;
-}
+    if (!affectedInvoiceKeys.size) {
+      console.log("No affected invoices.");
+      return;
+    }
 
     /* ================= PROCESS USERS ================= */
-    for (const [, item] of affectedMonths) {
+
+    const affectedMonths = affectedInvoiceKeys;
+
+   for (const [, item] of affectedInvoiceKeys) {
 
       const {
         user,
