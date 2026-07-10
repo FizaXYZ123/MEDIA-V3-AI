@@ -235,6 +235,7 @@ module.exports = () => ({
 
     const rows = [];
     const importedRoyalties = [];
+    const affectedInvoiceKeys = new Map();
 
     await new Promise((resolve) => {
       fs.createReadStream(filepath)
@@ -272,6 +273,7 @@ module.exports = () => ({
       .query("api::royalty-report.royalty-report")
       .findMany({
         select: [
+          "ISRC",
           "Platform",
           "Country",
           "StartDate",
@@ -284,6 +286,7 @@ module.exports = () => ({
     existingPeriods.forEach((item) => {
       existingPeriodKeys.add(
         [
+          normalizeISRC(item.ISRC),
           item.Platform,
           (item.Country || "").trim().toUpperCase(),
           formatDate(item.StartDate),
@@ -299,11 +302,12 @@ module.exports = () => ({
     for (const row of rows) {
 
       const key = [
-        normalizePlatform(row.channel),
-        (row.country || "").trim().toUpperCase(),
-        formatDate(row.start_date),
-        formatDate(row.end_date),
-      ].join("|");
+  normalizeISRC(row.isrc),
+  normalizePlatform(row.channel),
+  (row.country || "").trim().toUpperCase(),
+  formatDate(row.start_date),
+  formatDate(row.end_date),
+].join("|");
 
       if (existingPeriodKeys.has(key)) {
 
@@ -681,6 +685,51 @@ module.exports = () => ({
 
         skipped++;
 
+        const existingTrack = await strapi.entityService.findOne(
+  "api::royalty-report.royalty-report",
+  existingRoyalty.id,
+  {
+    populate: {
+      distribute_track: {
+        populate: {
+          PublishedRelease: {
+            populate: {
+              UserDetail: true,
+            },
+          },
+        },
+      },
+    },
+  }
+);
+
+const existingUser =
+  existingTrack.distribute_track?.PublishedRelease?.UserDetail;
+
+if (existingUser) {
+
+  const allocations = splitRoyaltyByMonths(
+    existingRoyalty.StartDate,
+    existingRoyalty.EndDate,
+    Number(existingRoyalty.NetTotal || 0)
+  );
+
+  for (const allocation of allocations) {
+
+    affectedInvoiceKeys.set(
+      `${existingUser.id}-${allocation.year}-${allocation.month}`,
+      {
+        user: existingUser,
+        userId: existingUser.id,
+        month: allocation.month,
+        year: allocation.year,
+      }
+    );
+
+  }
+
+}
+
         continue;
       }
 
@@ -770,6 +819,51 @@ module.exports = () => ({
 
       inserted++;
       importedRoyalties.push(created);
+
+      const createdTrack = await strapi.entityService.findOne(
+  "api::royalty-report.royalty-report",
+  created.id,
+  {
+    populate: {
+      distribute_track: {
+        populate: {
+          PublishedRelease: {
+            populate: {
+              UserDetail: true,
+            },
+          },
+        },
+      },
+    },
+  }
+);
+
+const createdUser =
+  createdTrack.distribute_track?.PublishedRelease?.UserDetail;
+
+if (createdUser) {
+
+  const allocations = splitRoyaltyByMonths(
+    created.StartDate,
+    created.EndDate,
+    Number(created.NetTotal || 0)
+  );
+
+  for (const allocation of allocations) {
+
+    affectedInvoiceKeys.set(
+      `${createdUser.id}-${allocation.year}-${allocation.month}`,
+      {
+        user: createdUser,
+        userId: createdUser.id,
+        month: allocation.month,
+        year: allocation.year,
+      }
+    );
+
+  }
+
+}
     }
 
     let originalTotal = 0;
@@ -822,8 +916,7 @@ module.exports = () => ({
     }
 
     /* 🔥 GENERATE INVOICES */
-    await generateInvoices(importedRoyalties);
-
+await generateInvoices(affectedInvoiceKeys);
     return {
       inserted,
       skipped: skipped + skippedImportedRows,
@@ -885,73 +978,14 @@ function splitRoyaltyByMonths(startDate, endDate, amount) {
 }
 
 /* ================= INVOICE GENERATION ================= */
-async function generateInvoices(importedRoyalties) {
+async function generateInvoices(affectedInvoiceKeys) {
   try {
     console.log("========== GENERATE INVOICES START ==========");
 
-    if (!importedRoyalties.length) {
-      console.log("No imported royalties.");
-      return;
-    }
-
-    /* ================= FETCH ROYALTIES ================= */
-
-    const royalties = await strapi.entityService.findMany(
-      "api::royalty-report.royalty-report",
-      {
-        filters: {
-          id: {
-            $in: importedRoyalties.map(r => r.id),
-          },
-        },
-        populate: {
-          distribute_track: {
-            populate: {
-              PublishedRelease: {
-                populate: {
-                  UserDetail: true,
-                },
-              },
-            },
-          },
-        },
-      }
-    );
-
-    if (!royalties.length) {
-      console.log("No royalties found.");
-      return;
-    }
-    /* ================= GROUP BY USER ================= */
-    const affectedMonths = new Map();
-
-    for (const royalty of royalties) {
-
-      const user =
-        royalty.distribute_track?.PublishedRelease?.UserDetail;
-
-      if (!user) continue;
-
-      const allocations = splitRoyaltyByMonths(
-        royalty.StartDate,
-        royalty.EndDate,
-        Number(royalty.NetTotal || 0)
-      );
-
-      for (const allocation of allocations) {
-
-        const key =
-          `${user.id}-${allocation.year}-${allocation.month}`;
-
-        affectedMonths.set(key, {
-          user,
-          userId: user.id,
-          month: allocation.month,
-          year: allocation.year,
-        });
-
-      }
-    }
+   if (!affectedInvoiceKeys.size) {
+  console.log("No affected invoices.");
+  return;
+}
 
     /* ================= PROCESS USERS ================= */
     for (const [, item] of affectedMonths) {
