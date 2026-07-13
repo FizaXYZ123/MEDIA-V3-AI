@@ -613,9 +613,9 @@ module.exports = () => ({
 
             EndDate: endDate,
 
-            ReportMonth: reportMonth,
+            reportMonth: reportMonth,
 
-            ReportYear: reportYear,
+            reportYear: reportYear,
 
             ConfirmationReportDate: confirmationDate,
 
