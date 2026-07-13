@@ -1,5 +1,45 @@
 "use strict";
 
+function splitUnitsByMonths(startDate, endDate, units) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const totalDays =
+    Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+  if (totalDays <= 0) return [];
+
+  const dailyUnits = Number(units || 0) / totalDays;
+
+  const result = [];
+
+  let current = new Date(start);
+
+  while (current <= end) {
+    const year = current.getFullYear();
+    const month = current.getMonth();
+
+    const monthEnd = new Date(year, month + 1, 0);
+
+    const periodEnd = monthEnd < end ? monthEnd : end;
+
+    const days =
+      Math.floor(
+        (periodEnd - current) / (1000 * 60 * 60 * 24)
+      ) + 1;
+
+    result.push({
+      year,
+      month: month + 1,
+      units: dailyUnits * days,
+    });
+
+    current = new Date(periodEnd);
+    current.setDate(current.getDate() + 1);
+  }
+
+  return result;
+}
 module.exports = {
 
   async importReport(ctx) {
@@ -385,23 +425,45 @@ module.exports = {
         });
       }
 
-      /* 5️⃣ GROUP BY AVAILABLE REPORT PERIODS */
-      const periodMap = new Map();
+      /* 5️⃣ SPLIT UNITS BY MONTH */
+
+      const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const key = `${royalty.StartDate}_${royalty.EndDate}`;
+        const allocations = splitUnitsByMonths(
+          royalty.StartDate,
+          royalty.EndDate,
+          royalty.Units
+        );
 
-        if (!periodMap.has(key)) {
-          periodMap.set(key, []);
-        }
+        allocations.forEach((allocation) => {
+          const key = `${allocation.year}-${allocation.month}`;
 
-        periodMap.get(key).push(royalty);
+          if (!monthMap.has(key)) {
+            monthMap.set(key, []);
+          }
+
+          monthMap.get(key).push({
+            Platform: royalty.Platform,
+            Units: allocation.units,
+          });
+        });
       });
 
-      /* 6️⃣ TAKE LATEST AVAILABLE REPORTS */
-      const selectedRoyalties = [...periodMap.values()]
+      /* 6️⃣ TAKE LATEST MONTHS */
+
+      const selectedRoyalties = [...monthMap.entries()]
+        .sort((a, b) => {
+          const [yearA, monthA] = a[0].split("-").map(Number);
+          const [yearB, monthB] = b[0].split("-").map(Number);
+
+          return (
+            new Date(yearB, monthB - 1) -
+            new Date(yearA, monthA - 1)
+          );
+        })
         .slice(0, limit)
-        .flat();
+        .flatMap(([, royalties]) => royalties);
 
       /* 7️⃣ GROUP BY PLATFORM */
       let totalUnits = 0;
@@ -525,23 +587,45 @@ module.exports = {
         });
       }
 
-      /* ================= AVAILABLE REPORT PERIODS ================= */
+      /* ================= SPLIT UNITS BY MONTH ================= */
 
-      const periodMap = new Map();
+      const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const key = `${royalty.StartDate}_${royalty.EndDate}`;
+        const allocations = splitUnitsByMonths(
+          royalty.StartDate,
+          royalty.EndDate,
+          royalty.Units
+        );
 
-        if (!periodMap.has(key)) {
-          periodMap.set(key, []);
-        }
+        allocations.forEach((allocation) => {
+          const key = `${allocation.year}-${allocation.month}`;
 
-        periodMap.get(key).push(royalty);
+          if (!monthMap.has(key)) {
+            monthMap.set(key, []);
+          }
+
+          monthMap.get(key).push({
+            Country: royalty.Country,
+            Units: allocation.units,
+          });
+        });
       });
 
-      const selectedRoyalties = [...periodMap.values()]
+      /* ================= TAKE LATEST MONTHS ================= */
+
+      const selectedRoyalties = [...monthMap.entries()]
+        .sort((a, b) => {
+          const [yearA, monthA] = a[0].split("-").map(Number);
+          const [yearB, monthB] = b[0].split("-").map(Number);
+
+          return (
+            new Date(yearB, monthB - 1) -
+            new Date(yearA, monthA - 1)
+          );
+        })
         .slice(0, limit)
-        .flat();
+        .flatMap(([, royalties]) => royalties);
 
       /* ================= COUNTRY UNITS ================= */
 
@@ -649,9 +733,6 @@ module.exports = {
             "StartDate",
             "EndDate",
           ],
-          orderBy: {
-            EndDate: "desc",
-          },
         });
 
       if (!royalties.length) {
@@ -661,42 +742,43 @@ module.exports = {
         });
       }
 
-      /* ================= GROUP BY AVAILABLE REPORT PERIODS ================= */
+      /* ================= GROUP STREAMS BY MONTH ================= */
 
-      const periodMap = new Map();
+      const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const key = `${royalty.StartDate}_${royalty.EndDate}`;
-
-        if (!periodMap.has(key)) {
-          periodMap.set(key, []);
-        }
-
-        periodMap.get(key).push(royalty);
-      });
-
-      /* ================= LATEST AVAILABLE REPORTS ================= */
-
-      const selectedReports = [...periodMap.entries()].slice(0, limit);
-
-      /* ================= CHART DATA ================= */
-
-      const chart = selectedReports.map(([key, royalties]) => {
-        const totalStreams = royalties.reduce(
-          (sum, royalty) => sum + Number(royalty.Units || 0),
-          0
+        const allocations = splitUnitsByMonths(
+          royalty.StartDate,
+          royalty.EndDate,
+          royalty.Units
         );
 
-        const endDate = new Date(royalties[0].EndDate);
+        allocations.forEach((allocation) => {
+          const key = `${allocation.year}-${allocation.month}`;
 
-        return {
-          month: endDate.toLocaleDateString("en-US", {
+          if (!monthMap.has(key)) {
+            monthMap.set(key, {
+              date: new Date(allocation.year, allocation.month - 1, 1),
+              totalStreams: 0,
+            });
+          }
+
+          monthMap.get(key).totalStreams += allocation.units;
+        });
+      });
+
+      /* ================= CHART ================= */
+
+      const chart = [...monthMap.values()]
+        .sort((a, b) => b.date - a.date)
+        .slice(0, limit)
+        .map((item) => ({
+          month: item.date.toLocaleDateString("en-US", {
             month: "short",
             year: "numeric",
           }),
-          totalStreams,
-        };
-      });
+          totalStreams: Math.round(item.totalStreams),
+        }));
 
       /* ================= GRAND TOTAL ================= */
 
