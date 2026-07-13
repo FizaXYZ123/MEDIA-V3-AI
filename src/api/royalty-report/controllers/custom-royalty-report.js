@@ -73,6 +73,38 @@ module.exports = {
         return ctx.badRequest("Invalid platformCommissions JSON");
       }
 
+      /* ================= report month and year ================= */
+
+      const reportMonth = Number(ctx.request.body?.reportMonth);
+      const reportYear = Number(ctx.request.body?.reportYear);
+
+      if (
+        !Number.isInteger(reportMonth) ||
+        reportMonth < 1 ||
+        reportMonth > 12 ||
+        !Number.isInteger(reportYear) ||
+        reportYear < 2000
+      ) {
+        return ctx.badRequest("Valid report month and year are required");
+      }
+
+      /* ================= CHECK REPORT ALREADY IMPORTED ================= */
+
+      const existingReport = await strapi.db
+        .query("api::imported-report.imported-report")
+        .findOne({
+          where: {
+            reportMonth,
+            reportYear,
+          },
+        });
+
+      if (existingReport) {
+        return ctx.badRequest(
+          `Royalty report for ${reportMonth}/${reportYear} has already been imported.`
+        );
+      }
+
       const loggedInUser = await strapi.db
         .query("plugin::users-permissions.user")
         .findOne({
@@ -91,7 +123,9 @@ module.exports = {
           file.name,
           commissionValue,
           platformCommissions,
-          loggedInUser
+          loggedInUser,
+          reportMonth,
+          reportYear
         );
 
       return ctx.send({

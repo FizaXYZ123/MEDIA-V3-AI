@@ -20,6 +20,12 @@
     "endDate": {
       "type": "date"
     },
+    "reportMonth": {
+  "type": "integer"
+},
+"reportYear": {
+  "type": "integer"
+},
     "totalNet": {
       "type": "float"
     },

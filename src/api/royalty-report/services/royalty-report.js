@@ -231,7 +231,8 @@ function normalizeHeader(header) {
 
 module.exports = () => ({
 
-  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {}, user = null) {
+  async importCSV(filepath, filename, commissionPercent = 15, platformCommissions = {}, user = null, reportMonth,
+    reportYear) {
 
     const rows = [];
     const importedRoyalties = [];
@@ -266,73 +267,6 @@ module.exports = () => ({
     const reportEndDate = formatDate(maxEnd);
 
     console.log("🧠 Calculated Period:", reportStartDate, "→", reportEndDate);
-
-    /* ================= CHECK IMPORTED PLATFORM/COUNTRY/PERIOD ================= */
-
-    const existingPeriods = await strapi.db
-      .query("api::royalty-report.royalty-report")
-      .findMany({
-        select: [
-          "ISRC",
-          "Platform",
-          "Country",
-          "StartDate",
-          "EndDate",
-        ],
-      });
-
-    const existingPeriodKeys = new Set();
-
-    existingPeriods.forEach((item) => {
-      existingPeriodKeys.add(
-        [
-          normalizeISRC(item.ISRC),
-          item.Platform,
-          (item.Country || "").trim().toUpperCase(),
-          formatDate(item.StartDate),
-          formatDate(item.EndDate),
-        ].join("|")
-      );
-    });
-
-    const filteredRows = [];
-
-    let skippedImportedRows = 0;
-
-    for (const row of rows) {
-
-      const key = [
-        normalizeISRC(row.isrc),
-        normalizePlatform(row.channel),
-        (row.country || "").trim().toUpperCase(),
-        formatDate(row.start_date),
-        formatDate(row.end_date),
-      ].join("|");
-
-      if (existingPeriodKeys.has(key)) {
-
-        skippedImportedRows++;
-
-        console.log("⏭️ PERIOD ALREADY IMPORTED:", key);
-
-        continue;
-      }
-
-      filteredRows.push(row);
-    }
-
-    rows.length = 0;
-    rows.push(...filteredRows);
-
-    console.log(
-      `⏭️ Rows skipped due to imported period: ${skippedImportedRows}`
-    );
-
-    if (!rows.length) {
-      throw new Error(
-        "All platform/country/date combinations already exist."
-      );
-    }
 
     /* ================= MERGE DUPLICATE ROWS ================= */
 
@@ -654,85 +588,6 @@ module.exports = () => ({
       const endDate = formatDate(row.end_date);
       const confirmationDate = formatDate(row.confirmation_report_date);
 
-      // Duplicate Check
-      const existingRoyalty = await strapi.db
-        .query("api::royalty-report.royalty-report")
-        .findOne({
-          where: {
-            ISRC: isrc,
-            Platform: platform,
-            Country: row.country,
-            StartDate: startDate,
-            EndDate: endDate,
-            UserEmail: row.user_email,
-          },
-        });
-
-      if (existingRoyalty) {
-
-        console.log(
-          "⚠️ DUPLICATE ROYALTY SKIPPED",
-          {
-            isrc,
-            platform,
-            country: row.country,
-            startDate,
-            endDate,
-            userEmail: row.user_email,
-            existingRoyaltyId: existingRoyalty.id
-          }
-        );
-
-        skipped++;
-
-        const existingTrack = await strapi.entityService.findOne(
-          "api::royalty-report.royalty-report",
-          existingRoyalty.id,
-          {
-            populate: {
-              distribute_track: {
-                populate: {
-                  PublishedRelease: {
-                    populate: {
-                      UserDetail: true,
-                    },
-                  },
-                },
-              },
-            },
-          }
-        );
-
-        const existingUser =
-          existingTrack.distribute_track?.PublishedRelease?.UserDetail;
-
-        if (existingUser) {
-
-          const allocations = splitRoyaltyByMonths(
-            existingRoyalty.StartDate,
-            existingRoyalty.EndDate,
-            Number(existingRoyalty.NetTotal || 0)
-          );
-
-          for (const allocation of allocations) {
-
-            affectedInvoiceKeys.set(
-              `${existingUser.id}-${allocation.year}-${allocation.month}`,
-              {
-                user: existingUser,
-                userId: existingUser.id,
-                month: allocation.month,
-                year: allocation.year,
-              }
-            );
-
-          }
-
-        }
-
-        continue;
-      }
-
       /* ================= CREATE ================= */
 
       const created = await strapi.db
@@ -757,6 +612,10 @@ module.exports = () => ({
             StartDate: startDate,
 
             EndDate: endDate,
+
+            ReportMonth: reportMonth,
+
+            ReportYear: reportYear,
 
             ConfirmationReportDate: confirmationDate,
 
@@ -842,27 +701,15 @@ module.exports = () => ({
         createdTrack.distribute_track?.PublishedRelease?.UserDetail;
 
       if (createdUser) {
-
-        const allocations = splitRoyaltyByMonths(
-          created.StartDate,
-          created.EndDate,
-          Number(created.NetTotal || 0)
+        affectedInvoiceKeys.set(
+          `${createdUser.id}-${reportYear}-${reportMonth}`,
+          {
+            user: createdUser,
+            userId: createdUser.id,
+            month: reportMonth,
+            year: reportYear,
+          }
         );
-
-        for (const allocation of allocations) {
-
-          affectedInvoiceKeys.set(
-            `${createdUser.id}-${allocation.year}-${allocation.month}`,
-            {
-              user: createdUser,
-              userId: createdUser.id,
-              month: allocation.month,
-              year: allocation.year,
-            }
-          );
-
-        }
-
       }
     }
 
@@ -878,6 +725,8 @@ module.exports = () => ({
       .query("api::imported-report.imported-report")
       .create({
         data: {
+          reportMonth,
+          reportYear,
           startDate: reportStartDate,
           endDate: reportEndDate,
           FileName: filename,
@@ -898,7 +747,6 @@ module.exports = () => ({
     console.log("🎉 IMPORT COMPLETED", {
       inserted,
       skipped,
-      periodSkipped: skippedImportedRows,
       monthlyTotal,
       skippedTotal,
       originalTotal
@@ -919,63 +767,15 @@ module.exports = () => ({
     await generateInvoices(affectedInvoiceKeys);
     return {
       inserted,
-      skipped: skipped + skippedImportedRows,
+      skipped,
       monthlyTotal,
       skippedTotal,
       commissionPercent,
       originalTotal,
     };
-
-
   },
 
 });
-
-function splitRoyaltyByMonths(startDate, endDate, amount) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const totalDays =
-    Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-  if (totalDays <= 0) {
-    return [];
-  }
-
-  const dailyAmount = amount / totalDays;
-
-  const result = [];
-
-  let current = new Date(start);
-
-  while (current <= end) {
-
-    const year = current.getFullYear();
-    const month = current.getMonth();
-
-    const monthEnd = new Date(year, month + 1, 0);
-
-    const periodEnd =
-      monthEnd < end ? monthEnd : end;
-
-    const days =
-      Math.floor(
-        (periodEnd - current) /
-        (1000 * 60 * 60 * 24)
-      ) + 1;
-
-    result.push({
-      month: month + 1,
-      year,
-      amount: Number((dailyAmount * days).toFixed(6)),
-    });
-
-    current = new Date(periodEnd);
-    current.setDate(current.getDate() + 1);
-  }
-
-  return result;
-}
 
 /* ================= INVOICE GENERATION ================= */
 async function generateInvoices(affectedInvoiceKeys) {
@@ -991,7 +791,7 @@ async function generateInvoices(affectedInvoiceKeys) {
 
     const affectedMonths = affectedInvoiceKeys;
 
-   for (const [, item] of affectedInvoiceKeys) {
+    for (const [, item] of affectedInvoiceKeys) {
 
       const {
         user,
@@ -1015,10 +815,12 @@ async function generateInvoices(affectedInvoiceKeys) {
         999
       );
 
-      const allRoyalties = await strapi.entityService.findMany(
+      const royalties = await strapi.entityService.findMany(
         "api::royalty-report.royalty-report",
         {
           filters: {
+            ReportMonth: month,
+            ReportYear: year,
             distribute_track: {
               PublishedRelease: {
                 UserDetail: {
@@ -1041,36 +843,10 @@ async function generateInvoices(affectedInvoiceKeys) {
         }
       );
 
-      let totalEarnings = 0;
-      const royalties = [];
-
-      for (const royalty of allRoyalties) {
-
-        const royaltyUser =
-          royalty.distribute_track?.PublishedRelease?.UserDetail;
-
-        if (!royaltyUser || royaltyUser.id !== user.id) {
-          continue;
-        }
-
-        const allocations = splitRoyaltyByMonths(
-          royalty.StartDate,
-          royalty.EndDate,
-          Number(royalty.NetTotal || 0)
-        );
-
-        for (const allocation of allocations) {
-
-          if (
-            allocation.month === month &&
-            allocation.year === year
-          ) {
-            totalEarnings += allocation.amount;
-            royalties.push(royalty);
-          }
-
-        }
-      }
+      const totalEarnings = royalties.reduce(
+        (sum, royalty) => sum + Number(royalty.NetTotal || 0),
+        0
+      );
 
       console.log(
         `User ${user.id} Month ${month}/${year} Total ${totalEarnings}`

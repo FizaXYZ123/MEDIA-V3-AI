@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-13T08:37:07.599Z"
+    "x-generation-date": "2026-07-13T10:30:36.978Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -47000,6 +47000,12 @@
                 "type": "string",
                 "format": "date"
               },
+              "reportMonth": {
+                "type": "integer"
+              },
+              "reportYear": {
+                "type": "integer"
+              },
               "totalNet": {
                 "type": "number",
                 "format": "float"
@@ -47080,6 +47086,12 @@
           "endDate": {
             "type": "string",
             "format": "date"
+          },
+          "reportMonth": {
+            "type": "integer"
+          },
+          "reportYear": {
+            "type": "integer"
           },
           "totalNet": {
             "type": "number",
