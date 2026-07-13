@@ -1965,6 +1965,8 @@ export interface ApiRoyaltyReportRoyaltyReport extends Schema.CollectionType {
     NetTotal: Attribute.Float;
     StartDate: Attribute.Date;
     EndDate: Attribute.Date;
+    reportMonth: Attribute.Integer;
+    reportYear: Attribute.Integer;
     ConfirmationReportDate: Attribute.Date;
     Currency: Attribute.String;
     Label: Attribute.String;

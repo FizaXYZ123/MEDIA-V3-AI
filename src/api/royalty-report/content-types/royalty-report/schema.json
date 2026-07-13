@@ -47,6 +47,12 @@
     "EndDate": {
       "type": "date"
     },
+    "reportMonth": {
+      "type": "integer"
+    },
+    "reportYear": {
+      "type": "integer"
+    },
     "ConfirmationReportDate": {
       "type": "date"
     },

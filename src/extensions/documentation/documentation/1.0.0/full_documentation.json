@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-13T06:06:59.239Z"
+    "x-generation-date": "2026-07-13T08:37:07.599Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1968,6 +1968,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -6815,6 +6821,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -11727,6 +11739,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -16687,6 +16705,12 @@
                                                                   "type": "string",
                                                                   "format": "date"
                                                                 },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
+                                                                },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
                                                                   "format": "date"
@@ -21578,6 +21602,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -27222,6 +27252,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -35072,6 +35108,12 @@
                                         "type": "string",
                                         "format": "date"
                                       },
+                                      "reportMonth": {
+                                        "type": "integer"
+                                      },
+                                      "reportYear": {
+                                        "type": "integer"
+                                      },
                                       "ConfirmationReportDate": {
                                         "type": "string",
                                         "format": "date"
@@ -39934,6 +39976,12 @@
                                                     "type": "string",
                                                     "format": "date"
                                                   },
+                                                  "reportMonth": {
+                                                    "type": "integer"
+                                                  },
+                                                  "reportYear": {
+                                                    "type": "integer"
+                                                  },
                                                   "ConfirmationReportDate": {
                                                     "type": "string",
                                                     "format": "date"
@@ -42373,6 +42421,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -49319,6 +49373,12 @@
                                                                   "type": "string",
                                                                   "format": "date"
                                                                 },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
+                                                                },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
                                                                   "format": "date"
@@ -54147,6 +54207,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -58977,6 +59043,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -63869,6 +63941,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -68831,6 +68909,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -74226,6 +74310,12 @@
                                                                               "EndDate": {
                                                                                 "type": "string",
                                                                                 "format": "date"
+                                                                              },
+                                                                              "reportMonth": {
+                                                                                "type": "integer"
+                                                                              },
+                                                                              "reportYear": {
+                                                                                "type": "integer"
                                                                               },
                                                                               "ConfirmationReportDate": {
                                                                                 "type": "string",
@@ -82117,6 +82207,12 @@
                                         "type": "string",
                                         "format": "date"
                                       },
+                                      "reportMonth": {
+                                        "type": "integer"
+                                      },
+                                      "reportYear": {
+                                        "type": "integer"
+                                      },
                                       "ConfirmationReportDate": {
                                         "type": "string",
                                         "format": "date"
@@ -86893,6 +86989,12 @@
                                                     "type": "string",
                                                     "format": "date"
                                                   },
+                                                  "reportMonth": {
+                                                    "type": "integer"
+                                                  },
+                                                  "reportYear": {
+                                                    "type": "integer"
+                                                  },
                                                   "ConfirmationReportDate": {
                                                     "type": "string",
                                                     "format": "date"
@@ -87332,6 +87434,12 @@
                 "type": "string",
                 "format": "date"
               },
+              "reportMonth": {
+                "type": "integer"
+              },
+              "reportYear": {
+                "type": "integer"
+              },
               "ConfirmationReportDate": {
                 "type": "string",
                 "format": "date"
@@ -87490,6 +87598,12 @@
           "EndDate": {
             "type": "string",
             "format": "date"
+          },
+          "reportMonth": {
+            "type": "integer"
+          },
+          "reportYear": {
+            "type": "integer"
           },
           "ConfirmationReportDate": {
             "type": "string",
@@ -92041,6 +92155,12 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "reportMonth": {
+                                      "type": "integer"
+                                    },
+                                    "reportYear": {
+                                      "type": "integer"
+                                    },
                                     "ConfirmationReportDate": {
                                       "type": "string",
                                       "format": "date"
@@ -94581,6 +94701,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -99817,6 +99943,12 @@
                                                                   "type": "string",
                                                                   "format": "date"
                                                                 },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
+                                                                },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
                                                                   "format": "date"
@@ -104726,6 +104858,12 @@
                                                                   "type": "string",
                                                                   "format": "date"
                                                                 },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
+                                                                },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
                                                                   "format": "date"
@@ -109512,6 +109650,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -114398,6 +114542,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
@@ -119288,6 +119438,12 @@
                                                                 "EndDate": {
                                                                   "type": "string",
                                                                   "format": "date"
+                                                                },
+                                                                "reportMonth": {
+                                                                  "type": "integer"
+                                                                },
+                                                                "reportYear": {
+                                                                  "type": "integer"
                                                                 },
                                                                 "ConfirmationReportDate": {
                                                                   "type": "string",
