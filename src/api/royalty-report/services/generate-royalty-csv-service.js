@@ -20,40 +20,23 @@ module.exports = createCoreService(
                 const { startMonth, endMonth } =
                     ctx.query;
 
-                /* ================= FORMAT DATES ================= */
+                const [startYear, startMonthNumber] = startMonth
+                    .split("-")
+                    .map(Number);
 
-                const startDate =
-                    `${startMonth}-01`;
+                const [endYear, endMonthNumber] = endMonth
+                    .split("-")
+                    .map(Number);
 
-                const [endYear, endMonthNumber] =
-                    endMonth.split("-");
-
-                const lastDay =
-                    new Date(
-                        Number(endYear),
-                        Number(endMonthNumber),
-                        0
-                    ).getDate();
-
-                const endDate =
-                    `${endMonth}-${lastDay}`;
-
-                console.log("📅 Formatted Dates:", {
-                    startDate,
-                    endDate,
-                });
+                const startValue = startYear * 100 + startMonthNumber;
+                const endValue = endYear * 100 + endMonthNumber;
 
                 const userId =
                     ctx.state.user.id;
 
-                console.log("📅 Date Range:", {
-                    startMonth,
-                    endMonth,
-                });
-
                 console.log("👤 User ID:", userId);
 
-               const log = await createUserActivityLog({
+                const log = await createUserActivityLog({
                     userId,
                     action: "CSV Report Requested",
                     description: `Requested royalty CSV report from ${startMonth} to ${endMonth}`,
@@ -100,12 +83,9 @@ module.exports = createCoreService(
                         "api::royalty-report.royalty-report",
                         {
                             filters: {
-                                StartDate: {
-                                    $gte: startDate,
-                                },
-
-                                EndDate: {
-                                    $lte: endDate,
+                                reportYear: {
+                                    $gte: startYear,
+                                    $lte: endYear,
                                 },
 
                                 distribute_track: {
@@ -136,7 +116,46 @@ module.exports = createCoreService(
                     royalties.length
                 );
 
-                if (!royalties.length) {
+                /* ================= FILTER & GROUP ROYALTIES ================= */
+
+                const groupedRoyalties = new Map();
+
+                for (const royalty of royalties) {
+
+                    if (!royalty.reportYear || !royalty.reportMonth) {
+                        continue;
+                    }
+
+                    const value =
+                        royalty.reportYear * 100 + royalty.reportMonth;
+
+                    if (
+                        value < startValue ||
+                        value > endValue
+                    ) {
+                        continue;
+                    }
+
+                    const key =
+                        `${royalty.reportYear}-${royalty.reportMonth}`;
+
+                    if (!groupedRoyalties.has(key)) {
+
+                        groupedRoyalties.set(key, {
+                            reportYear: royalty.reportYear,
+                            reportMonth: royalty.reportMonth,
+                            royalties: [],
+                        });
+
+                    }
+
+                    groupedRoyalties
+                        .get(key)
+                        .royalties
+                        .push(royalty);
+                }
+
+                if (!groupedRoyalties.size) {
 
                     console.log(
                         "⚠️ Report does not exist"
@@ -152,8 +171,11 @@ module.exports = createCoreService(
 
                 /* ================= USER ================= */
 
+                const firstGroup =
+                    [...groupedRoyalties.values()][0];
+
                 const user =
-                    royalties[0]
+                    firstGroup.royalties[0]
                         ?.distribute_track
                         ?.PublishedRelease
                         ?.UserDetail;
@@ -177,471 +199,393 @@ module.exports = createCoreService(
                     }
                 );
 
-                /* ================= TOTAL EARNINGS ================= */
-
-                const totalEarnings =
-                    royalties.reduce(
-                        (sum, royalty) =>
-                            sum +
-                            Number(
-                                royalty.NetTotal || 0
-                            ),
-                        0
-                    );
-
-                console.log(
-                    "💰 Total Earnings:",
-                    totalEarnings
-                );
-
-                /* ================= TOTAL UNITS ================= */
-
-                const totalUnits =
-                    royalties.reduce(
-                        (sum, royalty) =>
-                            sum +
-                            Number(
-                                royalty.Units || 0
-                            ),
-                        0
-                    );
-
-                console.log(
-                    "🎧 Total Units:",
-                    totalUnits
-                );
-
-                /* ================= ACTIVE SUBSCRIPTION ================= */
-
-                const activeSubscription =
-                    await strapi.db
-                        .query(
-                            "api::user-subscription.user-subscription"
-                        )
-                        .findOne({
-                            where: {
-                                users_permissions_user:
-                                    user.id,
-
-                                status: "active",
-                            },
-
-                            populate: {
-                                plan: true,
-                            },
-                        });
-
-                console.log(
-                    "📄 Active Subscription:",
-                    activeSubscription?.plan?.name
-                );
-
-                if (
-                    !activeSubscription?.plan
-                        ?.isActive
-                ) {
-
-                    console.log(
-                        "❌ No active plan"
-                    );
-
-                    return ctx.badRequest(
-                        "No active plan"
-                    );
-                }
-
-                const activePlan =
-                    activeSubscription.plan;
-
-                const planName =
-                    activePlan.name
-                        ?.toLowerCase()
-                        ?.trim();
-
-                console.log(
-                    "📦 Plan Name:",
-                    planName
-                );
-
-                const currentDate =
-                    new Date();
-
                 /* ================= FINAL ROWS ================= */
 
                 const finalRows = [];
 
                 let totalAdjustedNetTotal = 0;
+                let grandTotalUnits = 0;
 
-                /* =======================================================
-                   ARTIST / ARTIST PLUS
-                ======================================================= */
+                for (const group of groupedRoyalties.values()) {
 
-                if (
-                    planName === "artist" ||
-                    planName ===
-                    "artist plus"
-                ) {
+                    const filteredRoyalties = group.royalties;
 
-                    console.log(
-                        "🎤 Applying Artist Logic"
+                    const reportMonth = group.reportMonth;
+                    const reportYear = group.reportYear;
+
+                    console.log("=================================");
+                    console.log("Processing:", reportMonth, reportYear);
+                    console.log("Royalties:", filteredRoyalties.length);
+
+                    const totalEarnings = filteredRoyalties.reduce(
+                        (sum, royalty) => sum + Number(royalty.NetTotal || 0),
+                        0
                     );
 
-                    /* ================= ARTIST FEES ================= */
-
-                    const labelFeeData =
-                        await strapi.db
-                            .query(
-                                "api::label-fee-history.label-fee-history"
-                            )
-                            .findMany({
-                                where: {
-                                    users_permissions_user:
-                                        user.id,
-
-                                    effective_from: {
-                                        $lte: currentDate,
-                                    },
-                                },
-
-                                orderBy: {
-                                    effective_from:
-                                        "desc",
-                                },
-
-                                limit: 1,
-                            });
-
-                    const adminFeeData =
-                        await strapi.db
-                            .query(
-                                "api::admin-fee-history.admin-fee-history"
-                            )
-                            .findMany({
-                                where: {
-                                    users_permissions_user:
-                                        user.id,
-
-                                    effective_from: {
-                                        $lte: currentDate,
-                                    },
-                                },
-
-                                orderBy: {
-                                    effective_from:
-                                        "desc",
-                                },
-
-                                limit: 1,
-                            });
-
-                    let labelFee =
-                        labelFeeData[0]
-                            ?.feePercentage ??
-                        user.labelFee ??
-                        0;
-
-                    let adminFee =
-                        adminFeeData[0]
-                            ?.feePercentage ??
-                        user.adminFee ??
-                        0;
-
-                    console.log("💸 Artist Fees:", {
-                        labelFee,
-                        adminFee,
-                    });
-
-                    const labelFeeAmount =
-                        totalEarnings *
-                        labelFee /
-                        100;
-
-                    const afterLabel =
-                        totalEarnings -
-                        labelFeeAmount;
-
-                    const adminFeeAmount =
-                        afterLabel *
-                        adminFee /
-                        100;
-
-                    const finalAmount =
-                        afterLabel -
-                        adminFeeAmount;
-
-                    totalAdjustedNetTotal =
-                        finalAmount;
-
-                    console.log(
-                        "💰 Artist Calculations:",
-                        {
-                            totalEarnings,
-                            labelFeeAmount,
-                            adminFeeAmount,
-                            finalAmount,
-                        }
+                    const totalUnits = filteredRoyalties.reduce(
+                        (sum, royalty) => sum + Number(royalty.Units || 0),
+                        0
                     );
 
-                    for (const royalty of royalties) {
+                    grandTotalUnits += totalUnits;
 
-                        const royaltyNetTotal =
-                            Number(
-                                royalty.NetTotal || 0
-                            );
+                    const invoiceMonthEnd = new Date(
+                        reportYear,
+                        reportMonth - 1,
+                        new Date(reportYear, reportMonth, 0).getDate(),
+                        23,
+                        59,
+                        59,
+                        999
+                    );
 
-                        const ratio =
-                            totalEarnings > 0
-                                ? royaltyNetTotal /
-                                totalEarnings
-                                : 0;
+                    /* ================= DETERMINE PLAN ================= */
 
-                        const adjustedNetTotal =
-                            finalAmount * ratio;
+                    const invoiceMonthStart = new Date(
+                        reportYear,
+                        reportMonth - 1,
+                        1
+                    );
 
-                        finalRows.push({
-                            start_date:
-                                royalty.StartDate,
-
-                            end_date:
-                                royalty.EndDate,
-
-                            confirmation_report_date:
-                                royalty.ConfirmationReportDate,
-
-                            country:
-                                royalty.Country,
-
-                            units:
-                                royalty.Units,
-
-                            net_total:
-                                Number(
-                                    adjustedNetTotal.toFixed(
-                                        10
-                                    )
-                                ),
-
-                            channel:
-                                royalty.Platform,
-
-                            artist:
-                                royalty.Artist,
-
-                            release:
-                                royalty.ReleaseTitle,
-
-                            upc:
-                                royalty.UPC,
-
-                            track_title:
-                                royalty.TrackTitle,
-
-                            isrc:
-                                royalty.ISRC,
+                    /* ACTIVE SUBSCRIPTION */
+                    let activeSubscription = await strapi.db
+                        .query("api::user-subscription.user-subscription")
+                        .findOne({
+                            where: {
+                                users_permissions_user: user.id,
+                                startDate: {
+                                    $lte: invoiceMonthEnd,
+                                },
+                                endDate: {
+                                    $gte: invoiceMonthStart,
+                                },
+                            },
+                            populate: {
+                                plan: true,
+                            },
+                            orderBy: {
+                                startDate: "desc",
+                            },
                         });
+
+                    /* IF NO ACTIVE SUBSCRIPTION */
+                    if (!activeSubscription) {
+                        activeSubscription = await strapi.db
+                            .query("api::user-subscription.user-subscription")
+                            .findOne({
+                                where: {
+                                    users_permissions_user: user.id,
+                                    startDate: {
+                                        $lte: invoiceMonthEnd,
+                                    },
+                                },
+                                populate: {
+                                    plan: true,
+                                },
+                                orderBy: {
+                                    startDate: "desc",
+                                },
+                            });
                     }
 
-                    console.log(
-                        "✅ Artist rows processed:",
-                        finalRows.length
-                    );
-                }
+                    if (!activeSubscription) {
+                        return ctx.badRequest("No subscription found");
+                    }
 
-                /* =======================================================
-                   PRO LABEL
-                ======================================================= */
+                    if (!activeSubscription.plan?.isActive) {
+                        return ctx.badRequest("Plan inactive");
+                    }
 
-                else if (
-                    planName ===
-                    "pro label"
-                ) {
+                    let subscriptionToUse = activeSubscription;
 
-                    console.log(
-                        "🏢 Applying Pro Label Logic"
-                    );
+                    /* HANDLE UPGRADE LOGIC */
 
-                    /* ================= ENTERPRISE COMMISSION ================= */
+                    if (
+                        activeSubscription.subscriptionType === "upgrade" &&
+                        activeSubscription.upgradedAt
+                    ) {
+
+                        const upgradedAt = new Date(
+                            activeSubscription.upgradedAt
+                        );
+
+                        const upgradeMonth = upgradedAt.getMonth();
+                        const upgradeYear = upgradedAt.getFullYear();
+                        const upgradeDay = upgradedAt.getDate();
+
+                        const previousSubscription =
+                            await strapi.db
+                                .query("api::user-subscription.user-subscription")
+                                .findOne({
+                                    where: {
+                                        users_permissions_user: user.id,
+                                        startDate: {
+                                            $lt: activeSubscription.startDate,
+                                        },
+                                    },
+                                    populate: {
+                                        plan: true,
+                                    },
+                                    orderBy: {
+                                        startDate: "desc",
+                                    },
+                                });
+
+                        if (
+                            reportYear < upgradeYear ||
+                            (
+                                reportYear === upgradeYear &&
+                                reportMonth < upgradeMonth
+                            )
+                        ) {
+
+                            if (previousSubscription?.plan) {
+                                subscriptionToUse = previousSubscription;
+                            }
+
+                        } else if (
+                            reportYear === upgradeYear &&
+                            reportMonth === upgradeMonth
+                        ) {
+
+                            if (upgradeDay > 15 && previousSubscription?.plan) {
+                                subscriptionToUse = previousSubscription;
+                            }
+
+                        } else {
+
+                            subscriptionToUse = activeSubscription;
+                        }
+                    }
+
+                    const activePlan = subscriptionToUse.plan;
+
+                    const planName =
+                        activePlan?.name?.toLowerCase()?.trim();
+
+                    console.log("PLAN:", planName);
+                    console.log("Label Fee:", labelFee);
+                    console.log("Admin Fee:", adminFee);
+                    console.log("Enterprise Commission:", enterpriseCommission);
+
+                    /* ================= FETCH FEES ================= */
+
+                    const labelFeeData = await strapi.db
+                        .query("api::label-fee-history.label-fee-history")
+                        .findMany({
+                            where: {
+                                users_permissions_user: user.id,
+                                effective_from: {
+                                    $lte: invoiceMonthEnd,
+                                },
+                            },
+                            orderBy: {
+                                effective_from: "desc",
+                            },
+                            limit: 1,
+                        });
+
+                    const adminFeeData = await strapi.db
+                        .query("api::admin-fee-history.admin-fee-history")
+                        .findMany({
+                            where: {
+                                users_permissions_user: user.id,
+                                effective_from: {
+                                    $lte: invoiceMonthEnd,
+                                },
+                            },
+                            orderBy: {
+                                effective_from: "desc",
+                            },
+                            limit: 1,
+                        });
 
                     const enterpriseCommissionData =
                         await strapi.db
-                            .query(
-                                "api::enterprise-commission.enterprise-commission"
-                            )
+                            .query("api::enterprise-commission.enterprise-commission")
                             .findMany({
                                 where: {
-                                    users_permissions_user:
-                                        user.id,
-
+                                    users_permissions_user: user.id,
                                     effective_from: {
-                                        $lte: currentDate,
+                                        $lte: invoiceMonthEnd,
                                     },
                                 },
-
                                 orderBy: {
-                                    effective_from:
-                                        "desc",
+                                    effective_from: "desc",
                                 },
-
                                 limit: 1,
                             });
 
-                    const enterpriseCommission =
-                        enterpriseCommissionData[0]
-                            ?.commission_percentage ??
+                    const labelFee =
+                        labelFeeData[0]?.feePercentage ??
+                        user.labelFee ??
                         0;
 
-                    console.log(
-                        "🏢 Enterprise Commission:",
-                        enterpriseCommission
-                    );
+                    const adminFee =
+                        adminFeeData[0]?.feePercentage ??
+                        user.adminFee ??
+                        0;
 
-                    const isrcGroups = {};
+                    const enterpriseCommission =
+                        enterpriseCommissionData[0]
+                            ?.commission_percentage ?? 0;
 
-                    /* ================= GROUP BY ISRC ================= */
 
-                    for (const royalty of royalties) {
+                    /* =======================================================
+                       ARTIST / ARTIST PLUS
+                    ======================================================= */
 
-                        const isrc =
-                            royalty.ISRC ||
-                            "NO_ISRC";
+                    if (
+                        planName === "artist" ||
+                        planName === "artist plus"
+                    ) {
 
-                        if (
-                            !isrcGroups[isrc]
-                        ) {
-                            isrcGroups[isrc] =
-                                [];
-                        }
-
-                        isrcGroups[isrc].push(
-                            royalty
-                        );
-                    }
-
-                    console.log(
-                        "🎵 Total ISRC Groups:",
-                        Object.keys(
-                            isrcGroups
-                        ).length
-                    );
-
-                    /* ================= APPLY COMMISSION ================= */
-
-                    for (const isrc in isrcGroups) {
-
-                        const rows =
-                            isrcGroups[isrc];
-
-                        const isrcTotal =
-                            rows.reduce(
-                                (sum, row) =>
-                                    sum +
-                                    Number(
-                                        row.NetTotal ||
-                                        0
-                                    ),
-                                0
-                            );
-
-                        const commissionAmount =
-                            isrcTotal *
-                            enterpriseCommission /
-                            100;
-
-                        const adjustedTotal =
-                            isrcTotal -
-                            commissionAmount;
-
-                        totalAdjustedNetTotal +=
-                            adjustedTotal;
-
-                        console.log(
-                            "🎵 ISRC Processed:",
-                            {
-                                isrc,
-                                rows:
-                                    rows.length,
-                                isrcTotal,
-                                commissionAmount,
-                                adjustedTotal,
-                            }
+                        const labelFeeAmount = Number(
+                            (totalEarnings * labelFee / 100).toFixed(2)
                         );
 
-                        /* ================= REDISTRIBUTE ================= */
+                        const afterLabel = Number(
+                            (totalEarnings - labelFeeAmount).toFixed(2)
+                        );
 
-                        for (const royalty of rows) {
+                        const adminFeeAmount = Number(
+                            (afterLabel * adminFee / 100).toFixed(2)
+                        );
 
-                            const royaltyNetTotal =
-                                Number(
-                                    royalty.NetTotal ||
-                                    0
-                                );
+                        const finalAmount = Number(
+                            (afterLabel - adminFeeAmount).toFixed(2)
+                        );
+
+                        totalAdjustedNetTotal += finalAmount;
+
+                        for (const royalty of filteredRoyalties) {
+
+                            const royaltyNet = Number(royalty.NetTotal || 0);
 
                             const ratio =
-                                isrcTotal > 0
-                                    ? royaltyNetTotal /
-                                    isrcTotal
+                                totalEarnings > 0
+                                    ? royaltyNet / totalEarnings
                                     : 0;
 
-                            const adjustedNetTotal =
-                                adjustedTotal *
-                                ratio;
+                            const adjustedNet =
+                                Number((finalAmount * ratio).toFixed(10));
 
                             finalRows.push({
-                                start_date:
-                                    royalty.StartDate,
-
-                                end_date:
-                                    royalty.EndDate,
-
+                                report_month: royalty.reportMonth,
+                                report_year: royalty.reportYear,
                                 confirmation_report_date:
                                     royalty.ConfirmationReportDate,
-
-                                country:
-                                    royalty.Country,
-
-                                units:
-                                    royalty.Units,
-
-                                net_total:
-                                    Number(
-                                        adjustedNetTotal.toFixed(
-                                            10
-                                        )
-                                    ),
-
-                                channel:
-                                    royalty.Platform,
-
-                                artist:
-                                    royalty.Artist,
-
-                                release:
-                                    royalty.ReleaseTitle,
-
-                                upc:
-                                    royalty.UPC,
-
-                                track_title:
-                                    royalty.TrackTitle,
-
-                                isrc:
-                                    royalty.ISRC,
+                                country: royalty.Country,
+                                units: royalty.Units,
+                                net_total: adjustedNet,
+                                channel: royalty.Platform,
+                                artist: royalty.Artist,
+                                release: royalty.ReleaseTitle,
+                                upc: royalty.UPC,
+                                track_title: royalty.TrackTitle,
+                                isrc: royalty.ISRC,
                             });
                         }
                     }
+                    /* =======================================================
+                       PRO LABEL
+                    ======================================================= */
 
-                    console.log(
-                        "✅ Pro Label rows processed:",
-                        finalRows.length
-                    );
+                    else if (planName === "pro label") {
+
+                        const isrcGroups = {};
+
+                        for (const royalty of filteredRoyalties) {
+
+                            const isrc =
+                                royalty.ISRC ||
+                                royalty.isrc ||
+                                "NO_ISRC";
+
+                            if (!isrcGroups[isrc]) {
+                                isrcGroups[isrc] = [];
+                            }
+
+                            isrcGroups[isrc].push(royalty);
+                        }
+
+                        let monthAdjustedTotal = 0;
+
+                        for (const isrc in isrcGroups) {
+
+                            const rows = isrcGroups[isrc];
+
+                            const songTotal = rows.reduce(
+                                (sum, row) =>
+                                    sum + Number(row.NetTotal || 0),
+                                0
+                            );
+
+                            const commissionAmount = Number(
+                                (
+                                    songTotal *
+                                    enterpriseCommission /
+                                    100
+                                ).toFixed(2)
+                            );
+
+                            const payableAmount = Number(
+                                (
+                                    songTotal -
+                                    commissionAmount
+                                ).toFixed(2)
+                            );
+
+                            monthAdjustedTotal += payableAmount;
+
+                            for (const royalty of rows) {
+
+                                const royaltyNet = Number(
+                                    royalty.NetTotal || 0
+                                );
+
+                                const ratio =
+                                    songTotal > 0
+                                        ? royaltyNet / songTotal
+                                        : 0;
+
+                                const adjustedNet =
+                                    Number((payableAmount * ratio).toFixed(10));
+
+                                finalRows.push({
+                                    report_month: royalty.reportMonth,
+                                    report_year: royalty.reportYear,
+                                    confirmation_report_date:
+                                        royalty.ConfirmationReportDate,
+                                    country: royalty.Country,
+                                    units: royalty.Units,
+                                    net_total: adjustedNet,
+                                    channel: royalty.Platform,
+                                    artist: royalty.Artist,
+                                    release: royalty.ReleaseTitle,
+                                    upc: royalty.UPC,
+                                    track_title: royalty.TrackTitle,
+                                    isrc: royalty.ISRC,
+                                });
+                            }
+                        }
+
+                        totalAdjustedNetTotal += monthAdjustedTotal;
+                    }
+
                 }
+
+                console.log("=================================");
+                console.log("Grand Units:", grandTotalUnits);
+                console.log("Adjusted Total:", totalAdjustedNetTotal);
+                console.log("=================================");
 
                 /* ================= GLOBAL UNIT PRICE ================= */
 
                 const perUnitPrice =
-                    totalUnits > 0
+                    grandTotalUnits > 0
                         ? totalAdjustedNetTotal /
-                        totalUnits
+                        grandTotalUnits
                         : 0;
 
                 console.log(
@@ -654,11 +598,9 @@ module.exports = createCoreService(
                 const csvRows =
                     finalRows.map(
                         (row) => ({
-                            start_date:
-                                row.start_date,
+                            report_month: row.report_month,
 
-                            end_date:
-                                row.end_date,
+                            report_year: row.report_year,
 
                             confirmation_report_date:
                                 row.confirmation_report_date,
@@ -713,8 +655,8 @@ module.exports = createCoreService(
                 const parser =
                     new Parser({
                         fields: [
-                            "start_date",
-                            "end_date",
+                            "report_month",
+                            "report_year",
                             "confirmation_report_date",
                             "country",
                             "units",
