@@ -363,11 +363,6 @@ module.exports = createCoreService(
                     const planName =
                         activePlan?.name?.toLowerCase()?.trim();
 
-                    console.log("PLAN:", planName);
-                    console.log("Label Fee:", labelFee);
-                    console.log("Admin Fee:", adminFee);
-                    console.log("Enterprise Commission:", enterpriseCommission);
-
                     /* ================= FETCH FEES ================= */
 
                     const labelFeeData = await strapi.db
@@ -430,7 +425,10 @@ module.exports = createCoreService(
                         enterpriseCommissionData[0]
                             ?.commission_percentage ?? 0;
 
-
+                    console.log("PLAN:", planName);
+                    console.log("Label Fee:", labelFee);
+                    console.log("Admin Fee:", adminFee);
+                    console.log("Enterprise Commission:", enterpriseCommission);
                     /* =======================================================
                        ARTIST / ARTIST PLUS
                     ======================================================= */
