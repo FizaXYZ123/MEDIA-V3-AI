@@ -471,8 +471,7 @@ module.exports = createCoreService(
                             finalRows.push({
                                 report_month: royalty.reportMonth,
                                 report_year: royalty.reportYear,
-                                confirmation_report_date:
-                                    royalty.ConfirmationReportDate,
+                                
                                 country: royalty.Country,
                                 units: royalty.Units,
                                 net_total: adjustedNet,
@@ -553,8 +552,7 @@ module.exports = createCoreService(
                                 finalRows.push({
                                     report_month: royalty.reportMonth,
                                     report_year: royalty.reportYear,
-                                    confirmation_report_date:
-                                        royalty.ConfirmationReportDate,
+                                    
                                     country: royalty.Country,
                                     units: royalty.Units,
                                     net_total: adjustedNet,
@@ -600,8 +598,7 @@ module.exports = createCoreService(
 
                             report_year: row.report_year,
 
-                            confirmation_report_date:
-                                row.confirmation_report_date,
+                            
 
                             country:
                                 row.country,
@@ -655,7 +652,6 @@ module.exports = createCoreService(
                         fields: [
                             "report_month",
                             "report_year",
-                            "confirmation_report_date",
                             "country",
                             "units",
                             "unit_price",
