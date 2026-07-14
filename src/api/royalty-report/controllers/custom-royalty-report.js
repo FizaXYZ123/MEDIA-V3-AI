@@ -1,45 +1,5 @@
 "use strict";
 
-function splitUnitsByMonths(startDate, endDate, units) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const totalDays =
-    Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-  if (totalDays <= 0) return [];
-
-  const dailyUnits = Number(units || 0) / totalDays;
-
-  const result = [];
-
-  let current = new Date(start);
-
-  while (current <= end) {
-    const year = current.getFullYear();
-    const month = current.getMonth();
-
-    const monthEnd = new Date(year, month + 1, 0);
-
-    const periodEnd = monthEnd < end ? monthEnd : end;
-
-    const days =
-      Math.floor(
-        (periodEnd - current) / (1000 * 60 * 60 * 24)
-      ) + 1;
-
-    result.push({
-      year,
-      month: month + 1,
-      units: dailyUnits * days,
-    });
-
-    current = new Date(periodEnd);
-    current.setDate(current.getDate() + 1);
-  }
-
-  return result;
-}
 module.exports = {
 
   async importReport(ctx) {
@@ -443,12 +403,13 @@ module.exports = {
             "ISRC",
             "Platform",
             "Units",
-            "StartDate",
-            "EndDate",
+            "reportMonth",
+            "reportYear",
           ],
-          orderBy: {
-            EndDate: "desc",
-          },
+          orderBy: [
+            { reportYear: "desc" },
+            { reportMonth: "desc" },
+          ],
         });
 
       if (!royalties.length) {
@@ -459,28 +420,22 @@ module.exports = {
         });
       }
 
-      /* 5️⃣ SPLIT UNITS BY MONTH */
+      /* 5️⃣ GROUP BY REPORT MONTH */
 
       const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const allocations = splitUnitsByMonths(
-          royalty.StartDate,
-          royalty.EndDate,
-          royalty.Units
-        );
+        if (!royalty.reportMonth || !royalty.reportYear) return;
 
-        allocations.forEach((allocation) => {
-          const key = `${allocation.year}-${allocation.month}`;
+        const key = `${royalty.reportYear}-${royalty.reportMonth}`;
 
-          if (!monthMap.has(key)) {
-            monthMap.set(key, []);
-          }
+        if (!monthMap.has(key)) {
+          monthMap.set(key, []);
+        }
 
-          monthMap.get(key).push({
-            Platform: royalty.Platform,
-            Units: allocation.units,
-          });
+        monthMap.get(key).push({
+          Platform: royalty.Platform,
+          Units: Number(royalty.Units || 0),
         });
       });
 
@@ -605,12 +560,13 @@ module.exports = {
           select: [
             "Country",
             "Units",
-            "StartDate",
-            "EndDate",
+            "reportMonth",
+            "reportYear",
           ],
-          orderBy: {
-            EndDate: "desc",
-          },
+          orderBy: [
+            { reportYear: "desc" },
+            { reportMonth: "desc" },
+          ],
         });
 
       if (!royalties.length) {
@@ -621,31 +577,24 @@ module.exports = {
         });
       }
 
-      /* ================= SPLIT UNITS BY MONTH ================= */
+      /* ================= GROUP BY REPORT MONTH ================= */
 
       const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const allocations = splitUnitsByMonths(
-          royalty.StartDate,
-          royalty.EndDate,
-          royalty.Units
-        );
+        if (!royalty.reportMonth || !royalty.reportYear) return;
 
-        allocations.forEach((allocation) => {
-          const key = `${allocation.year}-${allocation.month}`;
+        const key = `${royalty.reportYear}-${royalty.reportMonth}`;
 
-          if (!monthMap.has(key)) {
-            monthMap.set(key, []);
-          }
+        if (!monthMap.has(key)) {
+          monthMap.set(key, []);
+        }
 
-          monthMap.get(key).push({
-            Country: royalty.Country,
-            Units: allocation.units,
-          });
+        monthMap.get(key).push({
+          Country: royalty.Country,
+          Units: Number(royalty.Units || 0),
         });
       });
-
       /* ================= TAKE LATEST MONTHS ================= */
 
       const selectedRoyalties = [...monthMap.entries()]
@@ -764,8 +713,8 @@ module.exports = {
           },
           select: [
             "Units",
-            "StartDate",
-            "EndDate",
+            "reportMonth",
+            "reportYear",
           ],
         });
 
@@ -776,31 +725,30 @@ module.exports = {
         });
       }
 
-      /* ================= GROUP STREAMS BY MONTH ================= */
 
+      /* ================= GROUP STREAMS BY MONTH ================= */
       const monthMap = new Map();
 
       royalties.forEach((royalty) => {
-        const allocations = splitUnitsByMonths(
-          royalty.StartDate,
-          royalty.EndDate,
-          royalty.Units
-        );
+        if (!royalty.reportMonth || !royalty.reportYear) {
+          return;
+        }
 
-        allocations.forEach((allocation) => {
-          const key = `${allocation.year}-${allocation.month}`;
+        const key = `${royalty.reportYear}-${royalty.reportMonth}`;
 
-          if (!monthMap.has(key)) {
-            monthMap.set(key, {
-              date: new Date(allocation.year, allocation.month - 1, 1),
-              totalStreams: 0,
-            });
-          }
+        if (!monthMap.has(key)) {
+          monthMap.set(key, {
+            date: new Date(
+              royalty.reportYear,
+              royalty.reportMonth - 1,
+              1
+            ),
+            totalStreams: 0,
+          });
+        }
 
-          monthMap.get(key).totalStreams += allocation.units;
-        });
+        monthMap.get(key).totalStreams += Number(royalty.Units || 0);
       });
-
       /* ================= CHART ================= */
 
       const chart = [...monthMap.values()]
